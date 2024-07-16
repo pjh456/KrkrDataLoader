@@ -1,15 +1,32 @@
 import json
 import os
 
+class Select:
+    def __init__(self,data=dict()):
+        self.text = data['text']
+        self.location = data['storage']
+        self.target = data['target']
+    
 class Scene:
-    def __init__(self,name,location,data = dict()):
+    def __init__(self,name,location,data=dict()):
         self.name = name
         self.location = location
-        self.data = data
-        self.selection = 'selects' in data
+        self.title = data['title']
+        self.__data = data
+        self.isselect = 'selects' in data
         
-    def goto(self):
-        return None if self.selection else [item['target'] for item in self.data['nexts']]
+        self.__selection = []
+        for data in data['selects']:
+            new_select = Select(data)
+            self.__selection.append(new_select)
+            
+        self.target = [item['target'] for item in (data['selects'] if self.isselect else data['nexts'])]
+        
+    @property
+    def selects(self):
+        if not self.isselect:
+            raise TypeError('Not a selection.')
+        return self.__selection
     
     def __str__(self):
         return self.name
@@ -32,10 +49,10 @@ class Scenes:
         for index,data in enumerate(self.scenes):
             self.index[data.name] = index
     
-    def _getIndexByName(self,name):
+    def getIndexByName(self,name):
         return self.index[self.scenes[self.index[name]]['label']]
     
-    def _getNameByIndex(self,index):
+    def getNameByIndex(self,index):
         return self.scenes[index]['label']
 
     def __getitem__(self,index):

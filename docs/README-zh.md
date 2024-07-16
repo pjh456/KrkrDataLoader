@@ -1,105 +1,127 @@
 # KrkrDataLoader
-一个尚未完成的项目，用于简便地处理Krkr引擎解包出来的剧情文件
 
-未来也许会有一些功能上的扩展，都是我现在已经实现，但是接口太丑陋的东西。
+一个尚未完成的项目，旨在方便地处理从 Krkr 引擎提取的剧情文件。
 
-## 主要功能：
+未来的扩展可能包括已经实现但目前界面不太友好的附加功能。
+
+## 主要功能
 
 ### 将 ``.ks.scn`` 格式文件批量处理为 ``.ks.json`` 格式文件
 
-用到了解包工具 [FreeMoteToolkit](../src/FreeMoteToolkit)，加了点 ``subprocess`` 的部分用于自动化处理文件，而不必一个个手动拖拽解包。
+使用解包工具 [FreeMoteToolkit](../src/FreeMoteToolkit)，辅以 ``subprocess`` 功能，实现文件处理自动化，无需逐一手动拖放解包。
 
-###### 实际上已经有一个写好的版本了，但是当时没想过开源，所以就写得很难维护。实际上都是些简单的东西，只不过把重复劳动的过程简化了而已。等我啥时候把它改得易维护之后就端上来。
+###### 实际上已存在一个可运行的版本，但最初并未计划开源，导致代码难以维护。本质上，它简化了重复性工作。我打算重构代码以提高可维护性，并在准备就绪后发布。
 
-### 将 ``.ks.json`` 格式文件的内容转化为对象，以实现对其内容的高效处理
+### 通过将 ``.ks.json`` 格式文件转换为对象结构，实现内容的有效处理。
 
 
-其他功能火热实现中。
+其他功能正在积极开发中。
 
-###### 已经在写了，只不过功能上还有什么可以简化的部分我还在想，所以可能可用版本的推出会稍微晚点。
+###### 我正在创建它们，但在考虑进一步简化，这可能推迟更精炼版本的发布。
 
 ## 安装方法
 
-将整个文件夹下载下来，引用 [src.tools](../src/tools) 里的库按照使用方法进行调用即可
-
-都是些没啥技术含量的东西，只不过省去了读文档结构和手动写解包脚本的步骤罢了。
+下载整个文件夹，按照使用说明引用 [src.tools](../src/tools) 中的库。这些都是简单的实用程序，避免了手动编写解包脚本的繁琐工作。
 
 ## 使用方法
 
-### 配置文件
+### **配置文件**
 
-在旧版本中用于寻找 [FreeMoteToolkit](../src/FreeMoteToolkit) 的路径。
+在早期版本中，用于定位 [FreeMoteToolkit](../src/FreeMoteToolkit) 的路径。
 
-不过现在已经可以基于文件架构进行自动配置了，所以暂时废弃。
+但现在支持基于项目结构的自动配置，使此功能暂时废弃。
 
-###### 未来实现音频处理的时候可能会附带ffmpeg，因此可能会用到。
+###### 未来实现音频处理时，可能会再次涉及 ``ffmpeg``。
 
-### 剧本解包
+### **剧本解包**
 
-在 [DecompileTool.py](../src/tools/DecompileTool.py) 中提供了一个类 ``Decompiler`` 用于自动化解包。
+[DecompileTool.py](../src/tools/DecompileTool.py) 中的 ``Decompiler`` 类用于自动化解包
 
-你可以使用以下方法对 ``Decompiler`` 进行调用：
-~~~py
+您可以像这样实例化和调用 ``Decompiler``：
+~~~python
 from tools.DecompileTool import Decompiler
 d = Decompiler()
 ~~~
-其中 ``Decompiler`` 的初始化包括一个参数 ``path``，用于获取 [FreeMoteToolkit](../src/FreeMoteToolkit) 的路径，如果不填则为默认项目路径（可正常使用）。
+
+``Decompiler`` 具有可选的 ``path`` 参数，用于指定 [FreeMoteToolkit](../src/FreeMoteToolkit) 的路径；如果省略，它将默认为项目路径（这可以正常工作）。
 
 你可以使用 ``Decompiler.decompile(path)`` 对一个路径为 ``path`` 的 ``.ks.scn`` 格式文件进行解包：
-~~~py
+~~~python
 from tools.DecompileTool import Decompiler
 d = Decompiler()
 d.decompile("D:\\senrenbanka\\outPath\\data.xp3\\scn\\001・アーサー王ver1.07.ks.scn")
 ~~~
 
 同理，你可以使用 ``Decompiler.decompile_all(path)`` 对一个路径为 ``path`` 的文件夹内所有的 ``.ks.scn`` 格式文件进行解包：
-~~~py
+~~~python
 from tools.DecompileTool import Decompiler
 d = Decompiler()
 d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 ~~~
 
-详细的使用例放在 [DecompileExample.py](../examples/DecompileExample.py) 中了。
+详细示例，请参见 [DecompileExample.py](../examples/DecompileExample.py)。
 
-### 剧情读取
+### **剧情读取**
 
-在 [ScnLoader.py](../src/tools/ScnLoader.py) 中提供了两个类 ``Scene`` 和 ``Scenes``用于自动化数据获取。
+[ScnLoader.py](../src/tools/ScnLoader.py) 中的 ``Select``、``Scene`` 和 ``Scenes``类用于自动化数据检索。
+
+#### ``Select``
+
+代表选择中的特定选项。
+
+具有 ``Select.text`` 和 ``Select.target`` 属性，分别指示选项的文本和它引导的后续剧情
 
 #### ``Scene``
 
-每一幕的剧情在源文件中被分隔开来，以便于实现选择支的切换和场景的跳转。
+剧情片段被分离，以实现选择和场景过渡之间的切换。
 
-包含了剧情和选择支两种类型的部分，以 ``Scene.selection`` 来区分。``Scene.selection=True`` 则为选择支，``Scene.selection=False`` 则为剧情。
+它包含剧情和选择两部分内容，通过 ``Scene.isselect`` 属性区分。``Scene.isselect=True`` 表示选择，``Scene.isselect=False`` 表示剧情内容。
 
-提供了一个接口 ``Scene.goto()`` 来获取下一个场景，若该场景为选择支，则其不包含
+它提供了 ``Scene.target`` 属性来获取下一个场景。若该场景为选择支，则其返回值为所有选项所指向的每一个场景。返回值均为 ``list``。
+
+提供了一个属性 ``Scene.selects`` 来获取该场景的所有选择支，其返回值为一个由 ``Select`` 类对象组成的 ``list``。
+
+提供了一个属性 ``Scene.title`` 来标识每个文件对应的剧情标题。
 
 #### ``Scenes``
 
-一整个 ``.ks.json`` 格式文件。为了方便各幕之间的管理，我将每一幕单独丢进类里套娃实现了。
+表示整个 ``.ks.json`` 格式文件。为了高效管理各个片段，我将每个片段嵌套在类结构中。
 
-详细的使用例放在 [ScnLoaderexample.py](../examples/ScnLoaderExample.py) 中了。
+您可以使用 ``Scenes[]`` 访问单个 ``Scene`` 实例，且 ``Scenes`` 支持迭代。
+
+使用 ``Scenes.getIndexByName`` 获取对应 ``Scene.name`` 的索引，以及 ``Scene.getNameByIndex`` 根据给定索引检索  ``Scene.name``。
+
+详细示例，请参见 [ScnLoaderexample.py](../examples/ScnLoaderExample.py) 中了。
 
 ## 开源动机(?)
 
-解包 Krkr2 引擎游戏的剧情、拿音频去练模型的时候遇到了些麻烦，浪费了许多时间在写这些神秘脚本上。
+在解包使用 Krkr2 引擎的游戏剧情和用音频训练模型时遇到一些困难，浪费了大量时间在这些神秘的脚本上。
 
-抱着前人种树后人乘凉的想法先把这个实现了，万一哪天被人刨坟也欢迎 pull。
+本着“前人栽树，后人乘凉”的精神，我决定实施这一解决方案。
+
+万一将来有人发现它，欢迎贡献。
 
 Ciallo～(∠・ω< )⌒☆
 
 ## 未来可能实现
 
 ### 长音频剧本合成
-把一整个文件的剧情合成为一个长音频（改进后也许含背景音乐？），用于当广播剧听之类的，省去了许多社死的可能性(?)。
+将整个文件的剧本合并为一个长音频文件（未来改进或许包含背景音乐），用于像听广播剧一样收听，避免许多尴尬时刻。 
 
-这个是我现在正在实现的，不过对于哑巴角色和旁白的语音还在考虑要不要用 TTS 实现，开销稍微有点大。
+这正在开发中，但我仍在权衡是否为无声角色和旁白使用文本转语音 (TTS)，这可能比较耗费资源。
 
-### 对于新引擎加密的解密
+### 新引擎加密的解密
 
-新作用的加密方式不同，导致 Krkrextract 没办法正常解包，必须得靠 KrkrzExtract/KrkrDump/KrkrPatch 等工具读取的同时解包文件。
+引擎采用的新加密方法阻止了 ``Krkrextract`` 的正常解包，需要 ``KrkrzExtract`` ``KrkrDump`` ``KrkrPatch`` 等工具进行同步读取和解包。
 
-这样子不仅麻烦，文件还没办法像之前一样被分好类。而后两个工具更是无法解包音频文件。
+这使文件分类和音频解包变得复杂。 我正在学习逆向工程，一旦熟练，我打算升级解包工具。
 
-正在学习逆向工程，万一哪天开窍了就上手把解包工具升级一下。
+敬请期待……但不会很快。
 
-Comming not soon......
+## 后记
+
+在版本 ``1.0.1`` 中，我使用 ``qwen2.5`` 更新了原来比较口语化的 ``README`` 中英文文档。
+
+如果你发现新版本文档中具有解释上的错误，可以查找 ``1.0.0`` 版本文档。
+
+###### 一切责任不在我，锅交给通义千问背。
