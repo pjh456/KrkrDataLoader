@@ -14,34 +14,34 @@ class Scene:
     def __str__(self):
         return self.name
 
-class Datas:
+class Scenes:
     def __init__(self,path):
         self.path = path
         
-        datas = json.load(open(path,'r',encoding='utf-8'))
-        self.hash = datas['hash']
-        self.name = datas['name']
-        self.outlines = datas['outlines']
+        scenes = json.load(open(path,'r',encoding='utf-8'))
+        self.hash = scenes['hash']
+        self.name = scenes['name']
+        self.outlines = scenes['outlines']
         
-        self.datas = []
-        for data in datas['scenes']:
+        self.scenes = []
+        for data in scenes['scenes']:
             new_scene = Scene(data['label'],self.name,data)
-            self.datas.append(new_scene)
+            self.scenes.append(new_scene)
         
         self.index = {}
-        for index,data in enumerate(self.datas):
+        for index,data in enumerate(self.scenes):
             self.index[data.name] = index
     
     def _getIndexByName(self,name):
-        return self.index[self.datas[self.index[name]]['label']]
+        return self.index[self.scenes[self.index[name]]['label']]
     
     def _getNameByIndex(self,index):
-        return self.datas[index]['label']
+        return self.scenes[index]['label']
 
     def __getitem__(self,index):
-        return self.datas[index]
+        return self.scenes[index]
     
     def __len__(self):
-        return len(self.datas)
+        return len(self.scenes)
     
     

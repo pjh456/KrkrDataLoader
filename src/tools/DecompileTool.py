@@ -3,14 +3,13 @@ import subprocess
 import os
 import sys
 
-from .ConstParams import FreeMoteToolkitPath, DecompilePath
-
-def init():
-    tools_dir = os.path.abspath(__file__)
-    sys.path.append(tools_dir)
 
 class Decompiler:
-    def __init__(self,path=os.path.join(FreeMoteToolkitPath,'PsbDecompile.exe')):
+    def __init__(self,path=None):
+        FreeMoteToolkitPath = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'FreeMoteToolkit')
+        print(FreeMoteToolkitPath)
+        if path == None:
+            path = os.path.join(FreeMoteToolkitPath,'PsbDecompile.exe')
         self.decompiler_path = path
         
     def decompile(self,file_path):
