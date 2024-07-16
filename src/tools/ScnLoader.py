@@ -1,5 +1,7 @@
 import json
 import os
+import re
+import io
 
 class Select:
     def __init__(self,data=dict()):
@@ -7,19 +9,29 @@ class Select:
         self.location = data['storage']
         self.target = data['target']
     
+    def __str__(self):
+        return self.text
+    
 class Scene:
     def __init__(self,name,location,data=dict()):
-        self.name = name
-        self.location = location
+        self.name = name.replace('*','').replace(':','-')
+        self.__location = location
         self.title = data['title']
-        self.__data = data
+        self.texts = None
+        try:
+            self.texts = data['texts']
+        except KeyError:
+            pass
         self.isselect = 'selects' in data
         
         self.__selection = []
-        for data in data['selects']:
-            new_select = Select(data)
-            self.__selection.append(new_select)
-            
+        if self.isselect:
+            for single_data in data['selects']:
+                new_select = Select(single_data)
+                self.__selection.append(new_select)
+        
+        #if self.isselect:
+            #print(data)
         self.target = [item['target'] for item in (data['selects'] if self.isselect else data['nexts'])]
         
     @property
@@ -28,6 +40,63 @@ class Scene:
             raise TypeError('Not a selection.')
         return self.__selection
     
+    def exposeTextWithFilter(self,filter=None,output_file=None,watch_output=False):
+        if filter == None:
+            filter = [r'%[^;]*;',
+               r'\[[^\]]*\]',
+               r'\\n']
+        datas = None
+        try:
+            datas = self.texts
+        except KeyError:
+            print(f"No texts in {self.__location}/{self.name},pass.")
+            return 
+        
+        outputs_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'outputs')
+        close_mark = output_file is None
+        if output_file is None:
+            output_folder = os.path.join(outputs_path,f'{self.__location}')
+            if not os.path.exists(output_folder):
+                os.makedirs(output_folder)
+            output_file = open(os.path.join(output_folder,f'{self.name}'+'.txt'),'w+',encoding='utf-8')
+        
+        if not isinstance(output_file,io.IOBase):
+            raise TypeError('File type error!')
+        
+        if watch_output:
+            print(f'【{self.name}】')
+        output_file.write(f'【{self.name}】'+'\n')
+        for data in datas:
+            name = data[0]
+            content = data[2]
+            for rule in filter:
+                content = re.sub(rule,'',content)
+            if data[0] is not None:
+                if watch_output:
+                    print(f'【{name}】'+':'+content)
+                output_file.write(f'【{name}】'+':'+content+'\n')
+            else:
+                if watch_output:
+                    print(content)
+                output_file.write(content+'\n')
+        if self.isselect:
+            for select in self.__selection:
+                if watch_output:
+                    print(f'【{select.name}】->【{select.target}】')
+                output_file.write(f'【{select.name}】->【{select.target}】'+'\n')
+        else:
+            for target in self.target:
+                if watch_output:
+                    print(f'【{target}】')
+                output_file.write(f'【{target}】'+'\n')
+        if watch_output:
+            print('')
+        output_file.write('\n')
+        
+        if close_mark:
+            output_file.close()
+        
+
     def __str__(self):
         return self.name
 
@@ -55,6 +124,24 @@ class Scenes:
     def getNameByIndex(self,index):
         return self.scenes[index]['label']
 
+    def exposeTextWithFilter(self,filter=None,output_path=None,watch_output=False):
+        outputs_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'outputs')
+        output_file = None
+        
+        if output_path is None:
+            output_folder = os.path.join(outputs_path,f'{self.name}')
+            if not os.path.exists(output_folder):
+                os.makedirs(output_folder)
+            output_file = open(os.path.join(output_folder,f'{self.name}'+'.txt'),'w+',encoding='utf-8')
+        else:
+            output_file = open(output_path,'w+',encoding='utf-8')
+            
+        for scene in self.scenes:
+            if scene.texts is not None:
+                scene.exposeTextWithFilter(filter,output_file,watch_output)
+                
+        output_file.close()
+    
     def __getitem__(self,index):
         return self.scenes[index]
     

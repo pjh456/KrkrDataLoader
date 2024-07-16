@@ -83,6 +83,8 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 提供了一个属性 ``Scene.title`` 来标识每个文件对应的剧情标题。
 
+使用 ``Scene.exposeTextWithFilter(filter,output_file,watch_output)`` 导出某一个场景的剧情文本。其中 ``filter`` 为一个由正则表达式组成的 ``list``，用于过滤一些特殊符号；``output_file`` 为导出文件 **（非路径，以 ``_io.TextIOWrapper``，即 ``open()`` 返回格式为指定格式）**，如果省略，则会在 src/outputs/文件名 下生成一个与该场景同名、以 ``.txt`` 结尾的文本文件；``watch_output`` 为测试选项，默认为 ``False``，若参数为 ``True`` 则会在命令行同步输出导出文件的内容以供测试。若该场景无文本，则会在命令行输出提示。
+
 #### ``Scenes``
 
 表示整个 ``.ks.json`` 格式文件。为了高效管理各个片段，我将每个片段嵌套在类结构中。
@@ -90,6 +92,8 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 您可以使用 ``Scenes[]`` 访问单个 ``Scene`` 实例，且 ``Scenes`` 支持迭代。
 
 使用 ``Scenes.getIndexByName`` 获取对应 ``Scene.name`` 的索引，以及 ``Scene.getNameByIndex`` 根据给定索引检索  ``Scene.name``。
+
+使用 ``Scenes.exposeTextWithFilter(filter,output_path,watch_output)`` 导出整个文件文本。其中 ``filter`` 为一个由正则表达式组成的 ``list``，用于过滤一些特殊符号；``output_path`` 为导出文件路径，如果省略，则会在 src/outputs/文件名 下生成一个与该文件同名、以 ``.ks.txt`` 结尾的文本文件；``watch_output`` 为测试选项，默认为 ``False``，若参数为 ``True`` 则会在命令行同步输出导出文件的内容以供测试。
 
 详细示例，请参见 [ScnLoaderexample.py](../examples/ScnLoaderExample.py) 中了。
 
