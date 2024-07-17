@@ -77,11 +77,13 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 它包含剧情和选择两部分内容，通过 ``Scene.isselect`` 属性区分。``Scene.isselect=True`` 表示选择，``Scene.isselect=False`` 表示剧情内容。
 
-它提供了 ``Scene.target`` 属性来获取下一个场景。若该场景为选择支，则其返回值为所有选项所指向的每一个场景。返回值均为 ``list``。
+它提供了 ``Scene.target`` 属性来获取下一个场景。若该场景为选择支，则其返回值为所有选项所指向的每一个场景。返回一个由 ``Scene`` 类对象组成的 ``list``。
 
 提供了一个属性 ``Scene.selects`` 来获取该场景的所有选择支，其返回值为一个由 ``Select`` 类对象组成的 ``list``。
 
-提供了一个属性 ``Scene.title`` 来标识每个文件对应的剧情标题。
+提供了一个属性 ``Scene.title`` 来标识每个文件对应的剧情标题（目前跨文件尚不可用）。
+
+提供了一个属性 ``Scene.fixname`` 作为每个场景的唯一标识符。
 
 使用 ``Scene.exposeTextWithFilter(filter,output_file,watch_output)`` 导出某一个场景的剧情文本。其中 ``filter`` 为一个由正则表达式组成的 ``list``，用于过滤一些特殊符号；``output_file`` 为导出文件 **（非路径，以 ``_io.TextIOWrapper``，即 ``open()`` 返回格式为指定格式）**，如果省略，则会在 src/outputs/文件名 下生成一个与该场景同名、以 ``.txt`` 结尾的文本文件；``watch_output`` 为测试选项，默认为 ``False``，若参数为 ``True`` 则会在命令行同步输出导出文件的内容以供测试。若该场景无文本，则会在命令行输出提示。
 

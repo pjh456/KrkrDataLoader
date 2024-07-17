@@ -12,11 +12,18 @@ class Select:
     def __str__(self):
         return self.text
     
+class Setting:
+    def __init__(self):
+        pass
+    
 class Scene:
     def __init__(self,name,location,data=dict()):
-        self.name = name.replace('*','').replace(':','-')
+        self._name = name
         self.__location = location
-        self.title = data['title']
+        try:
+            self.title = data['title']
+        except KeyError:
+            pass
         self.texts = None
         try:
             self.texts = data['texts']
@@ -32,13 +39,21 @@ class Scene:
         
         #if self.isselect:
             #print(data)
-        self.target = [item['target'] for item in (data['selects'] if self.isselect else data['nexts'])]
+        try:
+            self.target = [(item['target'],item['storage']) for item in (data['selects'] if self.isselect else data['nexts'])]
+        except KeyError:
+            pass
         
     @property
     def selects(self):
         if not self.isselect:
             raise TypeError('Not a selection.')
         return self.__selection
+    
+    @property
+    def fixname(self):
+        fixname = self._name.replace('*','').replace(':','-')
+        return fixname
     
     def exposeTextWithFilter(self,filter=None,output_file=None,watch_output=False):
         if filter == None:
@@ -49,7 +64,7 @@ class Scene:
         try:
             datas = self.texts
         except KeyError:
-            print(f"No texts in {self.__location}/{self.name},pass.")
+            print(f"No texts in {self.__location}/{self._name},pass.")
             return 
         
         outputs_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'outputs')
@@ -58,14 +73,15 @@ class Scene:
             output_folder = os.path.join(outputs_path,f'{self.__location}')
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
-            output_file = open(os.path.join(output_folder,f'{self.name}'+'.txt'),'w+',encoding='utf-8')
+            output_file = open(os.path.join(output_folder,f'{self.fixname}'+'.txt'),'w+',encoding='utf-8')
         
         if not isinstance(output_file,io.IOBase):
             raise TypeError('File type error!')
         
         if watch_output:
-            print(f'【{self.name}】')
-        output_file.write(f'【{self.name}】'+'\n')
+            print(f'【{self.fixname}】')
+        output_file.write(f'【{self.fixname}】'+'\n')
+        
         for data in datas:
             name = data[0]
             content = data[2]
@@ -79,6 +95,7 @@ class Scene:
                 if watch_output:
                     print(content)
                 output_file.write(content+'\n')
+                
         if self.isselect:
             for select in self.__selection:
                 if watch_output:
@@ -96,9 +113,8 @@ class Scene:
         if close_mark:
             output_file.close()
         
-
     def __str__(self):
-        return self.name
+        return self.fixname
 
 class Scenes:
     def __init__(self,path):
@@ -116,7 +132,20 @@ class Scenes:
         
         self.index = {}
         for index,data in enumerate(self.scenes):
-            self.index[data.name] = index
+            self.index[data._name] = index
+            
+        # Make targets as Scene class
+        for scene in self.scenes:
+            cache_target = scene.target
+            scene.target = []
+            for name,storage in cache_target:
+                try:
+                    scene.target.append(self.scenes[self.index[name]])
+                except KeyError:
+                    new_target = Scene(name,storage,{})
+                    scene.target.append(new_target)
+                except Exception as e:
+                    print(e)
     
     def getIndexByName(self,name):
         return self.index[self.scenes[self.index[name]]['label']]

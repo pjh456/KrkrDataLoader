@@ -1,4 +1,17 @@
-## [1.0.2] - 2024-7-16 ***latest**
+## [1.1.0] - 2024-7-17
+### Fixed
+- 完善了 [ScnLoader.py](../src/tools/ScnLoader.py) 报错的输出，减少了一些意外报错的可能性。
+
+### Added
+- 添加了新属性 ``Scene.fixname``，以支持修复后的路径格式。
+
+### Changed
+- 修改了 ``Scene.target`` 的返回格式，现在返回一个由 ``Scene`` 类对象组成的 ``list``。（若跨文件则只包含 ``Scene.name`` 和 ``Scene.__location`` 两个可调用属性）
+
+### Deleted
+- 属性 ``Scene.name`` 现已被废弃，如果需要使用场景原始名称请调用属性 ``Scene._name``。
+
+## [1.0.2] - 2024-7-16
 ### Fixed
 - 修复了 [ScnLoaderExample.py](../examples/ScnLoaderExample.py) 的演示 bug，使其能正常运行。
 
