@@ -65,33 +65,51 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 [ScnLoader.py](../src/tools/ScnLoader.py) 中的 ``Select``、``Scene`` 和 ``Scenes``类用于自动化数据检索。
 
+注：以下的结构在源码中是从里到外的。
+
 #### ``Select``
 
 代表选择中的特定选项。
 
-具有 ``Select.text`` 和 ``Select.target`` 属性，分别指示选项的文本和它引导的后续剧情
+具有 ``Select.text`` ``Select.target`` 和 ``Select.target`` 属性，分别指示选项的文本、所在文件和它引导的后续剧情。
+
+### ``ScnBase``
+
+``Setting`` 和 ``Setting`` 的基类，包含一些共用属性。
+
+在 2.0.0 版本后，选择支的具体内容可以由 ``ScnBase.selects`` 进行调用，通过 ``ScnBase.isselect`` 属性区分选择支的存在，除含选择支的 ``Setting`` 对象为 ``True``，其他情况均为 ``False``。
+
+提供了一个属性 ``ScnBase.fixname`` 作为每个场景的唯一标识符。
+
+提供了 ``ScnBase.target`` 属性来获取下一个或多个场景。返回一个由 ``Setting`` 或 ``Scene`` 类对象组成的 ``list``。
+
+#### ``Setting``
+
+代表剧情场景片段的背景设置，包括但不限于立绘、音频、图像、选择支等内容。
+
+调用属性 ``Setting.owner`` 来获取其所属剧情片段。
+
+**通过 ``Scenes.settings`` 获取的 ``Setting`` 类该属性必然为 ``None``。**
 
 #### ``Scene``
 
 剧情片段被分离，以实现选择和场景过渡之间的切换。
 
-它包含剧情和选择两部分内容，通过 ``Scene.isselect`` 属性区分。``Scene.isselect=True`` 表示选择，``Scene.isselect=False`` 表示剧情内容。
+若想获取具体参数内容，请调用 ``Scene.setting`` 属性以获取一个属于其的 ``Setting`` 类。
 
-它提供了 ``Scene.target`` 属性来获取下一个场景。若该场景为选择支，则其返回值为所有选项所指向的每一个场景。返回一个由 ``Scene`` 类对象组成的 ``list``。
+提供了一个属性 ``Scene.title`` 来标识每个文件对应的剧情标题（目前跨文件对象尚不可用）。
 
-提供了一个属性 ``Scene.selects`` 来获取该场景的所有选择支，其返回值为一个由 ``Select`` 类对象组成的 ``list``。
+提供了属性 ``Scene.texts`` 来获取剧情片段中的所有文本。返回一个由特殊格式的 ``dict`` 组成的 ``list``。
 
-提供了一个属性 ``Scene.title`` 来标识每个文件对应的剧情标题（目前跨文件尚不可用）。
-
-提供了一个属性 ``Scene.fixname`` 作为每个场景的唯一标识符。
-
-使用 ``Scene.exposeTextWithFilter(filter,output_file,watch_output)`` 导出某一个场景的剧情文本。其中 ``filter`` 为一个由正则表达式组成的 ``list``，用于过滤一些特殊符号；``output_file`` 为导出文件 **（非路径，以 ``_io.TextIOWrapper``，即 ``open()`` 返回格式为指定格式）**，如果省略，则会在 src/outputs/文件名 下生成一个与该场景同名、以 ``.txt`` 结尾的文本文件；``watch_output`` 为测试选项，默认为 ``False``，若参数为 ``True`` 则会在命令行同步输出导出文件的内容以供测试。若该场景无文本，则会在命令行输出提示。
+使用 ``Scene.exposeTextWithFilter(filter,output_file,watch_output)`` 导出某一个场景的剧情文本。其中 ``filter`` 为一个由正则表达式组成的 ``list``，用于过滤一些特殊符号；``output_file`` 为导出文件 **（非路径，以 ``_io.TextIOWrapper``，即 ``open()`` 返回格式为指定格式）**，如果省略，则会在 src/outputs/文件名 下生成一个与该场景同名、以 ``.txt`` 结尾的文本文件；``watch_output`` 为测试选项，默认为 ``False``，若参数为 ``True`` 则会在命令行同步输出导出文件的内容以供测试。若该场景无文本，则会在命令行输出提示，同时也会保留一个只含文件标识符和 ``target`` 的文件。
 
 #### ``Scenes``
 
 表示整个 ``.ks.json`` 格式文件。为了高效管理各个片段，我将每个片段嵌套在类结构中。
 
 您可以使用 ``Scenes[]`` 访问单个 ``Scene`` 实例，且 ``Scenes`` 支持迭代。
+
+提供了 ``Scenes.setting`` 和 ``Scenes.setting_index`` 分别指定了文件内所有 ``Setting`` 对象及其索引。通过 ``Scenes.settings`` 获取的 ``Setting`` 类该属性必然为 ``None``。
 
 使用 ``Scenes.getIndexByName`` 获取对应 ``Scene.name`` 的索引，以及 ``Scene.getNameByIndex`` 根据给定索引检索  ``Scene.name``。
 
@@ -125,6 +143,14 @@ Ciallo～(∠・ω< )⌒☆
 敬请期待……但不会很快。
 
 ## 后记
+
+### 2.0.0
+
+接下来的实现目标很明显了：跨文件批量处理、具体文本类和音频处理。大部分的雏形已经有了，但是编写接口文档和通过测试需要时间......
+
+从这个版本开始，我可能会暂停英文文档的更新，直到我完成了所有预期代码为止。
+
+### 1.1.0 
 
 在版本 ``1.0.1`` 中，我使用 ``qwen2.5`` 更新了原来比较口语化的 ``README`` 中英文文档。
 

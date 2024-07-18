@@ -1,3 +1,22 @@
+## [2.0.0]* - 2024-7-18 ***latest**
+* 该版本不是一个稳定的版本，稳定性的修复可能会无限期延期。
+### Fixed
+- 修复了 ``target`` 指向性的问题。
+- 修复了 ``Select.target`` 在特定条件下返回 ``None`` 的问题。
+
+### Added
+- 新增 ``Setting`` 类，表示某个场景对应的设置和背景信息。
+- 新增 ``ScnBase`` 基类，将 ``Scene`` 与 ``Setting`` 共有属性整合入 ``ScnBase``。
+- 新增 ``get_target_list(data,isselect)`` 内部函数，用于处理数据的 ``target`` 属性。
+- 新增 ``Scenes.settings`` 与 ``Scenes.setting_index`` 属性，用于在初始化阶段存储所有对应的设置信息与索引。（由数据格式可得，每个文件中都是 ``Scene`` 与 ``Setting`` 交替产生，因此以场景奇偶性进行区分，未来可能会发生不适用的问题）
+
+### Changed
+- ``Scenes.index`` 属性已被改为 ``Scenes.scene_index`` 属性，用于与 ``Scenes.setting_index`` 区分。
+- 修改了 ``Scene(Scenes).exposeTextWithFilter(filter,output_file,watch_output)`` 的输出文件格式，现在即使不存在文本也会生成相应文件而非直接跳过，从而增强整个文件的连贯性；每个场景的开头结尾如今会标注上 ``Scene.location``，为多文件批量处理做铺垫。
+- 修改了 ``Scene.target`` 的返回值内容，如今的返回值是 ``Scene.setting.target`` 的值，即一个由 ``Scene`` 对象组成的 ``list``。
+- 对应修改了 [ScnLoaderExample.py](../examples/ScnLoaderExample.py) 的示例内容。
+
+
 ## [1.1.0] - 2024-7-17
 ### Fixed
 - 完善了 [ScnLoader.py](../src/tools/ScnLoader.py) 报错的输出，减少了一些意外报错的可能性。
@@ -10,6 +29,7 @@
 
 ### Deleted
 - 属性 ``Scene.name`` 现已被废弃，如果需要使用场景原始名称请调用属性 ``Scene._name``。
+
 
 ## [1.0.2] - 2024-7-16
 ### Fixed
