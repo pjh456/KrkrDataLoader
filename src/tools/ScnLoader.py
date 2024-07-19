@@ -4,7 +4,7 @@ import re
 import io
 
 def get_target_list(data,isselect):
-    return [(item['target'],item['storage']) for item in (data['selects'] if isselect else data['nexts'])]
+    return [(item['target'] if 'target' in item else None,item['storage']) for item in (data['selects'] if isselect else data['nexts'])]
 
 class Select:
     def __init__(self,data=dict()):
@@ -66,10 +66,10 @@ class Scene(ScnBase):
                r'\\n']
         datas = self.texts
         
-        outputs_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'outputs')
+        defualt_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'outputs')
         close_mark = output_file is None
         if output_file is None:
-            output_folder = os.path.join(outputs_path,f'{self.location}')
+            output_folder = os.path.join(defualt_path,f'{self.location}')
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
             output_file = open(os.path.join(output_folder,f'{self.fixname}'+'.txt'),'w+',encoding='utf-8')
@@ -117,45 +117,53 @@ class Scene(ScnBase):
         
 class Scenes:
     def __init__(self,path):
+        
         self.path = path
+        if not os.path.exists(self.path):
+            raise FileNotFoundError(f'File {path} is not found.')
         
         scenes = json.load(open(path,'r',encoding='utf-8'))
         self.hash = scenes['hash']
         self.name = scenes['name']
-        self.outlines = scenes['outlines']
         
+        # 列出所有剧情片段
         self.scenes = []
         self.scene_index = {}
         for index,data in enumerate(scenes['scenes']):
-            #if 'texts' in data:
+            # UNSTABLE
+            # 这里使用的是奇偶交替判断，未来可能会报错。
             if index%2 == 0:
                 new_scene = Scene(data['label'],self.name,data,None)
                 self.scenes.append(new_scene)
         for index,data in enumerate(self.scenes):
             self.scene_index[data._name] = index
         
-        #print(self.scene_index)
-            
+        # 列出所有设置
         self.settings = []
         self.setting_index = {}
-        #for data in scenes['scenes']:
         for index,data in enumerate(scenes['scenes']):
+            # UNSTABLE
+            # 这里使用的是奇偶交替判断，未来可能会报错。
             if index%2 == 1:
-            #if not 'texts' in data:
                 new_setting = Setting(data['label'],None,self.name,data)
                 self.settings.append(new_setting)
         for index,data in enumerate(self.settings):
             self.setting_index[data._name] = index
         
-        
+        # 把设置赋给剧情片段，并重定向 Scene.target
         for scene in self.scenes:
             cache_target = scene.target
             scene.target = []
+            
+            # 取出 Scene 的所有 Setting（通常只有一个）
             for name,storage in cache_target:
                 try:
+                    # 新建一个 Setting，与 scenes.settings 区分开
                     new_setting = Setting(name,scene._name,storage,self.settings[self.setting_index[name]].data)
                     set_cache_target = new_setting.target
                     new_setting.target = []
+                    
+                    # 取出每个 Setting 对应的 Scene
                     for set_name,set_storage in set_cache_target:
                         try:
                             new_setting.target.append(self.scenes[self.setting_index[set_name]])
@@ -164,9 +172,12 @@ class Scenes:
                             new_setting.target.append(new_target)
                         except Exception as e:
                             print(e)
+                            
                     scene.setting = new_setting
+                    
                     scene.target += new_setting.target
                 except KeyError:
+                    # 跨文件的时候得改。
                     new_target = Scene(name,storage,{})
                     scene.target.append(new_target)
                 except Exception as e:
@@ -178,22 +189,28 @@ class Scenes:
     def getNameByIndex(self,index):
         return self.scenes[index]._name
 
+    # 导出清洗后文件
     def exposeTextWithFilter(self,filter=None,output_path=None,watch_output=False):
-        outputs_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'outputs')
-        output_file = None
+        # 清洗后文件的默认输出位置，与 tools 同层
+        defualt_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'outputs')
         
+        output_file = None
+        # 是否已经有指定位置
         if output_path is None:
-            output_folder = os.path.join(outputs_path,f'{self.name}')
+            output_folder = os.path.join(defualt_path,f'{self.name}')
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
             output_file = open(os.path.join(output_folder,f'{self.name}'+'.txt'),'w+',encoding='utf-8')
         else:
             output_file = open(output_path,'w+',encoding='utf-8')
-            
+        
+        # 遍历每个文件并导出
         for scene in self.scenes:
             scene.exposeTextWithFilter(filter,output_file,watch_output)
-                
-        output_file.close()
+            
+        # 关闭写入文件句柄    
+        if output_file is not None:
+            output_file.close()
     
     def __getitem__(self,index):
         return self.scenes[index]
@@ -201,4 +218,59 @@ class Scenes:
     def __len__(self):
         return len(self.scenes)
     
+    def __str__(self):
+        return self.name
     
+class Scnfolder:
+    def __init__(self,path='',name='defualt_scene',debug=False):
+        self.path = path
+        if not os.path.exists(path):
+            raise FileNotFoundError(f'Directory {path} is not found.')
+        
+        self.name = name
+        
+        # 读取所有非子目录的文件
+        filedirs = [filename for filename in os.listdir(path) if filename.endswith('.ks.json')]
+        self.datas = []
+        self.data_index = {}
+        for index,filename in enumerate(filedirs):
+            if debug:
+                print(f'Open {filename}...')
+            filepath = os.path.join(path, filename)
+            new_scene = Scenes(filepath)
+            self.datas.append(new_scene)
+            self.data_index[new_scene.name] = index
+            if debug:
+                print(f'{filename} Finished.')
+                
+        # 读完所有文件后再把跨文件的连接建立起来
+        for data in self.datas:
+            if debug:
+                print(f'Fix {data.name} targets...')
+            for scene in data.scenes:
+                for target in scene.target:
+                    if target._name is None:
+                        target._name = self.datas[self.data_index[target.location]][0]
+                    if target.location != data.name:
+                        aim_scenes = self.datas[self.data_index[scene.location]]
+                        target_scene = aim_scenes.scenes[aim_scenes.getIndexByName(scene._name)]
+                        scene = target_scene
+            if debug:
+                print(f'Fix {data.name} targets finished.')
+                
+    def getIndexByName(self,name):
+        return self.data_index[name]
+    
+    def getNameByIndex(self,index):
+        return self.datas[index].name
+        
+    def __getitem__(self,index):
+        return self.datas[index]
+    
+    def __str__(self):
+        return f'Scenes files in {self.path}'
+                
+        
+                
+        
+        
