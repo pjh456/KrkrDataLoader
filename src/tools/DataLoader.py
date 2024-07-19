@@ -4,6 +4,7 @@ import re
 import io
 import pygame
 import time
+import tqdm
 
 
 def get_target_list(data,isselect):
@@ -83,7 +84,6 @@ class Scene(ScnBase):
         self.texts = None
         try:
             #self.texts = data['texts']
-            print(len(data['texts']),self.texts,"::::::")
             self.texts = [SceneText(self,text) for text in data['texts']]
         except KeyError:
             pass
@@ -159,7 +159,7 @@ class Scenes:
         # 列出所有剧情片段
         self.scenes = []
         self.scene_index = {}
-        for index,data in enumerate(scenes['scenes']):
+        for index,data in tqdm.tqdm(enumerate(scenes['scenes']),desc=f'Loading {self.name} scenes',total=len(scenes['scenes'])):
             # UNSTABLE
             # 这里使用的是奇偶交替判断，未来可能会报错。
             if index%2 == 0:
@@ -171,7 +171,8 @@ class Scenes:
         # 列出所有设置
         self.settings = []
         self.setting_index = {}
-        for index,data in enumerate(scenes['scenes']):
+        #for index,data in enumerate(scenes['scenes']):
+        for index,data in tqdm.tqdm(enumerate(scenes['scenes']),desc=f'Loading {self.name} settings',total=len(scenes['scenes'])):
             # UNSTABLE
             # 这里使用的是奇偶交替判断，未来可能会报错。
             if index%2 == 1:
@@ -181,7 +182,7 @@ class Scenes:
             self.setting_index[data._name] = index
         
         # 把设置赋给剧情片段，并重定向 Scene.target
-        for scene in self.scenes:
+        for scene in tqdm.tqdm(self.scenes,desc=f'Redirect {self.name} targets',total=len(self.scenes)):
             cache_target = scene.target
             scene.target = []
             
@@ -263,6 +264,7 @@ class Scnfolder:
         filedirs = [filename for filename in os.listdir(path) if filename.endswith('.ks.json')]
         self.datas = []
         self.data_index = {}
+        #for index,filename in tqdm.tqdm(enumerate(filedirs),desc='Loading files',total=len(filedirs)):
         for index,filename in enumerate(filedirs):
             if debug:
                 print(f'Open {filename}...')
