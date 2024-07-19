@@ -1,7 +1,5 @@
-import json
 import subprocess
 import os
-import sys
 
 
 class Decompiler:

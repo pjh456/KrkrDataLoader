@@ -63,7 +63,7 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 ### **剧情读取**
 
-[ScnLoader.py](../src/tools/ScnLoader.py) 中的 ``Select``、``Scene`` 和 ``Scenes``类用于自动化数据检索。
+[DataLoader.py](../src/tools/DataLoader.py) 中的 ``Select``、``Scene`` 和 ``Scenes``类用于自动化数据检索。
 
 ``ScnFolder`` 类用于批量处理整个文件夹，实现了大规模的文件管理。
 
@@ -93,6 +93,19 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 **通过 ``Scenes.settings`` 获取的 ``Setting`` 类该属性必然为 ``None``。**
 
+#### ``SceneText``
+
+代表剧情里的一条文本。
+
+调用属性 ``SceneText.owner`` 来获取其所属剧情片段。
+
+调用属性 ``Setting.data`` 来获取其全部内容，其返回值为一个 ``list``。
+
+提供了属性 ``SceneText.speaker`` 和``SceneText.content``，分别表示文本说话人和内容。
+
+提供了属性 ``SceneText.sound`` 来获取所有对应播放的 ``SoundData`` 音频文件。（详见 **音频管理** 一章）
+
+
 #### ``Scene``
 
 剧情片段被分离，以实现选择和场景过渡之间的切换。
@@ -117,7 +130,7 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 使用 ``Scenes.exposeTextWithFilter(filter,output_path,watch_output)`` 导出整个文件文本。其中 ``filter`` 为一个由正则表达式组成的 ``list``，用于过滤一些特殊符号；``output_path`` 为导出文件路径，如果省略，则会在 src/outputs/文件名 下生成一个与该文件同名、以 ``.ks.txt`` 结尾的文本文件；``watch_output`` 为测试选项，默认为 ``False``，若参数为 ``True`` 则会在命令行同步输出导出文件的内容以供测试。
 
-详细示例，请参见 [ScnLoaderexample.py](../examples/ScnLoaderExample.py) 中了。
+详细示例，请参见 [ScnLoaderexample.py](../examples/ScnLoaderExample.py)。
 
 #### ``Scnfolder``
 
@@ -128,6 +141,34 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 初始化 ``Scnfolder(path,name,debug)`` 时，``path`` 用于指定文件夹路径，``name`` 用于指定该对象的名字（目前无用），``debug=True`` 时会在控制台输出读取文件进度。
 
 与 ``Scenes`` 类似，提供了函数 ``Scnfolder.getIndexByName`` 与 ``Scnfolder.getNameByIndex``，以及 ``Scnfloder[]`` 的调用方法。
+
+### **音频管理**
+
+[DataLoader.py](../src/tools/DataLoader.py) 中的 ``SoundData`` 和 ``SoundManager``类用于批量音频处理。
+
+#### ``SoundData``
+
+表示一条音频数据。
+
+初始化时 ``SoundData(owner={'speaker':'Unknown','content':"Unknown"},data=dict(),suffix='.ogg')``，``owner`` 默认值为 ``{'speaker':'Unknown','content':"Unknown"}``，以防止播放时的报错，**但从 ``SceneText`` 中获取的 ``SoundData.owner`` 必然为 ``SceneText`` 格式**；``data`` 指定了该音频在文件中的内容，默认为 ``{'voice':'defualt'}``；``suffix`` 为音频后缀，默认为 ``.ogg``。
+
+调用 ``SoundData.name`` 以获取其说话人名，调用 ``SoundData.voice`` 以获得其文件名。
+
+调用 ``SoundData.owner`` 以获取其所属 ``SceneText`` 文本。
+
+#### ``SoundManager``
+
+表示音乐播放器，播放由 ``pygame.mixer`` 实现。
+
+调用 ``SoundManager.playsound(sound,wait_done,tick,print_content)`` 以播放一条 ``SoundData`` 格式的 ``sound`` 音频，其中 ``wait_done`` 表示是否为阻塞式播放， ``tick`` 为检测播放是否结束的间隔时间，``print_content`` 为是否把对应的 ``SceneText`` 台词输出。
+
+调用 ``SoundManager.playsounds(sound_list,wait_done,tick,interval,print_content)`` 以遍历 sound_list 列表并播放多条音频。音频可为 ``str``（文件目录），``SoundData``(单条音频)，``SceneText``（包含文本），其中 ``interval`` 指定了两条语音播放之间的间隔，而当 ``print_content=True`` 时，无声的 ``SceneText`` 也会显示出其台词内容，并同样共享 ``interval``。
+
+调用 ``SoundManager.playScene(self,scene,wait_done,tick,interval,print_content)`` 以遍历 ``Scene`` 格式的 ``scene`` 剧情片段，其他参数如上所述。
+
+调用 ``SoundManager.playScenes(self,scenes,wait_done=True,tick=0.1,interval=0.0,print_content=False):`` 以播放一个 ``Scenes`` 格式的 ``scenes`` 剧情文件，其他参数如上所述。
+
+详细示例，请参见 [SoundManagerExample.py](../examples/SoundManagerExample.py)。
 
 ## 开源动机(?)
 

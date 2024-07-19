@@ -1,8 +1,7 @@
 import json
 import os
 import re
-import io    
-from pydub import AudioSegment
+import io
 import pygame
 import time
 
@@ -51,11 +50,11 @@ class Setting(ScnBase):
 
 # 我禁止了直接通过SoundData来播放，因为无法指定其地址，批量化进行太麻烦
 class SoundData:
-    def __init__(self,owner={'speaker':'Unknown','content':"Unknown"},data=dict(),suffix='.ogg'):
+    def __init__(self,owner={'speaker':'Unknown','content':"Unknown"},data={'voice':'defualt'},suffix='.ogg'):
         self.owner = owner
         self.data = data
         
-        self.name = data['name']
+        #self.name = data['name']
         #self.pan = data['pan']
         #self.type = data['type']
         self.voice = data['voice']+suffix
