@@ -1,7 +1,11 @@
 import json
 import os
 import re
-import io
+import io    
+from pydub import AudioSegment
+import pygame
+import time
+
 
 def get_target_list(data,isselect):
     return [(item['target'] if 'target' in item else None,item['storage']) for item in (data['selects'] if isselect else data['nexts'])]
@@ -44,6 +48,30 @@ class Setting(ScnBase):
             for single_data in data['selects']:
                 new_select = Select(single_data)
                 self.selects.append(new_select)
+
+# 我禁止了直接通过SoundData来播放，因为无法指定其地址，批量化进行太麻烦
+class SoundData:
+    def __init__(self,owner={'speaker':'Unknown','content':"Unknown"},data=dict(),suffix='.ogg'):
+        self.owner = owner
+        self.data = data
+        
+        self.name = data['name']
+        #self.pan = data['pan']
+        #self.type = data['type']
+        self.voice = data['voice']+suffix
+
+class SceneText:
+    def __init__(self,owner,data=list()):
+        self.owner = owner
+        self.data = data
+        
+        self.speaker = data[0]
+        self.content = data[2]
+        self.sound = None
+        #print(owner._name,data[3],'?????????/')
+        if data[3] != None:
+            self.sound = [SoundData(self,sound) for sound in data[3]]
+        
         
 class Scene(ScnBase):
     def __init__(self,name,location,data=dict(),setting=None):
@@ -52,9 +80,12 @@ class Scene(ScnBase):
             self.title = data['title']
         except KeyError:
             pass
+        
         self.texts = None
         try:
-            self.texts = data['texts']
+            #self.texts = data['texts']
+            print(len(data['texts']),self.texts,"::::::")
+            self.texts = [SceneText(self,text) for text in data['texts']]
         except KeyError:
             pass
         self.setting = setting
@@ -269,8 +300,81 @@ class Scnfolder:
     
     def __str__(self):
         return f'Scenes files in {self.path}'
-                
+            
+class SoundManager:
+    def __init__(self,path):
+        pygame.mixer.init()
         
-                
+        self.path = path
+        if not os.path.exists(path):
+            raise FileNotFoundError(f'Directory {path} is not found.')
         
+        '''
+        self.ffmpeg = ffmpeg_path
+        if not os.path.exists(ffmpeg_path):
+            raise FileNotFoundError(f'Directory {ffmpeg_path} is not found.')
+        '''
         
+    def playsound(self,sound,wait_done=True,tick=0.1,print_content=False):
+        if not isinstance(sound,SoundData):
+            raise TypeError(f'{sound} must be SoundData.')
+        
+        sound_path = os.path.join(self.path,sound.voice)
+        if not os.path.exists(sound_path):
+            raise FileNotFoundError(f'Sound File {sound_path} is not found.')
+        
+        audio = pygame.mixer.Sound(sound_path)
+        if sound.owner.speaker:
+            print(f'【{sound.owner.speaker}】:{sound.owner.content}')
+        else:
+            print(sound.owner.content)
+        if wait_done:
+            sound_length = audio.get_length()
+            # 创建一个计时器
+            clock = pygame.time.Clock()
+            
+            audio.play()
+
+            # 等待声音播放完成
+            time_waited = 0.0
+            while time_waited < sound_length:
+                time.sleep(tick)  # 防止CPU空转，可以调整睡眠时间
+                time_waited += 0.1
+                clock.tick(60)  # 控制循环的帧率
+        else:
+            audio.play()
+            
+    def playsounds(self,soundlist=list(),wait_done=True,tick=0.1,interval=0.0,print_content=False):
+        for sound in soundlist:
+            if isinstance(sound,SceneText):
+                if sound.sound == None:
+                    if print_content == True:
+                        if sound.speaker:
+                            print(f'【{sound.speaker}】:{sound.content}')
+                        else:
+                            print(sound.content)
+                        time.sleep(interval)
+                else:
+                    self.playsounds(sound.sound,wait_done,tick,interval,print_content)
+                continue
+            if isinstance(sound,str):
+                sound = SoundData(data={'name':'Unknown','voice':sound})
+            if isinstance(sound,SoundData):
+                self.playsound(sound,wait_done,tick,print_content)
+                time.sleep(interval)
+            else:
+                raise TypeError(f'every element in soundlist must be SoundData, SceneText or str,but not {type(sound)}')
+            
+    def playScene(self,scene,wait_done=True,tick=0.1,interval=0.0,print_content=False):
+        if not isinstance(scene,Scene):
+            raise TypeError('scene must be Scene.')
+        
+        if scene.texts is None or len(scene.texts) == 0:
+            print(f"No voice in {scene.location}/{scene._name}, pass.")
+            return
+        
+        self.playsounds(scene.texts,wait_done,tick,interval,print_content)
+            
+    def playScenes(self,scenes,wait_done=True,tick=0.1,interval=0.0,print_content=False):
+        for scene in scenes:
+            self.playScene(scene,wait_done,tick,interval,print_content)

@@ -1,8 +1,20 @@
-## [2.1.1]* - 2024-7-19 ***latest**
+## [2.2.0]* - 2024-7-19 ***latest**
+* 该版本不是一个稳定的版本，稳定性的修复可能会无限期延期。
+### Added
+- 新增文本管理类 ``SceneText`` 及其配套音频类 ``SoundData``，用于精细化管理剧情文本。
+- 新增播放器类 ``SoundManager``，用于批量播放音频。
+- 对应新增了 [SoundManagerExample.py](../examples/SoundManagerExample.py) 的示例内容。
+
+### Changed
+- 由于扩充了音频播放的功能，修改 ``ScnLoader.py`` 为 [DataLoader](../src/tools/DataLoader.py)。
+
+
+## [2.1.1]* - 2024-7-19
 * 该版本是一个文档补充版本。
 ### Changed
 - 更新了 [README-zh.md](README-zh.md)，增加了对快速导出文本的说明。
 - 更新了 [README.md](../README.md)，修改了新的版本前瞻。
+
 
 ## [2.1.0]* - 2024-7-19
 * 该版本不是一个稳定的版本，稳定性的修复可能会无限期延期。
@@ -38,7 +50,7 @@
 
 ## [1.1.0] - 2024-7-17
 ### Fixed
-- 完善了 [ScnLoader.py](../src/tools/ScnLoader.py) 报错的输出，减少了一些意外报错的可能性。
+- 完善了 [DataLoader.py](../src/tools/DataLoader.py) 报错的输出，减少了一些意外报错的可能性。
 
 ### Added
 - 添加了新属性 ``Scene.fixname``，以支持修复后的路径格式。
@@ -69,7 +81,7 @@
 
 ### Changed
 - 更新了 [README-zh.md](README-zh.md) 与 [README-en.md](README-en.md)，规范化了文档说明。
-- 更新了 [ScnLoader.py](../src/tools/ScnLoader.py)，废弃了 ``Scene.goto()`` 方法，以 ``Scene.target`` 属性简化。
+- 更新了 [DataLoader.py](../src/tools/DataLoader.py)，废弃了 ``Scene.goto()`` 方法，以 ``Scene.target`` 属性简化。
 
 ### Deleted
 - 移除了 [0.0.1] 版本的测试文件 ``DataLoader.py``。
