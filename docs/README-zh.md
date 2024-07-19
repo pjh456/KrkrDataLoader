@@ -162,11 +162,13 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 调用 ``SoundManager.playsound(sound,wait_done,tick,print_content)`` 以播放一条 ``SoundData`` 格式的 ``sound`` 音频，其中 ``wait_done`` 表示是否为阻塞式播放， ``tick`` 为检测播放是否结束的间隔时间，``print_content`` 为是否把对应的 ``SceneText`` 台词输出。
 
-调用 ``SoundManager.playsounds(sound_list,wait_done,tick,interval,print_content)`` 以遍历 sound_list 列表并播放多条音频。音频可为 ``str``（文件目录），``SoundData``(单条音频)，``SceneText``（包含文本），其中 ``interval`` 指定了两条语音播放之间的间隔，而当 ``print_content=True`` 时，无声的 ``SceneText`` 也会显示出其台词内容，并同样共享 ``interval``。
+调用 ``SoundManager.playsounds(sound_list,wait_done,tick,interval,print_content,using_tts)`` 以遍历 sound_list 列表并播放多条音频。音频可为 ``str``（文件目录），``SoundData``(单条音频)，``SceneText``（包含文本），其中 ``interval`` 指定了两条语音播放之间的间隔，而当 ``print_content=True`` 时，无声的 ``SceneText`` 也会显示出其台词内容，并同样共享 ``interval``；若 ``using_tts=True``，则会使用内置的 ``pyttsx3`` 语音引擎对无声台词进行语音合成并播放。
 
-调用 ``SoundManager.playScene(self,scene,wait_done,tick,interval,print_content)`` 以遍历 ``Scene`` 格式的 ``scene`` 剧情片段，其他参数如上所述。
+调用 ``SoundManager.playScene(self,scene,wait_done,tick,interval,print_content,using_tts)`` 以遍历 ``Scene`` 格式的 ``scene`` 剧情片段，其他参数如上所述。
 
-调用 ``SoundManager.playScenes(self,scenes,wait_done=True,tick=0.1,interval=0.0,print_content=False):`` 以播放一个 ``Scenes`` 格式的 ``scenes`` 剧情文件，其他参数如上所述。
+调用 ``SoundManager.playScenes(self,scenes,wait_done,tick,interval,print_content,using_tts):`` 以播放一个 ``Scenes`` 格式的 ``scenes`` 剧情文件，其他参数如上所述。
+
+提供了一个属性 ``SoundManager.engine`` 来获取内置的 ``pyttsx3`` 语音引擎。
 
 详细示例，请参见 [SoundManagerExample.py](../examples/SoundManagerExample.py)。
 

@@ -5,6 +5,7 @@ import io
 import pygame
 import time
 import tqdm
+import pyttsx3
 
 
 def get_target_list(data,isselect):
@@ -310,11 +311,7 @@ class SoundManager:
         if not os.path.exists(path):
             raise FileNotFoundError(f'Directory {path} is not found.')
         
-        '''
-        self.ffmpeg = ffmpeg_path
-        if not os.path.exists(ffmpeg_path):
-            raise FileNotFoundError(f'Directory {ffmpeg_path} is not found.')
-        '''
+        self.engine = pyttsx3.init()
         
     def playsound(self,sound,wait_done=True,tick=0.1,print_content=False):
         if not isinstance(sound,SoundData):
@@ -345,11 +342,20 @@ class SoundManager:
         else:
             audio.play()
             
-    def playsounds(self,soundlist=list(),wait_done=True,tick=0.1,interval=0.0,print_content=False):
+    def playsounds(self,soundlist=list(),wait_done=True,tick=0.1,interval=0.0,print_content=False,using_tts=False):
         for sound in soundlist:
             if isinstance(sound,SceneText):
                 if sound.sound == None:
-                    if print_content == True:
+                    if using_tts:
+                        if print_content == True:
+                            if sound.speaker:
+                                print(f'【{sound.speaker}】:{sound.content}')
+                            else:
+                                print(sound.content)
+                        self.engine.say(sound.content)
+                        self.engine.runAndWait()
+                        time.sleep(interval)
+                    elif print_content == True:
                         if sound.speaker:
                             print(f'【{sound.speaker}】:{sound.content}')
                         else:
@@ -366,16 +372,16 @@ class SoundManager:
             else:
                 raise TypeError(f'every element in soundlist must be SoundData, SceneText or str,but not {type(sound)}')
             
-    def playScene(self,scene,wait_done=True,tick=0.1,interval=0.0,print_content=False):
+    def playScene(self,scene,wait_done=True,tick=0.1,interval=0.0,print_content=False,using_tts=False):
         if not isinstance(scene,Scene):
             raise TypeError('scene must be Scene.')
         
         if scene.texts is None or len(scene.texts) == 0:
-            print(f"No voice in {scene.location}/{scene._name}, pass.")
+            print(f"No texts in {scene.location}/{scene._name}, pass.")
             return
         
-        self.playsounds(scene.texts,wait_done,tick,interval,print_content)
+        self.playsounds(scene.texts,wait_done,tick,interval,print_content,using_tts)
             
-    def playScenes(self,scenes,wait_done=True,tick=0.1,interval=0.0,print_content=False):
+    def playScenes(self,scenes,wait_done=True,tick=0.1,interval=0.0,print_content=False,using_tts=False):
         for scene in scenes:
-            self.playScene(scene,wait_done,tick,interval,print_content)
+            self.playScene(scene,wait_done,tick,interval,print_content,using_tts)
