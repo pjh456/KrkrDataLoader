@@ -65,6 +65,8 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 [ScnLoader.py](../src/tools/ScnLoader.py) 中的 ``Select``、``Scene`` 和 ``Scenes``类用于自动化数据检索。
 
+``ScnFolder`` 类用于批量处理整个文件夹，实现了大规模的文件管理。
+
 注：以下的结构在源码中是从里到外的。
 
 #### ``Select``
@@ -117,6 +119,16 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 详细示例，请参见 [ScnLoaderexample.py](../examples/ScnLoaderExample.py) 中了。
 
+#### ``Scnfolder``
+
+表示整个通过 ``krkrextract`` 解包出来的 ``data.xp3/scn`` 文件夹。
+
+在初始化阶段把所有 ``.ks.json`` 格式文件作为 ``Scenes`` 格式读取。（不包括子文件夹中的文件）
+
+初始化 ``Scnfolder(path,name,debug)`` 时，``path`` 用于指定文件夹路径，``name`` 用于指定该对象的名字（目前无用），``debug=True`` 时会在控制台输出读取文件进度。
+
+与 ``Scenes`` 类似，提供了函数 ``Scnfolder.getIndexByName`` 与 ``Scnfolder.getNameByIndex``，以及 ``Scnfloder[]`` 的调用方法。
+
 ## 开源动机(?)
 
 在解包使用 Krkr2 引擎的游戏剧情和用音频训练模型时遇到一些困难，浪费了大量时间在这些神秘的脚本上。
@@ -143,6 +155,16 @@ Ciallo～(∠・ω< )⌒☆
 敬请期待……但不会很快。
 
 ## 后记
+
+### 2.1.0
+
+在批量处理文本的时候，我发现解包出来的数据上有格式上的问题。不知道是柚子社自己的问题还是解包工具的问题。
+
+因此接下来对于报错的修复可能需要大量游戏数据作为基础，但目前还没整合，因此说这个版本仍然是不稳定版本。
+
+本项目基于《千恋万花》数据实现，对于其他 krkr 引擎游戏不保证可以正常使用，如果有报错问题请提 issue，如果可以的话把发生错误的文件发过来最好。
+
+对于文档的处理到此差不多算是告一段落了，具体文本类的实现暂时不太有必要，下一步是音频的处理，可能需要 ffmpeg。
 
 ### 2.0.0
 
