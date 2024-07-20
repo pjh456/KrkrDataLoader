@@ -8,11 +8,31 @@ import tqdm
 import pyttsx3
 
 
-def get_target_list(data,isselect):
-    return [(item['target'] if 'target' in item else None,item['storage']) for item in (data['selects'] if isselect else data['nexts'])]
+def get_target_list(data={'nexts':[{'target':[],
+                                    'storage':'Defualt location'}]},
+                    isselect=False):
+    """Format target list.
+
+    Args:
+        data (_type_): data dict.
+        isselect (bool): type of data.
+
+    Returns:
+        target_list: a list of target(str).
+    """
+    return [(item['target'] if 'target' in item else None,
+             item['storage']) 
+            for item in (data['selects'] if isselect else data['nexts'])]
 
 class Select:
-    def __init__(self,data=dict()):
+    def __init__(self,data={'text':'Unknown',
+                            'storage':'defualt',
+                            'target':[]}):
+        """A piece of select.
+
+        Args:
+            data (dict): Selection data.
+        """
         self.text = data['text']
         self.location = data['storage']
         self.target = data['target']
@@ -21,7 +41,17 @@ class Select:
         return self.text
 
 class ScnBase:
-    def __init__(self,name,location,data={}):
+    def __init__(self,
+                 name='Defualt Name',
+                 location='Defualt Location',
+                 data={}):
+        """Base Scene class initialization.
+
+        Args:
+            name (str):Base Scene name.
+            location (str):Base Scene file name.
+            data (dict):Base Scene data.
+        """
         self._name = name
         self.location = location
         self.isselect = 'selects' in data
@@ -32,6 +62,11 @@ class ScnBase:
         
     @property
     def fixname(self):
+        """Fixed name which doesn't conflict with the system path.
+
+        Returns:
+            Fixed name: name after replace some sensitive characters.
+        """
         fixname = self._name.replace('*','').replace(':','-')
         return fixname
     
@@ -40,7 +75,19 @@ class ScnBase:
 
 
 class Setting(ScnBase):
-    def __init__(self,name,owner,location,data=dict()):
+    def __init__(self,
+                 name='Defualt Name',
+                 owner=None,
+                 location='Defualt Location',
+                 data={}):
+        """A piece of setting which consists of BGM data,image data and so on.
+
+        Args:
+            name (str): Setting name.
+            owner (Scene): The owner scene of the setting.
+            location (str): Setting file name.
+            data (dict): Setting file data.
+        """
         super().__init__(name,location,data)
         self.owner = owner
         
@@ -53,6 +100,13 @@ class Setting(ScnBase):
 # 我禁止了直接通过SoundData来播放，因为无法指定其地址，批量化进行太麻烦
 class SoundData:
     def __init__(self,owner={'speaker':'Unknown','content':"Unknown"},data={'voice':'defualt'},suffix='.ogg'):
+        """A piece of sound data.
+
+        Args:
+            owner (SceneText): The owner text of the sound.
+            data (dict): Sound data.
+            suffix (str): Sound file suffix.
+        """
         self.owner = owner
         self.data = data
         
@@ -62,7 +116,13 @@ class SoundData:
         self.voice = data['voice']+suffix
 
 class SceneText:
-    def __init__(self,owner,data=list()):
+    def __init__(self,owner=None,data=list()):
+        """A piece of text data.
+
+        Args:
+            owner (Scene): The owner scene of the text.
+            data (dict): _description_. Defaults to list().
+        """
         self.owner = owner
         self.data = data
         
@@ -75,7 +135,19 @@ class SceneText:
         
         
 class Scene(ScnBase):
-    def __init__(self,name,location,data=dict(),setting=None):
+    def __init__(self,
+                 name='Defualt Name',
+                 location='Defualt Location',
+                 data={},
+                 setting=None):
+        """A piece of setting which consists of BGM data,image data and so on.
+
+        Args:
+            name (str): Setting name.
+            location (str): Setting file name.
+            data (dict): Setting file data.
+            setting (Setting): Scene setting.
+        """
         super().__init__(name,location,data)
         try:
             self.title = data['title']
@@ -90,7 +162,17 @@ class Scene(ScnBase):
             pass
         self.setting = setting
     
-    def exposeTextWithFilter(self,filter=None,output_file=None,watch_output=False):
+    def exposeTextWithFilter(self,
+                             filter=None,
+                             output_file=None,
+                             watch_output=False):
+        """Save scene texts with filter.
+
+        Args:
+            filter (list, optional): A list of regular expression strs. Set 'None' to use defualt filter.
+            output_file (str, optional): Output file path. Set 'None' to use defualt path.
+            watch_output (bool): Print output text in console. Defualts to False.
+        """
         if filter == None:
             filter = [r'%[^;]*;',
                r'\[[^\]]*\]',
@@ -148,6 +230,11 @@ class Scene(ScnBase):
         
 class Scenes:
     def __init__(self,path):
+        """A whole scene file.
+
+        Args:
+            path (st): Scene file path.
+        """
         
         self.path = path
         if not os.path.exists(self.path):
@@ -222,7 +309,17 @@ class Scenes:
         return self.scenes[index]._name
 
     # 导出清洗后文件
-    def exposeTextWithFilter(self,filter=None,output_path=None,watch_output=False):
+    def exposeTextWithFilter(self,
+                             filter=None,
+                             output_path=None,
+                             watch_output=False):
+        """Save scene file texts with filter.
+
+        Args:
+            filter (list, optional): A list of regular expression strs. Set 'None' to use defualt filter.
+            output_file (str ,optional): Output file path. Set 'None' to use defualt path.
+            watch_output (bool): Print output text in console. Defualts to False.
+        """
         # 清洗后文件的默认输出位置，与 tools 同层
         defualt_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'outputs')
         
@@ -254,7 +351,17 @@ class Scenes:
         return self.name
     
 class Scnfolder:
-    def __init__(self,path='',name='defualt_scene',debug=False):
+    def __init__(self,
+                 path,
+                 name='defualt_scene',
+                 debug=False):
+        """A whole scene file folder.
+
+        Args:
+            path (str): Folder path.
+            name (str, optional): Name of folder. Defaults to 'defualt_scene'.
+            debug (bool, optional): Debug mode which prints process of loading. Defaults to False.
+        """
         self.path = path
         if not os.path.exists(path):
             raise FileNotFoundError(f'Directory {path} is not found.')
@@ -305,6 +412,11 @@ class Scnfolder:
             
 class SoundManager:
     def __init__(self,path):
+        """A tool using to play sounds simpler.
+
+        Args:
+            path (str): Where the voice files are in.
+        """
         pygame.mixer.init()
         
         self.path = path
@@ -313,7 +425,19 @@ class SoundManager:
         
         self.engine = pyttsx3.init()
         
-    def playsound(self,sound,wait_done=True,tick=0.1,print_content=False):
+    def playsound(self,
+                  sound,
+                  wait_done=True,
+                  tick=0.1,
+                  print_content=False):
+        """Play a piece of sound.
+
+        Args:
+            sound (SoundData): A piece of sound data.
+            wait_done (bool, optional): Blocking the stream or not. Defaults to True.
+            tick (float, optional): How often does a checking to stop sound playing happens. Defaults to 0.1.
+            print_content (bool, optional): Print lines of sound. Defaults to False.
+        """
         if not isinstance(sound,SoundData):
             raise TypeError(f'{sound} must be SoundData.')
         
@@ -321,11 +445,14 @@ class SoundManager:
         if not os.path.exists(sound_path):
             raise FileNotFoundError(f'Sound File {sound_path} is not found.')
         
+        if print_content:
+            if sound.owner.speaker:
+                print(f'【{sound.owner.speaker}】:{sound.owner.content}')
+            else:
+                print(sound.owner.content)
+            
+        
         audio = pygame.mixer.Sound(sound_path)
-        if sound.owner.speaker:
-            print(f'【{sound.owner.speaker}】:{sound.owner.content}')
-        else:
-            print(sound.owner.content)
         if wait_done:
             sound_length = audio.get_length()
             # 创建一个计时器
@@ -342,7 +469,23 @@ class SoundManager:
         else:
             audio.play()
             
-    def playsounds(self,soundlist=list(),wait_done=True,tick=0.1,interval=0.0,print_content=False,using_tts=False):
+    def playsounds(self,
+                   soundlist=[],
+                   wait_done=True,
+                   tick=0.1,
+                   interval=0.0,
+                   print_content=False,
+                   using_tts=False):
+        """Play several pieces of sounds.
+
+        Args:
+            soundlist (list): List of sound.Supporting SceneText,SoundData and str type. Defaults to [].
+            wait_done (bool, optional): Blocking the stream or not. Defaults to True.
+            tick (float, optional): How often does a checking to stop sound playing happens. Defaults to 0.1.
+            interval (float, optional): The time between two sounds. Defaults to 0.0.
+            print_content (bool, optional): Print lines of sound. Defaults to False.
+            using_tts (bool, optional): Using tts engine to fill lines without voice. Defaults to False.
+        """
         for sound in soundlist:
             if isinstance(sound,SceneText):
                 if sound.sound == None:
@@ -372,7 +515,23 @@ class SoundManager:
             else:
                 raise TypeError(f'every element in soundlist must be SoundData, SceneText or str,but not {type(sound)}')
             
-    def playScene(self,scene,wait_done=True,tick=0.1,interval=0.0,print_content=False,using_tts=False):
+    def playScene(self,
+                  scene,
+                  wait_done=True,
+                  tick=0.1,
+                  interval=0.0,
+                  print_content=False,
+                  using_tts=False):
+        """Play all the texts in a scene.
+
+        Args:
+            scene (Scene): The scene.
+            wait_done (bool, optional): Blocking the stream or not. Defaults to True.
+            tick (float, optional): How often does a checking to stop sound playing happens. Defaults to 0.1.
+            interval (float, optional): The time between two sounds. Defaults to 0.0.
+            print_content (bool, optional): Print lines of sound. Defaults to False.
+            using_tts (bool, optional): Using tts engine to fill lines without voice. Defaults to False.
+        """
         if not isinstance(scene,Scene):
             raise TypeError('scene must be Scene.')
         
@@ -383,5 +542,15 @@ class SoundManager:
         self.playsounds(scene.texts,wait_done,tick,interval,print_content,using_tts)
             
     def playScenes(self,scenes,wait_done=True,tick=0.1,interval=0.0,print_content=False,using_tts=False):
+        """Play all the scene in a scene file.
+
+        Args:
+            scenes (Scenes): The scene file.
+            wait_done (bool, optional): Blocking the stream or not. Defaults to True.
+            tick (float, optional): How often does a checking to stop sound playing happens. Defaults to 0.1.
+            interval (float, optional): The time between two sounds. Defaults to 0.0.
+            print_content (bool, optional): Print lines of sound. Defaults to False.
+            using_tts (bool, optional): Using tts engine to fill lines without voice. Defaults to False.
+        """
         for scene in scenes:
             self.playScene(scene,wait_done,tick,interval,print_content,using_tts)
