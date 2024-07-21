@@ -1,4 +1,12 @@
-## [2.3.1]* - 2024-7-20 ***latest**
+## [2.3.1.0721]- 2024-7-21 ***latest**
+* 0d00 0721
+### Added
+- 新增了 [AfterStory](../src/AfterStory) 文件夹，用于维护在本项目完工后的一些相关小创意。
+- 新增了 [ayachinene.py](../src/AfterStory/ayachinene.py)，可调用 ``Onani`` 类用于调用 ``Onani.Onani_generate_number()`` 函数，将数字转化为数学表达式（目前最大是60）。
+
+
+
+## [2.3.1]* - 2024-7-20
 * 该版本是一个文档补充与代码修复版本。
 ### Fixed
 - 修复了 ``SoundManager.playsound()`` 在 ``print_content=False`` 时仍会输出台词的问题。
