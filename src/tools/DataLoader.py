@@ -141,6 +141,16 @@ class SceneText:
         #print(owner._name,data[3],'?????????/')
         if data[3] != None:
             self.sound = [SoundData(self,sound,suffix) for sound in data[3]]
+    @property
+    def fixcontent(self):
+        filter = [r'%[^;]*;',
+            r'\[[^\]]*\]',
+            r'\\n']
+        content = self.content
+        for rule in filter:
+            content = re.sub(rule,'',content)
+        return content
+        
         
         
 class Scene(ScnBase):
@@ -486,9 +496,9 @@ class SoundManager:
         
         if print_content:
             if sound.owner.speaker:
-                print(f'【{sound.owner.speaker}】:{sound.owner.content}')
+                print(f'【{sound.owner.speaker}】:{sound.owner.fixcontent}')
             else:
-                print(sound.owner.content)
+                print(sound.owner.fixcontent)
             
         
         audio = pygame.mixer.Sound(sound_path)
@@ -531,17 +541,17 @@ class SoundManager:
                     if using_tts:
                         if print_content == True:
                             if sound.speaker:
-                                print(f'【{sound.speaker}】:{sound.content}')
+                                print(f'【{sound.speaker}】:{sound.fixcontent}')
                             else:
-                                print(sound.content)
-                        self.engine.say(sound.content)
+                                print(sound.fixcontent)
+                        self.engine.say(sound.fixcontent)
                         self.engine.runAndWait()
                         time.sleep(interval)
                     elif print_content == True:
                         if sound.speaker:
-                            print(f'【{sound.speaker}】:{sound.content}')
+                            print(f'【{sound.speaker}】:{sound.fixcontent}')
                         else:
-                            print(sound.content)
+                            print(sound.fixcontent)
                         time.sleep(interval)
                 else:
                     self.playsounds(sound.sound,wait_done,tick,interval,print_content)
