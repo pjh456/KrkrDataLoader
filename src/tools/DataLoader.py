@@ -10,7 +10,8 @@ import pyttsx3
 
 def get_target_list(data={'nexts':[{'target':[],
                                     'storage':'Defualt location'}]},
-                    isselect=False):
+                    isselect=False,
+                    defualt_storage='Defualt location'):
     """Format target list.
 
     Args:
@@ -20,22 +21,25 @@ def get_target_list(data={'nexts':[{'target':[],
     Returns:
         target_list: a list of target(str).
     """
+        
     return [(item['target'] if 'target' in item else None,
-             item['storage']) 
+            (item['storage'] if 'storage' in item else defualt_storage)) 
             for item in (data['selects'] if isselect else data['nexts'])]
 
 class Select:
-    def __init__(self,data={'text':'Unknown',
+    def __init__(self,
+                 data={'text':'Unknown',
                             'storage':'defualt',
-                            'target':[]}):
+                            'target':[]},
+                 storage='Defualt location'):
         """A piece of select.
 
         Args:
             data (dict): Selection data.
         """
         self.text = data['text']
-        self.location = data['storage']
-        self.target = data['target']
+        self.target = data['target'] if 'target' in data else '*'+data['tag']
+        self.location = storage
     
     def __str__(self):
         return self.text
@@ -57,7 +61,7 @@ class ScnBase:
         self.isselect = 'selects' in data
         self.target = []
         if data != {}:
-            self.target = get_target_list(data,self.isselect)
+            self.target = get_target_list(data,self.isselect,location)
         self.data = data
         
     @property
@@ -74,6 +78,7 @@ class ScnBase:
         return self.fixname
 
 
+'''
 class Setting(ScnBase):
     def __init__(self,
                  name='Defualt Name',
@@ -96,10 +101,14 @@ class Setting(ScnBase):
             for single_data in data['selects']:
                 new_select = Select(single_data)
                 self.selects.append(new_select)
+'''
 
 # 我禁止了直接通过SoundData来播放，因为无法指定其地址，批量化进行太麻烦
 class SoundData:
-    def __init__(self,owner={'speaker':'Unknown','content':"Unknown"},data={'voice':'defualt'},suffix='.ogg'):
+    def __init__(self,
+                 owner={'speaker':'Unknown','content':"Unknown"},
+                 data={'voice':'defualt'},
+                 suffix='.ogg'):
         """A piece of sound data.
 
         Args:
@@ -116,7 +125,7 @@ class SoundData:
         self.voice = data['voice']+suffix
 
 class SceneText:
-    def __init__(self,owner=None,data=list()):
+    def __init__(self,owner=None,data=list(),suffix='.ogg'):
         """A piece of text data.
 
         Args:
@@ -131,7 +140,7 @@ class SceneText:
         self.sound = None
         #print(owner._name,data[3],'?????????/')
         if data[3] != None:
-            self.sound = [SoundData(self,sound) for sound in data[3]]
+            self.sound = [SoundData(self,sound,suffix) for sound in data[3]]
         
         
 class Scene(ScnBase):
@@ -139,7 +148,8 @@ class Scene(ScnBase):
                  name='Defualt Name',
                  location='Defualt Location',
                  data={},
-                 setting=None):
+                 setting=None,
+                 suffix='.ogg'):
         """A piece of setting which consists of BGM data,image data and so on.
 
         Args:
@@ -157,10 +167,18 @@ class Scene(ScnBase):
         self.texts = None
         try:
             #self.texts = data['texts']
-            self.texts = [SceneText(self,text) for text in data['texts']]
+            self.texts = [SceneText(self,text,suffix) for text in data['texts']]
         except KeyError:
             pass
         self.setting = setting
+        self.suffix = suffix
+        
+        self.selects = []
+        if self.isselect:
+            for single_data in data['selects']:
+                #print(single_data)
+                new_select = Select(single_data,location)
+                self.selects.append(new_select)
     
     def exposeTextWithFilter(self,
                              filter=None,
@@ -229,7 +247,7 @@ class Scene(ScnBase):
             output_file.close()
         
 class Scenes:
-    def __init__(self,path):
+    def __init__(self,path,suffix='.ogg'):
         """A whole scene file.
 
         Args:
@@ -243,32 +261,49 @@ class Scenes:
         scenes = json.load(open(path,'r',encoding='utf-8'))
         self.hash = scenes['hash']
         self.name = scenes['name']
+        self.suffix = suffix
         
         # 列出所有剧情片段
+        # 由于《魔女的夜宴》中的数据报错，现在将所有设置归为场景处理 - version 3.0.0。
         self.scenes = []
         self.scene_index = {}
         for index,data in tqdm.tqdm(enumerate(scenes['scenes']),desc=f'Loading {self.name} scenes',total=len(scenes['scenes'])):
             # UNSTABLE
             # 这里使用的是奇偶交替判断，未来可能会报错。
-            if index%2 == 0:
-                new_scene = Scene(data['label'],self.name,data,None)
+            #if index%2 == 0:
+            if True:
+                new_scene = Scene(data['label'],self.name,data,None,suffix)
                 self.scenes.append(new_scene)
         for index,data in enumerate(self.scenes):
             self.scene_index[data._name] = index
         
+        '''
         # 列出所有设置
         self.settings = []
         self.setting_index = {}
         #for index,data in enumerate(scenes['scenes']):
         for index,data in tqdm.tqdm(enumerate(scenes['scenes']),desc=f'Loading {self.name} settings',total=len(scenes['scenes'])):
             # UNSTABLE
-            # 这里使用的是奇偶交替判断，未来可能会报错。
-            if index%2 == 1:
+            if not 'texts' in data:
                 new_setting = Setting(data['label'],None,self.name,data)
                 self.settings.append(new_setting)
         for index,data in enumerate(self.settings):
             self.setting_index[data._name] = index
+        '''
         
+        for scene in tqdm.tqdm(self.scenes,desc=f'Redirect {self.name} targets',total=len(self.scenes)):
+            cache_target = scene.target
+            scene.target = []
+            for name,storage in cache_target:
+                try:
+                    scene.target.append(self.scenes[self.scene_index[name]])
+                except KeyError:
+                    new_target = Scene(name,storage,{})
+                    scene.target.append(new_target)
+                except Exception as e:
+                    print(e)
+        
+        '''
         # 把设置赋给剧情片段，并重定向 Scene.target
         for scene in tqdm.tqdm(self.scenes,desc=f'Redirect {self.name} targets',total=len(self.scenes)):
             cache_target = scene.target
@@ -301,6 +336,7 @@ class Scenes:
                     scene.target.append(new_target)
                 except Exception as e:
                     print(e)
+        '''
             
     def getIndexByName(self,name):
         return self.scene_index[name]
@@ -354,7 +390,8 @@ class Scnfolder:
     def __init__(self,
                  path,
                  name='defualt_scene',
-                 debug=False):
+                 debug=False,
+                 suffix='.ogg'):
         """A whole scene file folder.
 
         Args:
@@ -366,7 +403,9 @@ class Scnfolder:
         if not os.path.exists(path):
             raise FileNotFoundError(f'Directory {path} is not found.')
         
+        
         self.name = name
+        self.suffix = suffix
         
         # 读取所有非子目录的文件
         filedirs = [filename for filename in os.listdir(path) if filename.endswith('.ks.json')]
@@ -377,7 +416,7 @@ class Scnfolder:
             if debug:
                 print(f'Open {filename}...')
             filepath = os.path.join(path, filename)
-            new_scene = Scenes(filepath)
+            new_scene = Scenes(filepath,suffix)
             self.datas.append(new_scene)
             self.data_index[new_scene.name] = index
             if debug:

@@ -4,6 +4,7 @@ engine = pyttsx3.init()
 print(engine.getProperty('rate'))
 engine.setProperty('rate',150)
 voices = engine.getProperty('voices')
+engine.setProperty('voice','HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_JA-JP_HARUKA_11.0')
 
 for voice in voices:
     # 输出声音的ID

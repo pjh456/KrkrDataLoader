@@ -5,7 +5,7 @@ import os
 class Decompiler:
     def __init__(self,path=None):
         FreeMoteToolkitPath = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'FreeMoteToolkit')
-        print(FreeMoteToolkitPath)
+        #print(FreeMoteToolkitPath)
         if path == None:
             path = os.path.join(FreeMoteToolkitPath,'PsbDecompile.exe')
         self.decompiler_path = path

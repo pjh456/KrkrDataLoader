@@ -1,9 +1,22 @@
-## [2.3.1.0721]- 2024-7-21 ***latest**
+## [3.0.0] - 2024-7-22  ***latest**
+* 这个版本是一个稳定版本，并且进行了大的更新
+### Fixed
+- 修复了读取《魔女的夜宴》会报错的问题，对《魔女的夜宴》进行了适应性调整。
+- 修复了 [README-zh.md](README-zh.md) 的文档错误。
+### Added
+- 增加了《魔女的夜宴》对应的适配参数，使其能够正常被读取。
+- 给 ``SoundData``,``SceneText``,``Scene``,``Scenes`` 与 ``Scnfolder`` 增加了初始化参数 ``suffix``，用于指定音频文件格式。
+### Changed
+- 修改了 [SoundManagerExample.py](../examples/SoundManagerExample.py) 的设置，提供了本地语音播放参数的设置样例。
+### Deleted
+- 删除了 ``Setting`` 类，以后所有的剧情片段只根据 ``isselect`` 参数及有无文本进行区分，不对设置参数做具体调整，以适应《魔女的夜宴》数据。
+
+
+## [2.3.1.0721]* - 2024-7-21
 * 0d00 0721
 ### Added
 - 新增了 [AfterStory](../src/AfterStory) 文件夹，用于维护在本项目完工后的一些相关小创意。
 - 新增了 [ayachinene.py](../src/AfterStory/ayachinene.py)，可调用 ``Onani`` 类用于调用 ``Onani.Onani_generate_number()`` 函数，将数字转化为数学表达式（目前最大是60）。
-
 
 
 ## [2.3.1]* - 2024-7-20

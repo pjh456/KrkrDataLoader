@@ -77,21 +77,13 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 ### ``ScnBase``
 
-``Setting`` 和 ``Setting`` 的基类，包含一些共用属性。
+``Scene`` 的基类。
 
-在 2.0.0 版本后，选择支的具体内容可以由 ``ScnBase.selects`` 进行调用，通过 ``ScnBase.isselect`` 属性区分选择支的存在，除含选择支的 ``Setting`` 对象为 ``True``，其他情况均为 ``False``。
+在 2.0.0 版本后，选择支的具体内容可以由 ``ScnBase.selects`` 进行调用，通过 ``ScnBase.isselect`` 属性区分选择支的存在。
 
 提供了一个属性 ``ScnBase.fixname`` 作为每个场景的唯一标识符。
 
-提供了 ``ScnBase.target`` 属性来获取下一个或多个场景。返回一个由 ``Setting`` 或 ``Scene`` 类对象组成的 ``list``。
-
-#### ``Setting``
-
-代表剧情场景片段的背景设置，包括但不限于立绘、音频、图像、选择支等内容。
-
-调用属性 ``Setting.owner`` 来获取其所属剧情片段。
-
-**通过 ``Scenes.settings`` 获取的 ``Setting`` 类该属性必然为 ``None``。**
+提供了 ``ScnBase.target`` 属性来获取下一个或多个场景。返回一个由 ``Scene`` 类对象组成的 ``list``。
 
 #### ``SceneText``
 
@@ -99,7 +91,7 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 调用属性 ``SceneText.owner`` 来获取其所属剧情片段。
 
-调用属性 ``Setting.data`` 来获取其全部内容，其返回值为一个 ``list``。
+调用属性 ``SceneText.data`` 来获取其全部内容，其返回值为一个 ``list``。
 
 提供了属性 ``SceneText.speaker`` 和``SceneText.content``，分别表示文本说话人和内容。
 
@@ -109,8 +101,6 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 #### ``Scene``
 
 剧情片段被分离，以实现选择和场景过渡之间的切换。
-
-若想获取具体参数内容，请调用 ``Scene.setting`` 属性以获取一个属于其的 ``Setting`` 类。
 
 提供了一个属性 ``Scene.title`` 来标识每个文件对应的剧情标题（目前跨文件对象尚不可用）。
 
@@ -123,8 +113,6 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 表示整个 ``.ks.json`` 格式文件。为了高效管理各个片段，我将每个片段嵌套在类结构中。
 
 您可以使用 ``Scenes[]`` 访问单个 ``Scene`` 实例，且 ``Scenes`` 支持迭代。
-
-提供了 ``Scenes.setting`` 和 ``Scenes.setting_index`` 分别指定了文件内所有 ``Setting`` 对象及其索引。通过 ``Scenes.settings`` 获取的 ``Setting`` 类该属性必然为 ``None``。
 
 使用 ``Scenes.getIndexByName`` 获取对应 ``Scene.name`` 的索引，以及 ``Scene.getNameByIndex`` 根据给定索引检索  ``Scene.name``。
 
