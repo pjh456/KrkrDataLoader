@@ -10,28 +10,27 @@
 
 使用解包工具 [FreeMoteToolkit](../src/FreeMoteToolkit)，辅以 ``subprocess`` 功能，实现文件处理自动化，无需逐一手动拖放解包。
 
-###### 实际上已存在一个可运行的版本，但最初并未计划开源，导致代码难以维护。本质上，它简化了重复性工作。我打算重构代码以提高可维护性，并在准备就绪后发布。
 
-### 通过将 ``.ks.json`` 格式文件转换为对象结构，实现内容的有效处理。
+### 通过将 ``.ks.json`` 格式文件（或文件夹）转换为对象结构，提供了导出剧情文本等功能
 
+
+### 播放剧情音频，提供了便利的“听剧情”接口
+
+利用 ``pyttsx3`` 库的TTS功能，以及 ``pygame`` 的音频播放，实现了对剧情内容的复现。
+
+###### 未来还会接入 ``ffmpeg`` 的合成功能，以便导出由剧情合成的长音频。
+
+### 立绘合成与导出（施工中）
 
 其他功能正在积极开发中。
 
-###### 我正在创建它们，但在考虑进一步简化，这可能推迟更精炼版本的发布。
+###### 更精炼版本的发布可能会受进度的影响而推迟。
 
 ## 安装方法
 
 下载整个文件夹，按照使用说明引用 [src.tools](../src/tools) 中的库。这些都是简单的实用程序，避免了手动编写解包脚本的繁琐工作。
 
 ## 使用方法
-
-### **配置文件**
-
-在早期版本中，用于定位 [FreeMoteToolkit](../src/FreeMoteToolkit) 的路径。
-
-但现在支持基于项目结构的自动配置，使此功能暂时废弃。
-
-###### 未来实现音频处理时，可能会再次涉及 ``ffmpeg``。
 
 ### **剧本解包**
 
@@ -59,6 +58,8 @@ d = Decompiler()
 d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 ~~~
 
+>为了防止访问越界等问题，在指定的文件夹中解包的文件并不包含其子文件夹的文件。
+
 详细示例，请参见 [DecompileExample.py](../examples/DecompileExample.py)。
 
 ### **剧情读取**
@@ -67,23 +68,15 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 ``ScnFolder`` 类用于批量处理整个文件夹，实现了大规模的文件管理。
 
+``Config`` 类用于配置全局变量。
+
 注：以下的结构在源码中是从里到外的。
 
 #### ``Select``
 
 代表选择中的特定选项。
 
-具有 ``Select.text`` ``Select.target`` 和 ``Select.target`` 属性，分别指示选项的文本、所在文件和它引导的后续剧情。
-
-### ``ScnBase``
-
-``Scene`` 的基类。
-
-在 2.0.0 版本后，选择支的具体内容可以由 ``ScnBase.selects`` 进行调用，通过 ``ScnBase.isselect`` 属性区分选择支的存在。
-
-提供了一个属性 ``ScnBase.fixname`` 作为每个场景的唯一标识符。
-
-提供了 ``ScnBase.target`` 属性来获取下一个或多个场景。返回一个由 ``Scene`` 类对象组成的 ``list``。
+具有 ``Select.text`` ``Select.location`` 和 ``Select.target`` 属性，分别指示选项的文本、所在文件和它引导的后续剧情。
 
 #### ``SceneText``
 
@@ -102,11 +95,19 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 剧情片段被分离，以实现选择和场景过渡之间的切换。
 
-提供了一个属性 ``Scene.title`` 来标识每个文件对应的剧情标题（目前跨文件对象尚不可用）。
+通过 ``Scene.isselect`` 属性区分选择支的存在，选择支的具体内容可以由 ``Scene.selects`` 进行调用。
+
+提供了一个属性 ``Scene.fixname`` 作为每个场景的唯一标识符。
+
+提供了 ``Scene.target`` 属性来获取下一个或多个场景。返回一个由 ``Scene`` 类对象组成的 ``list``。
+
+提供了一个属性 ``Scene.title`` 来标识每个文件对应的剧情标题（目前已不维护）。
 
 提供了属性 ``Scene.texts`` 来获取剧情片段中的所有文本。返回一个由特殊格式的 ``dict`` 组成的 ``list``。
 
-使用 ``Scene.exposeTextWithFilter(filter,output_file,watch_output)`` 导出某一个场景的剧情文本。其中 ``filter`` 为一个由正则表达式组成的 ``list``，用于过滤一些特殊符号；``output_file`` 为导出文件 **（非路径，以 ``_io.TextIOWrapper``，即 ``open()`` 返回格式为指定格式）**，如果省略，则会在 src/outputs/文件名 下生成一个与该场景同名、以 ``.txt`` 结尾的文本文件；``watch_output`` 为测试选项，默认为 ``False``，若参数为 ``True`` 则会在命令行同步输出导出文件的内容以供测试。若该场景无文本，则会在命令行输出提示，同时也会保留一个只含文件标识符和 ``target`` 的文件。
+使用 ``Scene.exposeText(output_file,watch_output)`` 导出某一个场景的剧情文本。``output_file`` 为导出文件 **（非路径，以 ``_io.TextIOWrapper``，即 ``open()`` 返回格式为指定格式）**，如果省略，则会在 src/outputs/文件名 下生成一个与该场景同名、以 ``.txt`` 结尾的文本文件；``watch_output`` 为测试选项，默认为 ``False``，若参数为 ``True`` 则会在命令行同步输出导出文件的内容以供测试。若该场景无文本，则会在命令行输出提示，同时也会保留一个只含文件标识符和 ``target`` 的文件。
+
+>如果希望自定义文本的过滤器，请修改属性 ``Config.filter``，其默认值为一个包含若干正则表达式的列表，用于去除被过滤的部分。
 
 #### ``Scenes``
 
@@ -116,7 +117,9 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 使用 ``Scenes.getIndexByName`` 获取对应 ``Scene.name`` 的索引，以及 ``Scene.getNameByIndex`` 根据给定索引检索  ``Scene.name``。
 
-使用 ``Scenes.exposeTextWithFilter(filter,output_path,watch_output)`` 导出整个文件文本。其中 ``filter`` 为一个由正则表达式组成的 ``list``，用于过滤一些特殊符号；``output_path`` 为导出文件路径，如果省略，则会在 src/outputs/文件名 下生成一个与该文件同名、以 ``.ks.txt`` 结尾的文本文件；``watch_output`` 为测试选项，默认为 ``False``，若参数为 ``True`` 则会在命令行同步输出导出文件的内容以供测试。
+使用 ``Scenes.exposeText(output_path,watch_output)`` 导出整个文件文本。``output_path`` 为导出文件路径，如果省略，则会在 src/outputs/文件名 下生成一个与该文件同名、以 ``.ks.txt`` 结尾的文本文件；``watch_output`` 为测试选项，默认为 ``False``，若参数为 ``True`` 则会在命令行同步输出导出文件的内容以供测试。
+
+>如果希望自定义文本的过滤器，请修改属性 ``Config.filter``，其默认值为一个包含若干正则表达式的列表，用于去除被过滤的部分。
 
 详细示例，请参见 [ScnLoaderexample.py](../examples/ScnLoaderExample.py)。
 
@@ -126,9 +129,25 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 在初始化阶段把所有 ``.ks.json`` 格式文件作为 ``Scenes`` 格式读取。（不包括子文件夹中的文件）
 
-初始化 ``Scnfolder(path,name,debug)`` 时，``path`` 用于指定文件夹路径，``name`` 用于指定该对象的名字（目前无用），``debug=True`` 时会在控制台输出读取文件进度。
+初始化 ``Scnfolder(path,name)`` 时，``path`` 用于指定文件夹路径，``name`` 用于指定该对象的名字（目前无用）。
 
 与 ``Scenes`` 类似，提供了函数 ``Scnfolder.getIndexByName`` 与 ``Scnfolder.getNameByIndex``，以及 ``Scnfloder[]`` 的调用方法。
+
+### ``Config``
+
+全局变量的设置。
+
+``Config.encoding`` 指定了文件读取的编码形式。
+``Config.audio_suffix`` 指定了音频文件的后缀名。
+``Config.defualt_name`` 指定了默认的对象名。
+``Config.defualt_location`` 指定了默认的对象位置名。
+``Config.defualt_speaker`` 指定了文本的默认说话人。
+``Config.defualt_content`` 指定了文本的默认内容。
+``Config.filter`` 指定了输出文本时的过滤器，为一个由正则表达式组成的``list``，用于去除需要过滤掉的部分。
+``Config.hide_tqdm`` 指定了是否显示读取文件的进度条。
+``Config.debug`` 指定了是否开启调试模式。
+``Config.version`` 指定了加载文档的解释器，目前稳定的只有 ``senrenbanka`` 和 ``sanoba witch`` 两个版本，默认为 ``senrenbanka``。
+> ``Config.version`` 的设置主要是因为不同krkr2引擎的版本不同，从而导致了选择支、跳转等定义的命名方式不同。目前只对《千恋万花》和《魔女的夜宴》两大版本进行了微调，其他游戏在版本相近的情况下应该是同样可以正常使用的。
 
 ### **音频管理**
 
@@ -138,7 +157,7 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 表示一条音频数据。
 
-初始化时 ``SoundData(owner={'speaker':'Unknown','content':"Unknown"},data=dict(),suffix='.ogg')``，``owner`` 默认值为 ``{'speaker':'Unknown','content':"Unknown"}``，以防止播放时的报错，**但从 ``SceneText`` 中获取的 ``SoundData.owner`` 必然为 ``SceneText`` 格式**；``data`` 指定了该音频在文件中的内容，默认为 ``{'voice':'defualt'}``；``suffix`` 为音频后缀，默认为 ``.ogg``。
+初始化时 ``SoundData(owner={'speaker':'Unknown','content':"Unknown"},data=dict())``，``owner`` 默认值为 ``{'speaker':'Unknown','content':"Unknown"}``，以防止播放时的报错，**但从 ``SceneText`` 中获取的 ``SoundData.owner`` 必然为 ``SceneText`` 格式**；``data`` 指定了该音频在文件中的内容，默认为 ``{'voice':'defualt'}``。
 
 调用 ``SoundData.name`` 以获取其说话人名，调用 ``SoundData.voice`` 以获得其文件名。
 
@@ -172,10 +191,15 @@ Ciallo～(∠・ω< )⌒☆
 
 ## 未来可能实现
 
-### 长音频剧本合成
+### 长音频剧本合成（正在开发中）
+
 将整个文件的剧本合并为一个长音频文件（未来改进或许包含背景音乐），用于像听广播剧一样收听，避免许多尴尬时刻。 
 
-这正在开发中，但我仍在权衡是否为无声角色和旁白使用文本转语音 (TTS)，这可能比较耗费资源。
+虽然长音频的合成尚未完成，但是播放已经完全可以实现了。
+
+### 立绘的加载与导出（正在开发中）
+
+为了给可能要进行制作的桌宠做铺垫。
 
 ### 新引擎加密的解密
 
@@ -186,6 +210,22 @@ Ciallo～(∠・ω< )⌒☆
 敬请期待……但不会很快。
 
 ## 后记
+
+### 3.1.0
+
+自从我发现 ``Krkrextract`` 具有直接导出文本的功能之后，其实我是深受打击的，因此项目的开发进度也就慢了下来。
+
+但是我发现偶尔在B站上还是能看到一些对于这类工具的需要，这促使我继续改进这个项目，以实现一个便于使用的版本。
+
+未来我可能会考虑PyQt的使用，以开发窗口化程序来简化解包和文件读取过程。
+
+而且立绘的信息在我用GRAbro获取了合并规则之后，也变得可读了，因此也许最终会把立绘合成导出也给合并进来。
+
+我还没考虑过CG的合成，这个或许不会很快，因为我还要花实现搞点小玩具（桌宠）玩玩。
+
+《魔女的夜宴》和《千恋万花》的数据尚已通过测试，可以正常使用，其他的不保证，因此将来我会提供一个自定义接口，可以自定义解包规则，以简化这一流程。
+
+综上所述，看到还有这么多功能要写，《天使纷扰》的解包暂停，未来重启时会写在这里的。
 
 ### 2.1.0
 

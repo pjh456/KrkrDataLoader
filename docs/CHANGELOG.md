@@ -1,4 +1,20 @@
-## [3.0.1] - 2024-7-22  ***latest**
+## [3.1.0] - 2024-7-24  ***latest**
+* 这个版本是一个稳定版本，并且进行了大的更新
+### Fixed
+- 修复了初始化 ``SoundManager`` 会输出pygame欢迎信息的问题。
+- 修复了保存文本文件报错的问题。
+- 修复了 ``Decompiler.decompile_all()`` 会访问子文件夹的潜在问题，如今不会再访问子文件夹。
+### Added
+- 新增 ``Config`` 类用于初始化配置。
+- 新增 [FgimageLoader](../src/tools/FgimageLoader.py) 用于处理立绘。
+### Changed
+- 修改了 ``SoundData``,``SceneText``,``Scene``,``Scenes`` 与 ``Scnfolder`` 参数 ``suffix`` 配置位置，现在仅需调用 ``Config.audio_suffix`` 即可配置。
+- 调整了大部分类的函数文档。
+- 调整了支持的解析格式，提高了版本的稳定性。
+- 修改了 [README-zh.md](README-zh.md)，使其符合当前版本接口。
+
+
+## [3.0.1] - 2024-7-22
 ### Added 
 - 新增属性 ``SceneText.fixcontent``，确保播放输出台词时的正常输出与TTS。
 

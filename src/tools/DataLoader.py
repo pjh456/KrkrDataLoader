@@ -1,17 +1,64 @@
+import os,re,io
 import json
-import os
-import re
-import io
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
-import time
-import tqdm
 import pyttsx3
+import time,tqdm
 
+STABLE_GAMES = [
+    'senrenbanka',
+    'sanoba witch'
+]
+
+STABLE_DICT = {
+    'senrenbanka':{
+        'nexts':{
+            'target':lambda data:data['target'] if 'target' in data else None,
+            'storage':lambda data:data['storage'] if 'storage' in data else Config.defualt_location
+        },
+        'selects':{
+            'target':lambda data:data['target'] if 'target' in data else None,
+            'storage':lambda data:data['storage'] if 'storage' in data else Config.defualt_location
+        }
+    },
+    'sanoba witch':{
+        'nexts':{
+            'target':lambda data:data['target'] if 'target' in data else None,
+            'storage':lambda data:data['storage'] if 'storage' in data else Config.defualt_location
+        },
+        'selects':{
+            'target':lambda data:data['target'] if 'target' in data else '*'+data['tag'],
+            'storage':lambda data:data['storage'] if 'storage' in data else Config.defualt_location
+        }
+        
+    }
+}
+
+class Config:
+    encoding = 'utf-8'
+    audio_suffix = '.ogg'
+    
+    defualt_name = 'Defualt Name'
+    defualt_location = 'Defualt location'
+    
+    defualt_speaker = 'Unknown'
+    defualt_content = 'Unknown'
+    
+    filter = [r'%[^;]*;',
+            r'\[[^\]]*\]',
+            r'\\n']
+    
+    hide_tqdm = False
+    debug = False
+    
+    version = 'senrenbanka'
+    
+    
 
 def get_target_list(data={'nexts':[{'target':[],
-                                    'storage':'Defualt location'}]},
+                                    'storage':Config.defualt_location}]},
                     isselect=False,
-                    defualt_storage='Defualt location'):
+                    defualt_storage=Config.defualt_location):
     """Format target list.
 
     Args:
@@ -22,23 +69,30 @@ def get_target_list(data={'nexts':[{'target':[],
         target_list: a list of target(str).
     """
         
+    '''
     return [(item['target'] if 'target' in item else None,
             (item['storage'] if 'storage' in item else defualt_storage)) 
             for item in (data['selects'] if isselect else data['nexts'])]
+    '''
+    return [(STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['target'](item),
+            STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['storage'](item)) 
+            for item in (data['selects'] if isselect else data['nexts'])]
+    
 
 class Select:
     def __init__(self,
                  data={'text':'Unknown',
-                            'storage':'defualt',
+                            'storage':Config.defualt_location,
                             'target':[]},
-                 storage='Defualt location'):
+                 storage=Config.defualt_location):
         """A piece of select.
 
         Args:
             data (dict): Selection data.
         """
         self.text = data['text']
-        self.target = data['target'] if 'target' in data else '*'+data['tag']
+        self.target = STABLE_DICT[Config.version]['selects']['target'](data)
+        #self.target = data['target']
         self.location = storage
     
     def __str__(self):
@@ -46,8 +100,8 @@ class Select:
 
 class ScnBase:
     def __init__(self,
-                 name='Defualt Name',
-                 location='Defualt Location',
+                 name=Config.defualt_name,
+                 location=Config.defualt_location,
                  data={}):
         """Base Scene class initialization.
 
@@ -78,54 +132,24 @@ class ScnBase:
         return self.fixname
 
 
-'''
-class Setting(ScnBase):
-    def __init__(self,
-                 name='Defualt Name',
-                 owner=None,
-                 location='Defualt Location',
-                 data={}):
-        """A piece of setting which consists of BGM data,image data and so on.
-
-        Args:
-            name (str): Setting name.
-            owner (Scene): The owner scene of the setting.
-            location (str): Setting file name.
-            data (dict): Setting file data.
-        """
-        super().__init__(name,location,data)
-        self.owner = owner
-        
-        self.selects = []
-        if self.isselect:
-            for single_data in data['selects']:
-                new_select = Select(single_data)
-                self.selects.append(new_select)
-'''
-
 # 我禁止了直接通过SoundData来播放，因为无法指定其地址，批量化进行太麻烦
 class SoundData:
     def __init__(self,
-                 owner={'speaker':'Unknown','content':"Unknown"},
-                 data={'voice':'defualt'},
-                 suffix='.ogg'):
+                 owner={'speaker':Config.defualt_speaker,'content':Config.defualt_content},
+                 data={'voice':'defualt'}):
         """A piece of sound data.
 
         Args:
             owner (SceneText): The owner text of the sound.
             data (dict): Sound data.
-            suffix (str): Sound file suffix.
         """
         self.owner = owner
         self.data = data
         
-        #self.name = data['name']
-        #self.pan = data['pan']
-        #self.type = data['type']
-        self.voice = data['voice']+suffix
+        self.voice = data['voice']
 
 class SceneText:
-    def __init__(self,owner=None,data=list(),suffix='.ogg'):
+    def __init__(self,owner=None,data=list()):
         """A piece of text data.
 
         Args:
@@ -138,36 +162,25 @@ class SceneText:
         self.speaker = data[0]
         self.content = data[2]
         self.sound = None
-        #print(owner._name,data[3],'?????????/')
+        
         if data[3] != None:
-            self.sound = [SoundData(self,sound,suffix) for sound in data[3]]
+            self.sound = [SoundData(self,sound) for sound in data[3]]
     @property
     def fixcontent(self):
-        filter = [r'%[^;]*;',
-            r'\[[^\]]*\]',
-            r'\\n']
+        filter = Config.filter
         content = self.content
         for rule in filter:
             content = re.sub(rule,'',content)
         return content
         
-        
+    def __str__(self):
+        return f'【{self.speaker}】:{self.content}'
         
 class Scene(ScnBase):
     def __init__(self,
-                 name='Defualt Name',
-                 location='Defualt Location',
-                 data={},
-                 setting=None,
-                 suffix='.ogg'):
-        """A piece of setting which consists of BGM data,image data and so on.
-
-        Args:
-            name (str): Setting name.
-            location (str): Setting file name.
-            data (dict): Setting file data.
-            setting (Setting): Scene setting.
-        """
+                 name=Config.defualt_name,
+                 location=Config.defualt_location,
+                 data={}):
         super().__init__(name,location,data)
         try:
             self.title = data['title']
@@ -177,11 +190,9 @@ class Scene(ScnBase):
         self.texts = None
         try:
             #self.texts = data['texts']
-            self.texts = [SceneText(self,text,suffix) for text in data['texts']]
+            self.texts = [SceneText(self,text) for text in data['texts']]
         except KeyError:
             pass
-        self.setting = setting
-        self.suffix = suffix
         
         self.selects = []
         if self.isselect:
@@ -190,21 +201,16 @@ class Scene(ScnBase):
                 new_select = Select(single_data,location)
                 self.selects.append(new_select)
     
-    def exposeTextWithFilter(self,
-                             filter=None,
-                             output_file=None,
-                             watch_output=False):
-        """Save scene texts with filter.
+    def exposeText(self,
+                    output_file=None,
+                    watch_output=False):
+        """Save scene texts.
 
         Args:
-            filter (list, optional): A list of regular expression strs. Set 'None' to use defualt filter.
             output_file (str, optional): Output file path. Set 'None' to use defualt path.
             watch_output (bool): Print output text in console. Defualts to False.
         """
-        if filter == None:
-            filter = [r'%[^;]*;',
-               r'\[[^\]]*\]',
-               r'\\n']
+        filter = Config.filter
         datas = self.texts
         
         defualt_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'outputs')
@@ -213,7 +219,7 @@ class Scene(ScnBase):
             output_folder = os.path.join(defualt_path,f'{self.location}')
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
-            output_file = open(os.path.join(output_folder,f'{self.fixname}'+'.txt'),'w+',encoding='utf-8')
+            output_file = open(os.path.join(output_folder,f'{self.fixname}'+'.txt'),'w+',encoding=Config.encoding)
         
         if not isinstance(output_file,io.IOBase):
             raise TypeError('File type error!')
@@ -226,11 +232,11 @@ class Scene(ScnBase):
             print(f"No texts in {self.location}/{self._name}, pass.")
         else:
             for data in datas:
-                name = data[0]
-                content = data[2]
+                name = data.speaker
+                content = data.content
                 for rule in filter:
                     content = re.sub(rule,'',content)
-                if data[0] is not None:
+                if name is not None:
                     if watch_output:
                         print(f'【{name}】'+':'+content)
                     output_file.write(f'【{name}】'+':'+content+'\n')
@@ -239,16 +245,27 @@ class Scene(ScnBase):
                         print(content)
                     output_file.write(content+'\n')
         
-        if self.setting is not None and self.setting.isselect:
-            for select in self.setting.selects:
+        if self.selects != []:
+            for select in self.selects:
+                output_file.write(select.text+'\n')
                 if watch_output:
-                    print(f'【{select.text}】->【{select.target}】')
-                output_file.write(f'【{select.text}】->【{select.target}】'+'\n')
+                    print(select.text)
+                    
+                output_file.write(f'【{select.location}/{select.target}】')
+                if watch_output:
+                    print(f'【{select.location}/{select.target}】',end='')
+                
+                output_file.write('\n')
+                if watch_output:
+                    print('')
         else:
-            for target in self.setting.target:
+            for target in self.target:
+                output_file.write(f'【{target.location}/{target.fixname}】'+'\n')
                 if watch_output:
-                    print(f'【{self.location}/{target}】')
-                output_file.write(f'【{self.location}/{target}】'+'\n')
+                    print(f'【{target.location}/{target.fixname}】')
+                    
+            
+        
         if watch_output:
             print('')
         output_file.write('\n')
@@ -257,7 +274,7 @@ class Scene(ScnBase):
             output_file.close()
         
 class Scenes:
-    def __init__(self,path,suffix='.ogg'):
+    def __init__(self,path):
         """A whole scene file.
 
         Args:
@@ -268,85 +285,50 @@ class Scenes:
         if not os.path.exists(self.path):
             raise FileNotFoundError(f'File {path} is not found.')
         
-        scenes = json.load(open(path,'r',encoding='utf-8'))
+        scenes = json.load(open(path,'r',encoding=Config.encoding))
         self.hash = scenes['hash']
         self.name = scenes['name']
-        self.suffix = suffix
         
         # 列出所有剧情片段
         # 由于《魔女的夜宴》中的数据报错，现在将所有设置归为场景处理 - version 3.0.0。
         self.scenes = []
         self.scene_index = {}
-        for index,data in tqdm.tqdm(enumerate(scenes['scenes']),desc=f'Loading {self.name} scenes',total=len(scenes['scenes'])):
-            # UNSTABLE
-            # 这里使用的是奇偶交替判断，未来可能会报错。
-            #if index%2 == 0:
-            if True:
-                new_scene = Scene(data['label'],self.name,data,None,suffix)
+        if Config.hide_tqdm:
+            for index,data in enumerate(scenes['scenes']):
+                new_scene = Scene(data['label'],self.name,data)
                 self.scenes.append(new_scene)
+        else:
+            for index,data in tqdm.tqdm(enumerate(scenes['scenes']),desc=f'Loading {self.name} scenes',total=len(scenes['scenes'])):
+                new_scene = Scene(data['label'],self.name,data)
+                self.scenes.append(new_scene)
+        
         for index,data in enumerate(self.scenes):
             self.scene_index[data._name] = index
         
-        '''
-        # 列出所有设置
-        self.settings = []
-        self.setting_index = {}
-        #for index,data in enumerate(scenes['scenes']):
-        for index,data in tqdm.tqdm(enumerate(scenes['scenes']),desc=f'Loading {self.name} settings',total=len(scenes['scenes'])):
-            # UNSTABLE
-            if not 'texts' in data:
-                new_setting = Setting(data['label'],None,self.name,data)
-                self.settings.append(new_setting)
-        for index,data in enumerate(self.settings):
-            self.setting_index[data._name] = index
-        '''
-        
-        for scene in tqdm.tqdm(self.scenes,desc=f'Redirect {self.name} targets',total=len(self.scenes)):
-            cache_target = scene.target
-            scene.target = []
-            for name,storage in cache_target:
-                try:
-                    scene.target.append(self.scenes[self.scene_index[name]])
-                except KeyError:
-                    new_target = Scene(name,storage,{})
-                    scene.target.append(new_target)
-                except Exception as e:
-                    print(e)
-        
-        '''
-        # 把设置赋给剧情片段，并重定向 Scene.target
-        for scene in tqdm.tqdm(self.scenes,desc=f'Redirect {self.name} targets',total=len(self.scenes)):
-            cache_target = scene.target
-            scene.target = []
-            
-            # 取出 Scene 的所有 Setting（通常只有一个）
-            for name,storage in cache_target:
-                try:
-                    # 新建一个 Setting，与 scenes.settings 区分开
-                    new_setting = Setting(name,scene._name,storage,self.settings[self.setting_index[name]].data)
-                    set_cache_target = new_setting.target
-                    new_setting.target = []
-                    
-                    # 取出每个 Setting 对应的 Scene
-                    for set_name,set_storage in set_cache_target:
-                        try:
-                            new_setting.target.append(self.scenes[self.setting_index[set_name]])
-                        except KeyError:
-                            new_target = Scene(set_name,set_storage,{})
-                            new_setting.target.append(new_target)
-                        except Exception as e:
-                            print(e)
-                            
-                    scene.setting = new_setting
-                    
-                    scene.target += new_setting.target
-                except KeyError:
-                    # 跨文件的时候得改。
-                    new_target = Scene(name,storage,{})
-                    scene.target.append(new_target)
-                except Exception as e:
-                    print(e)
-        '''
+        if Config.hide_tqdm:
+            for scene in self.scenes:
+                cache_target = scene.target
+                scene.target = []
+                for name,storage in cache_target:
+                    try:
+                        scene.target.append(self.scenes[self.scene_index[name]])
+                    except KeyError:
+                        new_target = Scene(name,storage,{})
+                        scene.target.append(new_target)
+                    except Exception as e:
+                        print(e)
+        else:
+            for scene in tqdm.tqdm(self.scenes,desc=f'Redirect {self.name} targets',total=len(self.scenes)):
+                cache_target = scene.target
+                scene.target = []
+                for name,storage in cache_target:
+                    try:
+                        scene.target.append(self.scenes[self.scene_index[name]])
+                    except KeyError:
+                        new_target = Scene(name,storage,{})
+                        scene.target.append(new_target)
+                    except Exception as e:
+                        print(e)
             
     def getIndexByName(self,name):
         return self.scene_index[name]
@@ -355,14 +337,12 @@ class Scenes:
         return self.scenes[index]._name
 
     # 导出清洗后文件
-    def exposeTextWithFilter(self,
-                             filter=None,
+    def exposeText(self,
                              output_path=None,
                              watch_output=False):
-        """Save scene file texts with filter.
+        """Save scene file texts.
 
         Args:
-            filter (list, optional): A list of regular expression strs. Set 'None' to use defualt filter.
             output_file (str ,optional): Output file path. Set 'None' to use defualt path.
             watch_output (bool): Print output text in console. Defualts to False.
         """
@@ -375,13 +355,13 @@ class Scenes:
             output_folder = os.path.join(defualt_path,f'{self.name}')
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
-            output_file = open(os.path.join(output_folder,f'{self.name}'+'.txt'),'w+',encoding='utf-8')
+            output_file = open(os.path.join(output_folder,f'{self.name}'+'.txt'),'w+',encoding=Config.encoding)
         else:
-            output_file = open(output_path,'w+',encoding='utf-8')
+            output_file = open(output_path,'w+',encoding=Config.encoding)
         
         # 遍历每个文件并导出
         for scene in self.scenes:
-            scene.exposeTextWithFilter(filter,output_file,watch_output)
+            scene.exposeText(output_file,watch_output)
             
         # 关闭写入文件句柄    
         if output_file is not None:
@@ -399,15 +379,12 @@ class Scenes:
 class Scnfolder:
     def __init__(self,
                  path,
-                 name='defualt_scene',
-                 debug=False,
-                 suffix='.ogg'):
+                 name='defualt_scene'):
         """A whole scene file folder.
 
         Args:
             path (str): Folder path.
             name (str, optional): Name of folder. Defaults to 'defualt_scene'.
-            debug (bool, optional): Debug mode which prints process of loading. Defaults to False.
         """
         self.path = path
         if not os.path.exists(path):
@@ -415,26 +392,24 @@ class Scnfolder:
         
         
         self.name = name
-        self.suffix = suffix
         
         # 读取所有非子目录的文件
         filedirs = [filename for filename in os.listdir(path) if filename.endswith('.ks.json')]
         self.datas = []
         self.data_index = {}
-        #for index,filename in tqdm.tqdm(enumerate(filedirs),desc='Loading files',total=len(filedirs)):
         for index,filename in enumerate(filedirs):
-            if debug:
+            if Config.debug:
                 print(f'Open {filename}...')
             filepath = os.path.join(path, filename)
-            new_scene = Scenes(filepath,suffix)
+            new_scene = Scenes(filepath)
             self.datas.append(new_scene)
             self.data_index[new_scene.name] = index
-            if debug:
+            if Config.debug:
                 print(f'{filename} Finished.')
                 
         # 读完所有文件后再把跨文件的连接建立起来
         for data in self.datas:
-            if debug:
+            if Config.debug:
                 print(f'Fix {data.name} targets...')
             for scene in data.scenes:
                 for target in scene.target:
@@ -444,7 +419,7 @@ class Scnfolder:
                         aim_scenes = self.datas[self.data_index[scene.location]]
                         target_scene = aim_scenes.scenes[aim_scenes.getIndexByName(scene._name)]
                         scene = target_scene
-            if debug:
+            if Config.debug:
                 print(f'Fix {data.name} targets finished.')
                 
     def getIndexByName(self,name):
@@ -490,7 +465,7 @@ class SoundManager:
         if not isinstance(sound,SoundData):
             raise TypeError(f'{sound} must be SoundData.')
         
-        sound_path = os.path.join(self.path,sound.voice)
+        sound_path = os.path.join(self.path,sound.voice + Config.audio_suffix)
         if not os.path.exists(sound_path):
             raise FileNotFoundError(f'Sound File {sound_path} is not found.')
         

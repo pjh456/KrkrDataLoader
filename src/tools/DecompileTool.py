@@ -21,8 +21,7 @@ class Decompiler:
             print(e)
         
     def decompile_all(self,folder_path=os.getcwd()):
-        for root, dirs, files in os.walk(folder_path):
-            for file_name in files:
-                if file_name.endswith('.ks.scn'):
-                    file_path = os.path.join(root, file_name)
-                    self.decompile(file_path)
+        filedirs = [filename for filename in os.listdir(folder_path) if filename.endswith('.ks.scn')]
+        for file_name in filedirs:
+            file_path = os.path.join(folder_path, file_name)
+            self.decompile(file_path)
