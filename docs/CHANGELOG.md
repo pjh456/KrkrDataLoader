@@ -1,4 +1,12 @@
-## [3.1.0] - 2024-7-24  ***latest**
+## [3.2.0] - 2024-7-24  ***latest**
+### Added
+- 新增 [FginageLoaderExample.py](../src/tools/FgimageLoader.py) 用于演示立绘处理用法。
+- 于 [FgimageLoader](../src/tools/FgimageLoader.py) 中新增 ``Layer``,``Group``,``Fgimage`` 和 ``FgimageFolder`` 类。
+### Changed
+- 修改了 [README-zh.md](README-zh.md)，使其符合当前版本接口。
+
+
+## [3.1.0] - 2024-7-24
 * 这个版本是一个稳定版本，并且进行了大的更新
 ### Fixed
 - 修复了初始化 ``SoundManager`` 会输出pygame欢迎信息的问题。

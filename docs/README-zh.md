@@ -179,6 +179,40 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 详细示例，请参见 [SoundManagerExample.py](../examples/SoundManagerExample.py)。
 
+### **立绘合成与导出**
+
+[FgimageLoader.py](../src/tools/FgimageLoader.py) 中的 ``Fgimage`` 和 ``FgimageFolder``类用于批量音频处理。
+
+#### ``Layer``
+
+表示一张图层文件。
+
+目前尚不支持直接自定义，一般由 ``Fgimage`` 自动生成；
+
+因此对其参数也不进行详细介绍，详情请参照源码，属性均按照原有图层规则定义。
+
+#### ``Group``
+
+表示一个图层组。
+
+用于标记图层所在图层组，一般由 ``Fgimage`` 自动生成；
+
+目前尚无意义，未来在制作可视化界面时会用作图层组的分类。
+
+#### ``Fgimage``
+
+表示一份立绘规则文件（及其所调用的所有图层）。
+
+可以通过 ``Fgimage[]`` 调用其中的图层。
+
+提供了函数 ``Fgimage.get_image(layers,show,background)`` 获取一个 ``PIL.Image`` 对象。其中 ``layers`` 为一个由 ``int`` 组成的 ``list``，每个值为立绘名最后一个 ``_`` 与文件后缀（如 ``.png``）之间的下标；``show`` 为是否在返回的时候显示图片；``background`` 为一个四维元组 ``(R,G,B,A)``，用于注明背景颜色。
+
+#### ``FgimageFolder``
+
+表示一个图层文件夹（不包含子文件夹）。
+
+可以通过 ``FgimageFolder[]`` 调用其中的 ``Fgimage``。
+
 ## 开源动机(?)
 
 在解包使用 Krkr2 引擎的游戏剧情和用音频训练模型时遇到一些困难，浪费了大量时间在这些神秘的脚本上。
