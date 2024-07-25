@@ -36,6 +36,18 @@ class Layer(LayerBase):
             self.group_layer_id = int(row['group_layer_id'])
         except ValueError:
             self.group_layer_id = 0
+        self.image = None
+    
+    def load_image(self,max_size=None):
+        if not self.image:
+            try:
+                self.image = Image.open(self.path).convert('RGBA')
+            except FileNotFoundError:
+                self.image = Image.new("RGBA",(1,1),(0,0,0,0))
+        if max_size:
+            self.image.thumbnail(max_size)
+        return self.image
+            
         
             
 class Group(LayerBase):
@@ -51,7 +63,7 @@ class Fgimage:
             raise TypeError('Except a .txt file.')
         
         
-        self.name = rule_path.split('\\')[-1].split('.')[0]
+        self.name = rule_path.split('\\')[-1].split('/')[-1].split('.')[0]
         self.suffix = suffix
         
         self.data = None
@@ -106,7 +118,7 @@ class Fgimage:
     def getNameByIndex(self,index):
         return self.layers[self.layer_index[index]].name
     
-    def get_image(self,layers=[],show=False,background=(0,0,0,0)):
+    def get_image(self,layers=[],show=False,background=(0,0,0,0),max_size=None):
         def adjust_opacity(image, opacity):
             alpha = image.split()[-1]
             alpha = Image.fromarray((numpy.array(alpha) * opacity / 255).astype(numpy.uint8))
@@ -140,7 +152,10 @@ class Fgimage:
 
             # 使用alpha_composite将图层复合到最终图像上
             result_image = Image.alpha_composite(result_image, positioned_img)
-            
+        
+        if max_size:
+            result_image.thumbnail(max_size)
+        
         if show:
             result_image.show()
         return result_image

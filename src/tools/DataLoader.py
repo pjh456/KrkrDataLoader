@@ -526,6 +526,8 @@ class SoundManager:
                 print(f'【{sound.owner.speaker}】:{sound.owner.fixcontent}')
             else:
                 print(sound.owner.fixcontent)
+            if Config.window:
+                Config.window.refresh()
             
         
         audio = pygame.mixer.Sound(sound_path)
@@ -571,6 +573,8 @@ class SoundManager:
                                 print(f'【{sound.speaker}】:{sound.fixcontent}')
                             else:
                                 print(sound.fixcontent)
+                            if Config.window:
+                                Config.window.refresh()
                         self.engine.say(sound.fixcontent)
                         self.engine.runAndWait()
                         time.sleep(interval)
@@ -579,6 +583,8 @@ class SoundManager:
                             print(f'【{sound.speaker}】:{sound.fixcontent}')
                         else:
                             print(sound.fixcontent)
+                        if Config.window:
+                            Config.window.refresh()
                         time.sleep(interval)
                 else:
                     self.playsounds(sound.sound,wait_done,tick,interval,print_content)
