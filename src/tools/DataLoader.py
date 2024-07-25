@@ -52,6 +52,7 @@ class Config:
     debug = False
     
     version = 'senrenbanka'
+    window = None
     
     
 
@@ -180,7 +181,8 @@ class Scene(ScnBase):
     def __init__(self,
                  name=Config.defualt_name,
                  location=Config.defualt_location,
-                 data={}):
+                 data={},
+                 owner=None):
         super().__init__(name,location,data)
         try:
             self.title = data['title']
@@ -200,10 +202,41 @@ class Scene(ScnBase):
                 #print(single_data)
                 new_select = Select(single_data,location)
                 self.selects.append(new_select)
+        
+        self.owner = owner
+    
+    def get_text(self):
+        lines = []
+        lines.append(f'【{self.location}/{self.fixname}】'+'\n')
+        
+        if self.texts:
+            for data in self.texts:
+                name = data.speaker
+                content = data.content
+                for rule in Config.filter:
+                    content = re.sub(rule,'',content)
+                if name is not None:
+                    lines.append(f'【{name}】'+':'+content+'\n')
+                else:
+                    lines.append(content+'\n')
+                    
+                    
+        if self.selects != []:
+            for select in self.selects:
+                lines.append(select.text+'\n')
+                    
+                lines.append(f'【{select.location}/{select.target}】')
+                
+                lines.append('\n')
+        else:
+            for target in self.target:
+                lines.append(f'【{target.location}/{target.fixname}】'+'\n')
+        return lines
     
     def exposeText(self,
-                    output_file=None,
-                    watch_output=False):
+                    output_path='',
+                    watch_output=False,
+                    output_file=None):
         """Save scene texts.
 
         Args:
@@ -216,10 +249,13 @@ class Scene(ScnBase):
         defualt_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),'outputs')
         close_mark = output_file is None
         if output_file is None:
-            output_folder = os.path.join(defualt_path,f'{self.location}')
-            if not os.path.exists(output_folder):
-                os.makedirs(output_folder)
-            output_file = open(os.path.join(output_folder,f'{self.fixname}'+'.txt'),'w+',encoding=Config.encoding)
+            if output_path:
+                output_file = open(os.path.join(output_path,f'{self.fixname}'+'.txt'),'w+',encoding=Config.encoding)
+            else:
+                output_folder = os.path.join(defualt_path,f'{self.location}')
+                if not os.path.exists(output_folder):
+                    os.makedirs(output_folder)
+                output_file = open(os.path.join(output_folder,f'{self.fixname}'+'.txt'),'w+',encoding=Config.encoding)
         
         if not isinstance(output_file,io.IOBase):
             raise TypeError('File type error!')
@@ -293,18 +329,22 @@ class Scenes:
         # 由于《魔女的夜宴》中的数据报错，现在将所有设置归为场景处理 - version 3.0.0。
         self.scenes = []
         self.scene_index = {}
+        if Config.debug:
+            print(f'Loading scenes from {self.name}...')
         if Config.hide_tqdm:
             for index,data in enumerate(scenes['scenes']):
-                new_scene = Scene(data['label'],self.name,data)
+                new_scene = Scene(data['label'],self.name,data,self)
                 self.scenes.append(new_scene)
         else:
             for index,data in tqdm.tqdm(enumerate(scenes['scenes']),desc=f'Loading {self.name} scenes',total=len(scenes['scenes'])):
-                new_scene = Scene(data['label'],self.name,data)
+                new_scene = Scene(data['label'],self.name,data,self)
                 self.scenes.append(new_scene)
         
         for index,data in enumerate(self.scenes):
             self.scene_index[data._name] = index
         
+        if Config.debug:
+            print(f'Redirect from {self.name}...')
         if Config.hide_tqdm:
             for scene in self.scenes:
                 cache_target = scene.target
@@ -318,7 +358,7 @@ class Scenes:
                     except Exception as e:
                         print(e)
         else:
-            for scene in tqdm.tqdm(self.scenes,desc=f'Redirect {self.name} targets',total=len(self.scenes)):
+            for scene in tqdm.tqdm(self.scenes,desc=f'Redirect {self.name}',total=len(self.scenes)):
                 cache_target = scene.target
                 scene.target = []
                 for name,storage in cache_target:
@@ -336,10 +376,17 @@ class Scenes:
     def getNameByIndex(self,index):
         return self.scenes[index]._name
 
+    def get_text(self):
+        lines = []
+        for scene in self.scenes:
+            lines += scene.get_text()
+            lines.append('\n')
+        return lines
+    
     # 导出清洗后文件
     def exposeText(self,
-                             output_path=None,
-                             watch_output=False):
+                    output_path='',
+                    watch_output=False):
         """Save scene file texts.
 
         Args:
@@ -351,17 +398,18 @@ class Scenes:
         
         output_file = None
         # 是否已经有指定位置
-        if output_path is None:
+        if output_path == '':
             output_folder = os.path.join(defualt_path,f'{self.name}')
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
             output_file = open(os.path.join(output_folder,f'{self.name}'+'.txt'),'w+',encoding=Config.encoding)
         else:
-            output_file = open(output_path,'w+',encoding=Config.encoding)
+            #output_file = open(output_path,'w+',encoding=Config.encoding)
+            output_file = open(os.path.join(output_path,f'{self.name}'+'.txt'),'w+',encoding=Config.encoding)
         
         # 遍历每个文件并导出
         for scene in self.scenes:
-            scene.exposeText(output_file,watch_output)
+            scene.exposeText(output_file=output_file,watch_output=watch_output)
             
         # 关闭写入文件句柄    
         if output_file is not None:
@@ -399,13 +447,15 @@ class Scnfolder:
         self.data_index = {}
         for index,filename in enumerate(filedirs):
             if Config.debug:
-                print(f'Open {filename}...')
+                print(f'Open {filename}.')
             filepath = os.path.join(path, filename)
             new_scene = Scenes(filepath)
             self.datas.append(new_scene)
             self.data_index[new_scene.name] = index
             if Config.debug:
                 print(f'{filename} Finished.')
+                if Config.window:
+                    Config.window.refresh()
                 
         # 读完所有文件后再把跨文件的连接建立起来
         for data in self.datas:
@@ -414,13 +464,15 @@ class Scnfolder:
             for scene in data.scenes:
                 for target in scene.target:
                     if target._name is None:
-                        target._name = self.datas[self.data_index[target.location]][0]
+                        target._name = self.datas[self.data_index[target.location]][0]._name
                     if target.location != data.name:
                         aim_scenes = self.datas[self.data_index[scene.location]]
                         target_scene = aim_scenes.scenes[aim_scenes.getIndexByName(scene._name)]
                         scene = target_scene
             if Config.debug:
                 print(f'Fix {data.name} targets finished.')
+                if Config.window:
+                    Config.window.refresh()
                 
     def getIndexByName(self,name):
         return self.data_index[name]

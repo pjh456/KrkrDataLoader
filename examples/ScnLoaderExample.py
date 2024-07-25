@@ -30,5 +30,7 @@ for file in folder:
             print(f'        {target._name}')
 print('')
 
+print(datas.get_text())
+
 #datas[3].exposeText(watch_output = True)
 #datas.exposeText(watch_output = True)

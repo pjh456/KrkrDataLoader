@@ -1,4 +1,13 @@
-## [3.2.0] - 2024-7-24  ***latest**
+## [4.0.0] - 2024-7-25  ***latest**
+### Fixed
+- 修复了指定路径后可能存在的文件保存错误问题。
+- 修复了 ``Scene.fixname`` 的报错问题。
+### Added
+- 新增 ``Scene.get_text`` 与 ``Scenes.get_text`` 函数用于获取文本。
+- 新增尚未封装的GUI窗口 [KrkrDataLoaderGUI.py](../KrkrDataLoaderGUI.py)，可通过 ``python KrkrDataLoaderGUI.py`` 直接运行GUI；目前支持数据解包和剧情浏览、导出两大功能。
+
+
+## [3.2.0] - 2024-7-24
 ### Added
 - 新增 [FginageLoaderExample.py](../src/tools/FgimageLoader.py) 用于演示立绘处理用法。
 - 于 [FgimageLoader](../src/tools/FgimageLoader.py) 中新增 ``Layer``,``Group``,``Fgimage`` 和 ``FgimageFolder`` 类。
