@@ -1,4 +1,5 @@
 import PySimpleGUI as sg
+import PyQt5
 
 def main():
     # 定义布局

@@ -5,6 +5,7 @@ import pandas
 import chardet
 import numpy
 from PIL import Image
+from .DataLoader import Config
 
 def detect_encoding(file_path):
     with open(file_path, 'rb') as f:
@@ -14,7 +15,12 @@ def detect_encoding(file_path):
 class LayerBase:
     def __init__(self,row):
         if not isinstance(row,pandas.Series):
-            raise TypeError('Must be a Series object!')
+            if Config.debug:
+                raise TypeError('Must be a Series object!')
+            else:
+                print('Must be a Series object!')
+                if Config.window:
+                    Config.window.refresh()
         
         self.layer_type = int(row['layer_type'])
         self.name = row['name']
@@ -60,7 +66,12 @@ class Fgimage:
                  rule_path='',
                  suffix='.png'):
         if not rule_path.endswith('.txt'):
-            raise TypeError('Except a .txt file.')
+            if Config.debug:
+                raise TypeError('Except a .txt file.')
+            else:
+                print('Except a .txt file.')
+                if Config.window:
+                    Config.window.refresh()
         
         
         self.name = rule_path.split('\\')[-1].split('/')[-1].split('.')[0]
@@ -167,7 +178,12 @@ class Fgimage:
 class FgimageFolder:
     def __init__(self,path='',suffix='.png'):
         if not os.path.isdir(path):
-            raise Exception(f'{path} must be a folder!')
+            if Config.debug:
+                raise Exception(f'{path} must be a folder!')
+            else:
+                print(f'{path} must be a folder!')
+                if Config.window:
+                    Config.window.refresh()
         
         self.path = path
         filedirs = [filename for filename in os.listdir(path) if filename.endswith('.txt')]

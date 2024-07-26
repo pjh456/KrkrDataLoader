@@ -329,7 +329,7 @@ class Scenes:
         # 由于《魔女的夜宴》中的数据报错，现在将所有设置归为场景处理 - version 3.0.0。
         self.scenes = []
         self.scene_index = {}
-        if Config.debug:
+        if Config.debug or Config.window:
             print(f'Loading scenes from {self.name}...')
         if Config.hide_tqdm:
             for index,data in enumerate(scenes['scenes']):
@@ -343,7 +343,7 @@ class Scenes:
         for index,data in enumerate(self.scenes):
             self.scene_index[data._name] = index
         
-        if Config.debug:
+        if Config.debug or Config.window:
             print(f'Redirect from {self.name}...')
         if Config.hide_tqdm:
             for scene in self.scenes:
@@ -446,20 +446,20 @@ class Scnfolder:
         self.datas = []
         self.data_index = {}
         for index,filename in enumerate(filedirs):
-            if Config.debug:
+            if Config.debug or Config.window:
                 print(f'Open {filename}.')
             filepath = os.path.join(path, filename)
             new_scene = Scenes(filepath)
             self.datas.append(new_scene)
             self.data_index[new_scene.name] = index
-            if Config.debug:
+            if Config.debug or Config.window:
                 print(f'{filename} Finished.')
                 if Config.window:
                     Config.window.refresh()
                 
         # 读完所有文件后再把跨文件的连接建立起来
         for data in self.datas:
-            if Config.debug:
+            if Config.debug or Config.window:
                 print(f'Fix {data.name} targets...')
             for scene in data.scenes:
                 for target in scene.target:
@@ -469,7 +469,7 @@ class Scnfolder:
                         aim_scenes = self.datas[self.data_index[scene.location]]
                         target_scene = aim_scenes.scenes[aim_scenes.getIndexByName(scene._name)]
                         scene = target_scene
-            if Config.debug:
+            if Config.debug or Config.window:
                 print(f'Fix {data.name} targets finished.')
                 if Config.window:
                     Config.window.refresh()
