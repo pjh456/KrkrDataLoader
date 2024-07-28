@@ -1,6 +1,7 @@
 import subprocess
 import os
 import sys
+from .DataLoader import Config
 
 class Decompiler:
     def __init__(self,path=None):
@@ -12,9 +13,15 @@ class Decompiler:
         
     def decompile(self,file_path,stream_output=False):
         if not os.path.isfile(self.decompiler_path):
-            raise FileNotFoundError(f"Can't find {self.decompiler_path}")
+            if Config.debug:
+                raise FileNotFoundError(f"Can't find {self.decompiler_path}")
+            else:
+                print(f"Can't find {self.decompiler_path}")
         if not file_path.endswith('.ks.scn'):
-            raise TypeError('file must ends with ".ks.scn" ')
+            if Config.debug:
+                raise TypeError('file must ends with ".ks.scn" ')
+            else:
+                print('file must ends with ".ks.scn" ')
         try:
             if stream_output:
                 process  = subprocess.Popen([self.decompiler_path, file_path], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)

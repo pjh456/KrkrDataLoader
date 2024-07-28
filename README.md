@@ -5,9 +5,11 @@
 
 ## 版本更新前瞻
 
-GUI 基本上完工，但是暂时没空打包成可执行程序了，自己运行吧。
+GUI 的 exe 打包完了，bug 也修得差不多了。
 
-下一步修bug去。
+接下来可能会暂时停止更新，开始研究桌宠的制作了。
+
+If a English version of the latest README.md and KrkrDataLoader.exe is needed, please let me know by using Issues.
 
 ## 更远的前瞻：
 
@@ -16,3 +18,4 @@ GUI 基本上完工，但是暂时没空打包成可执行程序了，自己运�
 以及收集更多数据以检验代码健壮性，如《riddle joker》，《星光咖啡馆与死神之蝶》等，而不仅限于 《魔女的夜宴》和 《千恋万花》。
 
 对《天使纷扰》的解包暂停，敬请期待。
+

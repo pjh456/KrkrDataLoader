@@ -53,6 +53,7 @@ class Config:
     
     version = 'senrenbanka'
     window = None
+    stop_sound = False
     
     
 
@@ -565,6 +566,8 @@ class SoundManager:
             using_tts (bool, optional): Using tts engine to fill lines without voice. Defaults to False.
         """
         for sound in soundlist:
+            if Config.stop_sound:
+                return
             if isinstance(sound,SceneText):
                 if sound.sound == None:
                     if using_tts:
@@ -635,4 +638,6 @@ class SoundManager:
             using_tts (bool, optional): Using tts engine to fill lines without voice. Defaults to False.
         """
         for scene in scenes:
+            if Config.stop_sound:
+                return
             self.playScene(scene,wait_done,tick,interval,print_content,using_tts)

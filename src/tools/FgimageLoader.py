@@ -1,6 +1,5 @@
 import os
 import csv
-import json
 import pandas
 import chardet
 import numpy
