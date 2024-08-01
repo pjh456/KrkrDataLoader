@@ -407,13 +407,13 @@ def main():
                 
         if event == '-DECODEFILEPATH-':
             with RedirectStdout(window['-PROCESS-']):
-                for line in decomplier.decompile(values['-DECODEFILEPATH-'],True):
+                for line in decomplier.decompile_GUI(values['-DECODEFILEPATH-']):
                     window['-PROCESS-'].print(line, end='')
                     window.refresh()
             
         if event == '-DECODEFOLDERPATH-':
             with RedirectStdout(window['-PROCESS-']):
-                for line in decomplier.decompile_all(values['-DECODEFOLDERPATH-'],True):
+                for line in decomplier.decompile_all_GUI(values['-DECODEFOLDERPATH-']):
                     window['-PROCESS-'].print(line, end='')
                     window.refresh()
                     

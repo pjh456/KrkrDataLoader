@@ -19,6 +19,11 @@ STABLE_DICT = {
         'selects':{
             'target':lambda data:data['target'] if 'target' in data else None,
             'storage':lambda data:data['storage'] if 'storage' in data else Config.defualt_location
+        },
+        'texts':{
+            'speaker':lambda data:data[0] if data[0] else Config.defualt_name,
+            'content':lambda data:data[2] if data[2] else Config.defualt_content,
+            'sound':lambda data:[sound for sound in data[3]] if data[3] else []
         }
     },
     'sanoba witch':{
@@ -29,8 +34,27 @@ STABLE_DICT = {
         'selects':{
             'target':lambda data:data['target'] if 'target' in data else '*'+data['tag'],
             'storage':lambda data:data['storage'] if 'storage' in data else Config.defualt_location
+        },
+        'texts':{
+            'speaker':lambda data:data[0] if data[0] else Config.defualt_name,
+            'content':lambda data:data[2] if data[2] else Config.defualt_content,
+            'sound':lambda data:[sound for sound in data[3]] if data[3] else []
         }
-        
+    },
+    'cafe stella':{
+        'nexts':{
+            'target':lambda data:data['target'] if 'target' in data else None,
+            'storage':lambda data:data['storage'] if 'storage' in data else Config.defualt_location
+        },
+        'selects':{
+            'target':lambda data:data['target'] if 'target' in data else '*'+data['tag'],
+            'storage':lambda data:data['storage'] if 'storage' in data else Config.defualt_location
+        },
+        'texts':{
+            'speaker':lambda data:data[0] if data[0] else Config.defualt_name,
+            'content':lambda data:data[1][0][1] if data[1][0] else Config.defualt_content,
+            'sound':lambda data:[sound for sound in data[2]] if data[2] else None
+        }
     }
 }
 
@@ -77,8 +101,9 @@ def get_target_list(data={'nexts':[{'target':[],
             for item in (data['selects'] if isselect else data['nexts'])]
     '''
     return [(STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['target'](item),
-            STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['storage'](item)) 
-            for item in (data['selects'] if isselect else data['nexts'])]
+            STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['storage'](item))
+            for item in (data['selects'] if isselect else data['nexts'])
+            if not STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['target'](item) is None ]
     
 
 class Select:
@@ -161,12 +186,18 @@ class SceneText:
         self.owner = owner
         self.data = data
         
+        '''
         self.speaker = data[0]
         self.content = data[2]
         self.sound = None
+        '''
+        self.speaker = STABLE_DICT[Config.version]['texts']['speaker'](data)
+        self.content = STABLE_DICT[Config.version]['texts']['content'](data)
+        if not STABLE_DICT[Config.version]['texts']['sound'](data) is None:
+            self.sound = [SoundData(self,sound) for sound in STABLE_DICT[Config.version]['texts']['sound'](data)]
         
-        if data[3] != None:
-            self.sound = [SoundData(self,sound) for sound in data[3]]
+        #if data[3] != None:
+        #    self.sound = [SoundData(self,sound) for sound in data[3]]
     @property
     def fixcontent(self):
         filter = Config.filter
@@ -465,7 +496,12 @@ class Scnfolder:
             for scene in data.scenes:
                 for target in scene.target:
                     if target._name is None:
-                        target._name = self.datas[self.data_index[target.location]][0]._name
+                        try:
+                            target._name = self.datas[self.data_index[target.location]][0]._name
+                        except Exception as e:
+                            print(scene._name)
+                            print(data.name)
+                            raise e
                     if target.location != data.name:
                         aim_scenes = self.datas[self.data_index[scene.location]]
                         target_scene = aim_scenes.scenes[aim_scenes.getIndexByName(scene._name)]
