@@ -17,8 +17,9 @@ file_path = "D:\\games\\cafeStella\\KrkrExtract_Output\\scn\\001.始まりver1.0
 folder_path = "D:\\games\\cafeStella\\KrkrExtract_Output\\scn"
 
 datas = Scenes(file_path)
-folder = Scnfolder(folder_path)
+#folder = Scnfolder(folder_path)
 
+'''
 for data in datas:
     print(f"{data},{type(data)}")
 print('')
@@ -36,6 +37,12 @@ for file in folder:
 print('')
 
 print(datas.get_text())
+'''
 
 #datas[3].exposeText(watch_output = True)
-#datas.exposeText(watch_output = True)
+datas.exposeText(watch_output = True)
+
+'''
+for data in folder:
+    data.exposeText(r"D:\games\senrenbanka\outPath\data.xp3\scn\gitspace\KrkrDataLoader\output",True)
+'''

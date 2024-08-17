@@ -6,67 +6,58 @@
 
 ## 主要功能
 
-### 将 ``.ks.scn`` 格式文件批量处理为 ``.ks.json`` 格式文件
+- ### 将 ``.ks.scn`` 格式文件批量处理为 ``.ks.json`` 格式文件
 
-使用解包工具 [FreeMoteToolkit](../src/FreeMoteToolkit)，辅以 ``subprocess`` 功能，实现文件处理自动化，无需逐一手动拖放解包。
-
-
-### 通过将 ``.ks.json`` 格式文件（或文件夹）转换为对象结构，提供了导出剧情文本等功能
+- ### 通过将 ``.ks.json`` 格式文件（或文件夹）转换为对象结构，提供了导出剧情文本等功能
 
 
-### 播放剧情音频，提供了便利的“听剧情”接口
+- ### 播放剧情音频，提供了便利的“听剧情”接口
 
-利用 ``pyttsx3`` 库的TTS功能，以及 ``pygame`` 的音频播放，实现了对剧情内容的复现。
+- ### 立绘合成与导出
 
-###### 未来还会接入 ``ffmpeg`` 的合成功能，以便导出由剧情合成的长音频。
-
-### 立绘合成与导出（施工中）
-
-其他功能正在积极开发中。
-
-###### 更精炼版本的发布可能会受进度的影响而推迟。
+- ###### 未来还会接入 ``ffmpeg`` 的合成功能，以便导出由剧情合成的长音频。
 
 ## 安装方法
 
-下载整个文件夹，按照使用说明引用 [src.tools](../src/tools) 中的库。这些都是简单的实用程序，避免了手动编写解包脚本的繁琐工作。
+下载整个文件夹，按照使用说明引用 [src.tools](../src/tools) 中的库。
 
-## 使用方法
+## API 文档
 
-### **剧本解包**
+### 1. **剧本解包**
 
 [DecompileTool.py](../src/tools/DecompileTool.py) 中的 ``Decompiler`` 类用于自动化解包
 
 您可以像这样实例化和调用 ``Decompiler``：
 ~~~python
-from tools.DecompileTool import Decompiler
+from DecompileTool import Decompiler
 d = Decompiler()
 ~~~
 
-``Decompiler`` 具有可选的 ``path`` 参数，用于指定 [FreeMoteToolkit](../src/FreeMoteToolkit) 的路径；如果省略，它将默认为项目路径（这可以正常工作）。
+``Decompiler`` 具有可选的 ``path`` 参数，用于指定 [FreeMoteToolkit](../src/FreeMoteToolkit) 的路径；如果省略，它将默认为项目路径（可正常运行）。
 
 你可以使用 ``Decompiler.decompile(path)`` 对一个路径为 ``path`` 的 ``.ks.scn`` 格式文件进行解包：
 ~~~python
-from tools.DecompileTool import Decompiler
+from DecompileTool import Decompiler
 d = Decompiler()
 d.decompile("D:\\senrenbanka\\outPath\\data.xp3\\scn\\001・アーサー王ver1.07.ks.scn")
 ~~~
 
 同理，你可以使用 ``Decompiler.decompile_all(path)`` 对一个路径为 ``path`` 的文件夹内所有的 ``.ks.scn`` 格式文件进行解包：
 ~~~python
-from tools.DecompileTool import Decompiler
+from DecompileTool import Decompiler
 d = Decompiler()
 d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 ~~~
 
->为了防止访问越界等问题，在指定的文件夹中解包的文件并不包含其子文件夹的文件。
+为避免不必要的麻烦，在指定的文件夹中解包的文件 **并不包含** 其子文件夹的文件。
 
 详细示例，请参见 [DecompileExample.py](../examples/DecompileExample.py)。
 
-### **剧情读取**
+### 2. **剧情读取**
 
-[DataLoader.py](../src/tools/DataLoader.py) 中的 ``Select``、``Scene`` 和 ``Scenes``类用于自动化数据检索。
+[DataLoader.py](../src/tools/DataLoader.py) 中的 ``Select``、``Scene`` 和 ``Scenes``类用于数据的格式化加载。
 
-``ScnFolder`` 类用于批量处理整个文件夹，实现了大规模的文件管理。
+``ScnFolder`` 类用于批量处理整个文件夹，实现了大规模的文件数据格式化管理。
 
 ``Config`` 类用于配置全局变量。
 
@@ -138,18 +129,30 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 全局变量的设置。
 
 ``Config.encoding`` 指定了文件读取的编码形式。
-``Config.audio_suffix`` 指定了音频文件的后缀名。
-``Config.defualt_name`` 指定了默认的对象名。
-``Config.defualt_location`` 指定了默认的对象位置名。
-``Config.defualt_speaker`` 指定了文本的默认说话人。
-``Config.defualt_content`` 指定了文本的默认内容。
-``Config.filter`` 指定了输出文本时的过滤器，为一个由正则表达式组成的``list``，用于去除需要过滤掉的部分。
-``Config.hide_tqdm`` 指定了是否显示读取文件的进度条。
-``Config.debug`` 指定了是否开启调试模式。
-``Config.version`` 指定了加载文档的解释器，目前稳定的只有 ``senrenbanka`` 和 ``sanoba witch`` 两个版本，默认为 ``senrenbanka``。
-> ``Config.version`` 的设置主要是因为不同krkr2引擎的版本不同，从而导致了选择支、跳转等定义的命名方式不同。目前只对《千恋万花》和《魔女的夜宴》两大版本进行了微调，其他游戏在版本相近的情况下应该是同样可以正常使用的。
 
-### **音频管理**
+``Config.audio_suffix`` 指定了音频文件的后缀名。
+
+``Config.defualt_name`` 指定了默认的对象名。
+
+``Config.defualt_location`` 指定了默认的对象位置名。
+
+``Config.defualt_speaker`` 指定了文本的默认说话人。
+
+``Config.defualt_content`` 指定了文本的默认内容。
+
+``Config.filter`` 指定了输出文本时的过滤器，为一个由正则表达式组成的``list``，用于去除需要过滤掉的部分。
+
+``Config.hide_tqdm`` 指定了是否显示读取文件的进度条。
+
+``Config.debug`` 指定了是否开启调试模式。
+
+``Config.version`` 指定了加载文档的解释器，目前稳定的有 ``senrenbanka`` 和 ``sanoba witch`` 以及 ``cafe stella`` 三个版本，默认为 ``senrenbanka``。
+
+
+
+> ``Config.version`` 的设置主要是因为不同krkr2引擎的版本不同，从而导致了选择支、跳转等定义的命名方式不同。在接下来的版本更新中，将不断新增其他游戏的适配，并实现游戏数据通配。
+
+### 3. **音频管理**
 
 [DataLoader.py](../src/tools/DataLoader.py) 中的 ``SoundData`` 和 ``SoundManager``类用于批量音频处理。
 
@@ -157,11 +160,11 @@ d.decompile_all("D:\\senrenbanka\\outPath\\data.xp3\\scn")
 
 表示一条音频数据。
 
-初始化时 ``SoundData(owner={'speaker':'Unknown','content':"Unknown"},data=dict())``，``owner`` 默认值为 ``{'speaker':'Unknown','content':"Unknown"}``，以防止播放时的报错，**但从 ``SceneText`` 中获取的 ``SoundData.owner`` 必然为 ``SceneText`` 格式**；``data`` 指定了该音频在文件中的内容，默认为 ``{'voice':'defualt'}``。
-
 调用 ``SoundData.name`` 以获取其说话人名，调用 ``SoundData.voice`` 以获得其文件名。
 
 调用 ``SoundData.owner`` 以获取其所属 ``SceneText`` 文本。
+
+初始化时 ``SoundData(owner={'speaker':'Unknown','content':"Unknown"},data=dict())``，``owner`` 默认值为 ``{'speaker':'Unknown','content':"Unknown"}``，以防止播放时的报错，**但从 ``SceneText`` 中获取的 ``SoundData.owner`` 必然为 ``SceneText`` 格式**；``data`` 指定了该音频的文件名，默认为 ``{'voice':'defualt'}``。
 
 #### ``SoundManager``
 
@@ -231,9 +234,6 @@ Ciallo～(∠・ω< )⌒☆
 
 虽然长音频的合成尚未完成，但是播放已经完全可以实现了。
 
-### 立绘的加载与导出（正在开发中）
-
-为了给可能要进行制作的桌宠做铺垫。
 
 ### 新引擎加密的解密
 
@@ -244,6 +244,18 @@ Ciallo～(∠・ω< )⌒☆
 敬请期待……但不会很快。
 
 ## 后记
+
+### 4.1.4
+
+目前基础的功能已经完全实现，并且可视化的操作界面也已经开发完成。
+
+然而出于效率等角度的考虑，对比起同类工具 ``Krkrextract`` 等，``KrkrDataLoader`` 的内存仍然过大，并带着许多不便。这是由 Python 语言自身的臃肿性导致的，因此未来可能的重构之中，可能会换语言版本，但是为了方便可能需要的简便 API 的调用，我还是会保留 Python 版本的接口。也许未来不会继续维护 Python 接口了也不一定。
+
+2024.8.17，我上 github 看了一眼，发现居然有人给这个项目 star 了。无论出于什么原因，这个 star 还是挺鼓舞人心的，至少有人发现了这个项目，而也许这个项目会帮助到有需要的人。
+
+未来我也会继续优化的，等啥时候学了前端就拿这个项目来练练手。
+
+顺带一提，3.1.0 的后记中我提到了解包规则的自定义，目前内置的版本已经支持了《星光咖啡馆与死神之蝶》，而未来我想做的是一劳永逸地匹配所有文件，因此我会再次重新制作一个新的规则加载器以自动化规范其格式。
 
 ### 3.1.0
 

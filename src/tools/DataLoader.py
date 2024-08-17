@@ -268,7 +268,9 @@ class Scene(ScnBase):
     def exposeText(self,
                     output_path='',
                     watch_output=False,
-                    output_file=None):
+                    output_file=None,
+                    hide_location=True,
+                    hide_target=True):
         """Save scene texts.
 
         Args:
@@ -282,6 +284,8 @@ class Scene(ScnBase):
         close_mark = output_file is None
         if output_file is None:
             if output_path:
+                if not os.path.exists(output_path):
+                    os.makedirs(output_path)
                 output_file = open(os.path.join(output_path,f'{self.fixname}'+'.txt'),'w+',encoding=Config.encoding)
             else:
                 output_folder = os.path.join(defualt_path,f'{self.location}')
@@ -294,7 +298,9 @@ class Scene(ScnBase):
         
         if watch_output:
             print(f'【{self.location}/{self.fixname}】')
-        output_file.write(f'【{self.location}/{self.fixname}】'+'\n')
+            
+        if not hide_location:
+            output_file.write(f'【{self.location}/{self.fixname}】'+'\n')
         
         if datas is None:
             print(f"No texts in {self.location}/{self._name}, pass.")
@@ -304,7 +310,7 @@ class Scene(ScnBase):
                 content = data.content
                 for rule in filter:
                     content = re.sub(rule,'',content)
-                if name is not None:
+                if name != Config.defualt_name:
                     if watch_output:
                         print(f'【{name}】'+':'+content)
                     output_file.write(f'【{name}】'+':'+content+'\n')
@@ -312,25 +318,26 @@ class Scene(ScnBase):
                     if watch_output:
                         print(content)
                     output_file.write(content+'\n')
-        
-        if self.selects != []:
-            for select in self.selects:
-                output_file.write(select.text+'\n')
-                if watch_output:
-                    print(select.text)
                     
-                output_file.write(f'【{select.location}/{select.target}】')
-                if watch_output:
-                    print(f'【{select.location}/{select.target}】',end='')
-                
-                output_file.write('\n')
-                if watch_output:
-                    print('')
-        else:
-            for target in self.target:
-                output_file.write(f'【{target.location}/{target.fixname}】'+'\n')
-                if watch_output:
-                    print(f'【{target.location}/{target.fixname}】')
+        if not hide_target:
+            if self.selects != []:
+                for select in self.selects:
+                    output_file.write(select.text+'\n')
+                    if watch_output:
+                        print(select.text)
+                        
+                    output_file.write(f'【{select.location}/{select.target}】')
+                    if watch_output:
+                        print(f'【{select.location}/{select.target}】',end='')
+                    
+                    output_file.write('\n')
+                    if watch_output:
+                        print('')
+            else:
+                for target in self.target:
+                    output_file.write(f'【{target.location}/{target.fixname}】'+'\n')
+                    if watch_output:
+                        print(f'【{target.location}/{target.fixname}】')
                     
             
         
@@ -436,6 +443,8 @@ class Scenes:
                 os.makedirs(output_folder)
             output_file = open(os.path.join(output_folder,f'{self.name}'+'.txt'),'w+',encoding=Config.encoding)
         else:
+            if not os.path.exists(output_path):
+                os.makedirs(output_path)
             #output_file = open(output_path,'w+',encoding=Config.encoding)
             output_file = open(os.path.join(output_path,f'{self.name}'+'.txt'),'w+',encoding=Config.encoding)
         

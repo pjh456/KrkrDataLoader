@@ -5,7 +5,7 @@
 
 ## 版本更新前瞻
 
-修复了各种bug，暂时暂停桌宠的更新。
+正在进行匹配自动化的制作，未来目标是实现自动而非手动配置数据版本。
 
 If a English version of the latest README.md and KrkrDataLoader.exe is needed, please let me know by using Issues.
 

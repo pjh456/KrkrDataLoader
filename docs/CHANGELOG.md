@@ -1,4 +1,13 @@
-## [4.1.3] - 2024.8.1   ***latest**
+## [4.1.4] - 2024.8.18   ***latest**
+### Fixed
+- 为 `Scene.exposeText` 和 `Scenes.exposeText` 增添了指定路径不存在时会自动创建的确保。
+- 修复了输出清洗后文本会泄露 ``Defualt Name` 的问题。
+### Added
+- 为 `Scene.exposeText` 和 `Scenes.exposeText` 增添了 ``hide_location, hide_target`` 参数，以导出尽可能精简的文本。
+### Changed
+- 修改了 [README-zh.md](README-zh.md)，使其符合当前版本接口。
+
+## [4.1.3] - 2024.8.1
 ### Fixed
 - 修复了 ``Decompiler`` 调用函数无法在GUI外正常运行的问题。
 - 添加了对《星光咖啡馆与死神之蝶》的数据支持。
