@@ -16,8 +16,8 @@ file_path = "D:\\games\\cafeStella\\KrkrExtract_Output\\scn\\001.始まりver1.0
 #folder_path = "D:\\games\\sabbat of witch\\output\\data.xp3\\scn"
 folder_path = "D:\\games\\cafeStella\\KrkrExtract_Output\\scn"
 
-datas = Scenes(file_path)
-#folder = Scnfolder(folder_path)
+#datas = Scenes(file_path)
+folder = Scnfolder(folder_path)
 
 '''
 for data in datas:
@@ -40,7 +40,7 @@ print(datas.get_text())
 '''
 
 #datas[3].exposeText(watch_output = True)
-datas.exposeText(watch_output = True)
+#datas.exposeText(watch_output = True)
 
 '''
 for data in folder:

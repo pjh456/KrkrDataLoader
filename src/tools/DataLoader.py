@@ -4,7 +4,9 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 import pyttsx3
 import time,tqdm
+import langid
 
+'''
 STABLE_GAMES = [
     'senrenbanka',
     'sanoba witch'
@@ -47,7 +49,7 @@ STABLE_DICT = {
             'storage':lambda data:data['storage'] if 'storage' in data else Config.defualt_location
         },
         'selects':{
-            'target':lambda data:data['target'] if 'target' in data else '*'+data['tag'],
+            'target':lambda data:data['target'] if 'target' in data else '*' + data['tag'],
             'storage':lambda data:data['storage'] if 'storage' in data else Config.defualt_location
         },
         'texts':{
@@ -57,6 +59,76 @@ STABLE_DICT = {
         }
     }
 }
+
+class AutoDataConfiger:
+    def __init__(self):
+        pass
+    
+    def auto_find_next_target():
+        pass
+    
+    def auto_config(self, path:str):
+        if not os.path.exists(path):
+            raise FileNotFoundError(f'File {path} is not found.')
+        
+        scenes = json.load(open(path,'r',encoding=Config.encoding))
+        
+        # 以后这里也要用自动读取文件名的方式进行，要不然容易出问题
+        name = scenes['name']
+        
+        name_dict = {}
+        nexts = []
+        selects = []
+        texts = []
+        
+        for scene in scenes['scenes']:
+            if 'label' not in scene:
+                raise Exception("Auto config failed: label do not exist.")
+            name_dict[scene['label']] = True
+            
+            if 'nexts' in scene:
+                #raise Exception(f"Auto config failed: nexts do not exist in {scene['label']}.")
+                for next in scene['nexts']:
+                    nexts.append(next)
+            
+            if 'selects' in scene:
+                for select in scene['selects']:
+                    selects.append(select)
+            
+            if 'texts' in scene:
+                texts += scene['texts']
+        
+        for next in nexts:
+            for key, value in next.items():
+                if not self.nexts['target']:
+                    if value in name_dict:
+                        print("nexts.target auto config success.")
+                        self.nexts['target'] = lambda data: data[key] if key in data else None
+                
+                if not self.nexts['storage']:
+                    if value == name:
+                        print("nexts.storage auto config success.")
+                        self.nexts['storage'] = lambda data: data[key] if key in data else Config.defualt_location
+        
+        for select in selects:
+            for key, value in select.items():
+                if not self.selects['target']:
+                    if value in name_dict:
+                        print("selects.target auto config success.")
+                        self.selects['target'] = lambda data: data[key] if key in data else None
+                        
+                if not self.selects['storage']:
+                    if value == name:
+                        print("selects.storage auto config success.")
+                        self.selects['storage'] = lambda data: data[key] if key in data else Config.defualt_location
+                    else:
+                        # 我希望在这里能够匹配 self.selects['storage']的else 里面的部分
+                        pass
+                    
+'''
+            
+        
+    
 
 class Config:
     encoding = 'utf-8'
@@ -80,6 +152,11 @@ class Config:
     stop_sound = False
     
     
+    label_dict = {}
+    #_else_selects_target = lambda x: x
+    #_else_selects_storage = lambda x: x
+    
+    
 
 def get_target_list(data={'nexts':[{'target':[],
                                     'storage':Config.defualt_location}]},
@@ -100,10 +177,41 @@ def get_target_list(data={'nexts':[{'target':[],
             (item['storage'] if 'storage' in item else defualt_storage)) 
             for item in (data['selects'] if isselect else data['nexts'])]
     '''
+    
+    items = []
+    if isselect:
+        items = data['selects']
+    else:
+        items = data['nexts']
+        
+    result_list = []
+    
+    for item in items:
+        target, storage = None, None
+        for key, value in item.items():
+            if not isinstance(value, str):
+                continue
+            
+            if not target:
+                if value in Config.label_dict:
+                    target = value
+                    continue
+                for label_name in Config.label_dict.keys():
+                    if (value in label_name) or (label_name in value):
+                        target = label_name
+                        break    
+            if not storage:
+                if value.endswith('.ks'):
+                    storage = value
+        result_list.append((target, storage))
+    
+    return result_list
+    '''
     return [(STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['target'](item),
             STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['storage'](item))
             for item in (data['selects'] if isselect else data['nexts'])
             if not STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['target'](item) is None ]
+    '''
     
 
 class Select:
@@ -118,8 +226,19 @@ class Select:
             data (dict): Selection data.
         """
         self.text = data['text']
-        self.target = STABLE_DICT[Config.version]['selects']['target'](data)
+        self.target = []
+        #self.target = STABLE_DICT[Config.version]['selects']['target'](data)
         #self.target = data['target']
+        for key, value in data.items():
+            if value in Config.label_dict:
+                self.target.append(value)
+        
+        if len(self.target) == 0:
+            for key, value in data.items():
+                for res in Config.label_dict:
+                    if value in res:
+                        self.target.append(res)
+                        
         self.location = storage
     
     def __str__(self):
@@ -162,7 +281,8 @@ class ScnBase:
 # 我禁止了直接通过SoundData来播放，因为无法指定其地址，批量化进行太麻烦
 class SoundData:
     def __init__(self,
-                 owner={'speaker':Config.defualt_speaker,'content':Config.defualt_content},
+                 owner={'speaker':Config.defualt_speaker,
+                        'content':Config.defualt_content},
                  data={'voice':'defualt'}):
         """A piece of sound data.
 
@@ -191,10 +311,85 @@ class SceneText:
         self.content = data[2]
         self.sound = None
         '''
-        self.speaker = STABLE_DICT[Config.version]['texts']['speaker'](data)
-        self.content = STABLE_DICT[Config.version]['texts']['content'](data)
-        if not STABLE_DICT[Config.version]['texts']['sound'](data) is None:
-            self.sound = [SoundData(self,sound) for sound in STABLE_DICT[Config.version]['texts']['sound'](data)]
+        self.speaker = data[0]
+        #self.speaker = STABLE_DICT[Config.version]['texts']['speaker'](data)
+        #self.content = STABLE_DICT[Config.version]['texts']['content'](data)
+        self.content = None
+        cache_content = None
+        
+        for content_data in data[1:]:
+            if isinstance(content_data, str):
+                lang, _ = langid.classify(content_data)
+                # A funny fact: If sentence is like '......', it will be recognized as the Bengali language. XD
+                if lang == 'zh' or lang == 'ja' or lang == 'bn':
+                    self.content = content_data
+                    break
+                else:
+                    print(content_data,lang)
+                '''
+                if content_data.startswith('「') and content_data.endswith('」'):
+                    self.content = content_data
+                    break
+                if content_data.startswith('『') and content_data.endswith('』'):
+                    self.content = content_data
+                    break
+                '''
+            if isinstance(content_data, list):
+                for value in content_data:
+                    if not isinstance(value, list):
+                        break
+                    #print(value)
+                    for sentence in value:
+                        if isinstance(sentence, str):
+                            lang, _ = langid.classify(sentence)
+                            if lang == 'zh' or lang == 'ja' or lang == 'bn':
+                                # 《星光咖啡馆与死神之蝶》中，其对话是以列表呈现，而非放在主列表内作为一个元素存在。
+                                # 因此，需要重新给说话人命名，以防止发言被顶替。
+                                # 我目前看到的就是这两种格式：要么不嵌套列表，可以直接读取；要么嵌套列表，要进入其中读取。
+                                # 当然，也有昵称直接放在第一栏说话人那里的，因此要先把可能的句子存下来，等最后再释放。
+                                if not cache_content:
+                                    cache_content = sentence
+                                    continue
+                                self.content = sentence
+                                break
+                            else:
+                                print(content_data,lang)
+                            '''
+                            if sentence.startswith('「') and sentence.endswith('」'):
+                                self.content = sentence
+                                break
+                            '''
+                    if self.content:
+                        break
+                if self.content:
+                    break
+                
+        
+        if not self.content:
+            self.content = cache_content
+        
+        if not self.content:
+            print(data)
+            raise Exception()
+        
+        sound_index = -1
+        for index, sound_data in enumerate(data):
+            if not isinstance(sound_data, list):
+                continue
+            for sound_dict in sound_data:
+                if 'voice' in sound_dict:
+                    sound_index = index
+                    break
+            if sound_index != -1:
+                break
+        
+        if sound_index != -1:
+            self.sound = [SoundData(self,sound) for sound in data[sound_index]]
+        else:
+            self.sound = None
+        
+        #if not STABLE_DICT[Config.version]['texts']['sound'](data) is None:
+        #    self.sound = [SoundData(self,sound) for sound in STABLE_DICT[Config.version]['texts']['sound'](data)]
         
         #if data[3] != None:
         #    self.sound = [SoundData(self,sound) for sound in data[3]]
@@ -203,7 +398,11 @@ class SceneText:
         filter = Config.filter
         content = self.content
         for rule in filter:
-            content = re.sub(rule,'',content)
+            try:
+                content = re.sub(rule,'',content)
+            except Exception as e:
+                print(content)
+                raise(e)
         return content
         
     def __str__(self):
@@ -239,7 +438,7 @@ class Scene(ScnBase):
     
     def get_text(self):
         lines = []
-        lines.append(f'【{self.location}/{self.fixname}】'+'\n')
+        #lines.append(f'【{self.location}/{self.fixname}】'+'\n')
         
         if self.texts:
             for data in self.texts:
@@ -257,12 +456,13 @@ class Scene(ScnBase):
             for select in self.selects:
                 lines.append(select.text+'\n')
                     
-                lines.append(f'【{select.location}/{select.target}】')
+                #lines.append(f'【{select.location}/{select.target}】')
                 
-                lines.append('\n')
+                #lines.append('\n')
         else:
-            for target in self.target:
-                lines.append(f'【{target.location}/{target.fixname}】'+'\n')
+            lines.append('\n')
+            #for target in self.target:
+            #    lines.append(f'【{target.location}/{target.fixname}】'+'\n')
         return lines
     
     def exposeText(self,
@@ -310,7 +510,7 @@ class Scene(ScnBase):
                 content = data.content
                 for rule in filter:
                     content = re.sub(rule,'',content)
-                if name != Config.defualt_name:
+                if name != Config.defualt_name and name != None:
                     if watch_output:
                         print(f'【{name}】'+':'+content)
                     output_file.write(f'【{name}】'+':'+content+'\n')
@@ -363,6 +563,9 @@ class Scenes:
         scenes = json.load(open(path,'r',encoding=Config.encoding))
         self.hash = scenes['hash']
         self.name = scenes['name']
+        
+        for scene in scenes['scenes']:
+            Config.label_dict[scene['label']] = True
         
         # 列出所有剧情片段
         # 由于《魔女的夜宴》中的数据报错，现在将所有设置归为场景处理 - version 3.0.0。
@@ -508,9 +711,11 @@ class Scnfolder:
                         try:
                             target._name = self.datas[self.data_index[target.location]][0]._name
                         except Exception as e:
-                            print(scene._name)
-                            print(data.name)
-                            raise e
+                            print(f"something go wrong at {data.name}/{scene._name}\n(If this scene jumps to start menu, it occurs too and it goes without errors.)\n")
+                            #print(scene._name)
+                            #print(data.name)
+                            continue
+                            #raise e
                     if target.location != data.name:
                         aim_scenes = self.datas[self.data_index[scene.location]]
                         target_scene = aim_scenes.scenes[aim_scenes.getIndexByName(scene._name)]
