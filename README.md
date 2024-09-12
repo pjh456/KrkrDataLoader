@@ -5,7 +5,11 @@
 
 ## 版本更新前瞻
 
-正在进行匹配自动化的制作，未来目标是实现自动而非手动配置数据版本。
+自动化匹配的版本被证明是失败的，因此我选择了回退上一个版本并更新部分制作前瞻。
+
+以后的自动化匹配将会是基于用户选择的方法，以一个样例中文本定位的选取，平行定位至各个文本，以实现完全匹配文本。
+
+将会提供一个拓展性、健壮性更强的文本浏览工具，以更高的自由度与更高的可自定义性来实现100%准确的文件浏览。
 
 If a English version of the latest README.md and KrkrDataLoader.exe is needed, please let me know by using Issues.
 

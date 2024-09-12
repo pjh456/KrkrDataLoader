@@ -6,7 +6,7 @@ import pyttsx3
 import time,tqdm
 import langid
 
-'''
+
 STABLE_GAMES = [
     'senrenbanka',
     'sanoba witch'
@@ -60,6 +60,7 @@ STABLE_DICT = {
     }
 }
 
+'''
 class AutoDataConfiger:
     def __init__(self):
         pass
@@ -178,6 +179,7 @@ def get_target_list(data={'nexts':[{'target':[],
             for item in (data['selects'] if isselect else data['nexts'])]
     '''
     
+    '''
     items = []
     if isselect:
         items = data['selects']
@@ -207,11 +209,12 @@ def get_target_list(data={'nexts':[{'target':[],
     
     return result_list
     '''
+    
     return [(STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['target'](item),
             STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['storage'](item))
             for item in (data['selects'] if isselect else data['nexts'])
             if not STABLE_DICT[Config.version]['selects' if isselect else 'nexts']['target'](item) is None ]
-    '''
+    
     
 
 class Select:
@@ -227,8 +230,9 @@ class Select:
         """
         self.text = data['text']
         self.target = []
-        #self.target = STABLE_DICT[Config.version]['selects']['target'](data)
+        self.target = STABLE_DICT[Config.version]['selects']['target'](data)
         #self.target = data['target']
+        '''
         for key, value in data.items():
             if value in Config.label_dict:
                 self.target.append(value)
@@ -238,6 +242,7 @@ class Select:
                 for res in Config.label_dict:
                     if value in res:
                         self.target.append(res)
+        '''
                         
         self.location = storage
     
@@ -311,12 +316,12 @@ class SceneText:
         self.content = data[2]
         self.sound = None
         '''
-        self.speaker = data[0]
-        #self.speaker = STABLE_DICT[Config.version]['texts']['speaker'](data)
-        #self.content = STABLE_DICT[Config.version]['texts']['content'](data)
-        self.content = None
-        cache_content = None
-        
+        #self.speaker = data[0]
+        self.speaker = STABLE_DICT[Config.version]['texts']['speaker'](data)
+        self.content = STABLE_DICT[Config.version]['texts']['content'](data)
+        #self.content = None
+        #cache_content = None
+        """
         for content_data in data[1:]:
             if isinstance(content_data, str):
                 lang, _ = langid.classify(content_data)
@@ -387,9 +392,10 @@ class SceneText:
             self.sound = [SoundData(self,sound) for sound in data[sound_index]]
         else:
             self.sound = None
+        """
         
-        #if not STABLE_DICT[Config.version]['texts']['sound'](data) is None:
-        #    self.sound = [SoundData(self,sound) for sound in STABLE_DICT[Config.version]['texts']['sound'](data)]
+        if not STABLE_DICT[Config.version]['texts']['sound'](data) is None:
+            self.sound = [SoundData(self,sound) for sound in STABLE_DICT[Config.version]['texts']['sound'](data)]
         
         #if data[3] != None:
         #    self.sound = [SoundData(self,sound) for sound in data[3]]

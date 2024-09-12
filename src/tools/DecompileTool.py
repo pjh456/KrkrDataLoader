@@ -31,7 +31,7 @@ class Decompiler:
         filedirs = [filename for filename in os.listdir(folder_path) if filename.endswith('.ks.scn')]
         for file_name in filedirs:
             file_path = os.path.join(folder_path, file_name)
-            self.decompile(file_path,stream_output)
+            self.decompile(file_path)
     
     def decompile_GUI(self,file_path):
         if not os.path.isfile(self.decompiler_path):
