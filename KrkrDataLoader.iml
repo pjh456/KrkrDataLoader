@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="KrkrDataLoader" external.linked.project.path="$MODULE_DIR$/KrkrDataLoader" external.root.project.path="$MODULE_DIR$/KrkrDataLoader" external.system.id="GRADLE" external.system.module.group="com.KrkrData" external.system.module.version="1.0-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="CheckStyle-IDEA-Module" serialisationVersion="2">
+    <option name="activeLocationsIds" />
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/KrkrDataLoader">
+      <excludeFolder url="file://$MODULE_DIR$/KrkrDataLoader/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/KrkrDataLoader/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

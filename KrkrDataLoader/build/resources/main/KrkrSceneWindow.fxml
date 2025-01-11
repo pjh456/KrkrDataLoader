@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="KrkrDataLoader.gui.controller.KrkrSceneController">
+   <children>
+      <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <fx:include source="KrkrBaseWindow.fxml" />
+            <HBox alignment="CENTER" StackPane.alignment="CENTER">
+               <children>
+                  <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
+                     <children>
+                         <fx:include source="KrkrSceneTree.fxml" VBox.vgrow="ALWAYS">
+                         </fx:include>
+                        <fx:include source="KrkrCommandViewer.fxml" VBox.vgrow="ALWAYS">
+                        </fx:include>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                     <children>
+                        <fx:include source="KrkrSceneViewer.fxml" VBox.vgrow="ALWAYS" />
+                     </children>
+                     <HBox.margin>
+                        <Insets bottom="10.0" right="10.0" top="5.0" />
+                     </HBox.margin>
+                  </VBox>
+               </children>
+               <StackPane.margin>
+                  <Insets top="20.0" />
+               </StackPane.margin>
+            </HBox>
+         </children>
+      </StackPane>
+   </children>
+</AnchorPane>

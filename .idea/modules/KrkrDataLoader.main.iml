@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="KrkrDataLoader:main" external.linked.project.path="$MODULE_DIR$/../../KrkrDataLoader" external.root.project.path="$MODULE_DIR$/../../KrkrDataLoader" external.system.id="GRADLE" external.system.module.group="com.KrkrData" external.system.module.type="sourceSet" external.system.module.version="1.0-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="CheckStyle-IDEA-Module" serialisationVersion="2">
+    <option name="activeLocationsIds" />
+  </component>
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/../../KrkrDataLoader/build/classes/java/main" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../KrkrDataLoader/src/main">
+      <sourceFolder url="file://$MODULE_DIR$/../../KrkrDataLoader/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../KrkrDataLoader/src/main/resources" type="java-resource" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.11.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.controlsfx:controlsfx:11.2.1" level="project" />
+    <orderEntry type="library" name="Gradle: us.ihmc:jfoenix:17-0.1.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.googlecode.soundlibs:vorbisspi:1.0.3.3" level="project" />
+    <orderEntry type="library" name="Gradle: com.googlecode.soundlibs:mp3spi:1.9.5.4" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-fxml:win:17.0.11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-controls:17.0.11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-controls:win:17.0.11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-media:win:17.0.11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-graphics:17.0.11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-graphics:win:17.0.11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-base:17.0.11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-base:win:17.0.11" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.errorprone:error_prone_annotations:2.27.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-swing:win:17.0.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.googlecode.soundlibs:jorbis:0.0.17.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.googlecode.soundlibs:tritonus-share:0.3.7.4" level="project" />
+    <orderEntry type="library" name="Gradle: com.googlecode.soundlibs:jlayer:1.0.1.4" level="project" />
+    <orderEntry type="library" name="Gradle: junit:junit:3.8.2" level="project" />
+  </component>
+</module>

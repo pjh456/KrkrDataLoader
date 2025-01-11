@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.TextFlow?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="KrkrDataLoader.gui.controller.KrkrCommandViewerController">
+    <VBox alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" HBox.hgrow="ALWAYS">
+        <children>
+            <Label text="Command Output" VBox.vgrow="ALWAYS">
+                <font>
+                    <Font name="Consolas" size="15.0" />
+                </font>
+            </Label>
+            <ScrollPane vbarPolicy="ALWAYS" VBox.vgrow="ALWAYS">
+                <content>
+                    <AnchorPane prefHeight="113.0" prefWidth="229.0">
+                        <children>
+                            <TextFlow fx:id="commandViewer" lineSpacing="1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        </children>
+                    </AnchorPane>
+                </content>
+                <VBox.margin>
+                    <Insets />
+                </VBox.margin>
+            </ScrollPane>
+        </children>
+        <opaqueInsets>
+            <Insets />
+        </opaqueInsets>
+        <HBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </HBox.margin>
+    </VBox>
+</AnchorPane>

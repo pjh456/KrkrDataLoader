@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+}
+
+group = 'com.KrkrData'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation 'com.google.code.gson:gson:2.11.0'
+    // https://mvnrepository.com/artifact/org.openjfx/javafx-controls// https://mvnrepository.com/artifact/org.openjfx/javafx-controls
+    implementation 'org.openjfx:javafx-controls:17.0.11'
+    // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
+    implementation 'org.controlsfx:controlsfx:11.2.1'
+    // https://mvnrepository.com/artifact/us.ihmc/jfoenix
+    implementation 'us.ihmc:jfoenix:17-0.1.1'
+    // https://mvnrepository.com/artifact/com.googlecode.soundlibs/vorbisspi
+    implementation 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
+    // https://mvnrepository.com/artifact/com.googlecode.soundlibs/mp3spi
+    implementation 'com.googlecode.soundlibs:mp3spi:1.9.5.4'
+    // https://mvnrepository.com/artifact/dev.mccue/vorbisspi
+//    implementation 'dev.mccue:vorbisspi:2024.04.19'
+
+}
+
+javafx {
+    version = "17.0.11"
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.media' ]
+}
+
+test {
+    useJUnitPlatform()
+}

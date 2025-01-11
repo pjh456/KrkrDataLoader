@@ -1,0 +1,10 @@
+{
+  "audio_suffix": ".ogg",
+  "speaker": "",
+  "content": "",
+  "scene_title": "",
+  "window_title": "KrkrDataLoader",
+  "window_icon": "KrkrDataLoader/src/main/resources/KrkrDataLoaderIcon.png",
+  "scene_fxml_path": "KrkrDataLoader/src/main/resources/KrkrSceneWindow.fxml",
+  "config_path": "KrkrDataLoader/src/main/resources/configs.json"
+}
