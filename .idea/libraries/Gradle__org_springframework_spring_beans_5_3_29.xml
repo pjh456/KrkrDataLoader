@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.springframework:spring-beans:5.3.29" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.springframework" artifactId="spring-beans" version="5.3.29" />
+    <CLASSES>
+      <root url="jar://D:/gradle/caches/modules-2/files-2.1/org.springframework/spring-beans/5.3.29/be40f557f3fa52c703f00e127ff639f8cf499617/spring-beans-5.3.29.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

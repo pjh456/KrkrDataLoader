@@ -1,0 +1,15 @@
+{
+  "name": "krkr-dataloader-gui",
+  "version": "1.0.0",
+  "description": "GUI for KrkrDataLoader",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "pjh456",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^33.3.1"
+  }
+}

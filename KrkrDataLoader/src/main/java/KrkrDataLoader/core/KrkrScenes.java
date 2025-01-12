@@ -3,6 +3,9 @@ package KrkrDataLoader.core;
 import KrkrDataLoader.config.Config;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 
 public class KrkrScenes
 		extends KrkrData
@@ -25,4 +28,16 @@ public class KrkrScenes
 	{
 		this(KrkrUtils.loadJsonFile(path));
 	}
+	
+	public KrkrScenes(File file) throws Throwable
+	{
+		this(KrkrUtils.loadJsonFile(file));
+	}
+	
+	public KrkrScenes(MultipartFile file) throws Throwable
+	{
+		this(KrkrUtils.loadJsonFile(file));
+	}
+	
 }
+

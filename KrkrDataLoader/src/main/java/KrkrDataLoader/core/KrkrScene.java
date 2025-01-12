@@ -4,6 +4,9 @@ import KrkrDataLoader.config.Config;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class KrkrScene
 		extends KrkrData
 {
@@ -31,5 +34,15 @@ public class KrkrScene
 		{
 		
 		}
+	}
+	
+	public List<String> listDialogues()
+	{
+		List<String> dialogueList = new ArrayList<>();
+		for(KrkrData child: listChildren())
+		{
+			dialogueList.add(((KrkrDialogue)child).toString());
+		}
+		return dialogueList;
 	}
 }

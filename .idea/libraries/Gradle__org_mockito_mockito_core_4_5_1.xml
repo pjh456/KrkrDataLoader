@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.mockito:mockito-core:4.5.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.mockito" artifactId="mockito-core" version="4.5.1" />
+    <CLASSES>
+      <root url="jar://D:/gradle/caches/modules-2/files-2.1/org.mockito/mockito-core/4.5.1/ed456e623e5afc6f4cee3ae58144e5c45f3b3bf/mockito-core-4.5.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.slf4j:jul-to-slf4j:1.7.36" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.slf4j" artifactId="jul-to-slf4j" version="1.7.36" />
+    <CLASSES>
+      <root url="jar://D:/gradle/caches/modules-2/files-2.1/org.slf4j/jul-to-slf4j/1.7.36/ed46d81cef9c412a88caef405b58f93a678ff2ca/jul-to-slf4j-1.7.36.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

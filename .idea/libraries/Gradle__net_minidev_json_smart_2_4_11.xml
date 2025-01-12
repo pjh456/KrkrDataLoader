@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: net.minidev:json-smart:2.4.11" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="net.minidev" artifactId="json-smart" version="2.4.11" />
+    <CLASSES>
+      <root url="jar://D:/gradle/caches/modules-2/files-2.1/net.minidev/json-smart/2.4.11/cc5888f14a5768f254b97bafe8b9fd29b31e872e/json-smart-2.4.11.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

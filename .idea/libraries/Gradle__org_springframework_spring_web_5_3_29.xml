@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.springframework:spring-web:5.3.29" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.springframework" artifactId="spring-web" version="5.3.29" />
+    <CLASSES>
+      <root url="jar://D:/gradle/caches/modules-2/files-2.1/org.springframework/spring-web/5.3.29/4cd333e48d9a05d05c05ae7426242ecfe4cfb681/spring-web-5.3.29.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

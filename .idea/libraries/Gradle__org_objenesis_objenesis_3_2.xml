@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: org.objenesis:objenesis:3.2" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.objenesis" artifactId="objenesis" version="3.2" />
+    <CLASSES>
+      <root url="jar://D:/gradle/caches/modules-2/files-2.1/org.objenesis/objenesis/3.2/7fadf57620c8b8abdf7519533e5527367cb51f09/objenesis-3.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

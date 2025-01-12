@@ -10,25 +10,6 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="KrkrDataLoader.gui.controller.KrkrSceneViewerController">
     <children>
-<!--      <VBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">-->
-<!--         <children>-->
-<!--              <Label text="Scene View">-->
-<!--                  <font>-->
-<!--                      <Font name="Consolas" size="15.0" />-->
-<!--                  </font>-->
-<!--              </Label>-->
-<!--              <ScrollPane hbarPolicy="ALWAYS" vbarPolicy="ALWAYS" VBox.vgrow="ALWAYS">-->
-<!--                  <content>-->
-<!--                      <AnchorPane>-->
-<!--                          <children>-->
-<!--                              <TextFlow fx:id="sceneViewer" lineSpacing="1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />-->
-<!--                          </children>-->
-<!--                      </AnchorPane>-->
-<!--                  </content>-->
-<!--              </ScrollPane>-->
-<!--         </children>-->
-<!--      </VBox>-->
-
         <VBox alignment="TOP_CENTER" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
                 <Label text="Scene View" VBox.vgrow="NEVER">

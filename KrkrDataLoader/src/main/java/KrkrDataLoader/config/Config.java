@@ -41,8 +41,8 @@ public class Config
 		for(Map.Entry<String,JsonElement> json_config: data.entrySet())
 		{
 			List<Object> fields = new ArrayList<>();
-			//TODO 目前这里只用第一个匹配就够了，等以后多模式匹配的时候再把 get(0) 改了
-			for(JsonElement field: json_config.getValue().getAsJsonArray().get(0).getAsJsonArray())
+			//TODO 目前这里只用第一个匹配就够了，等以后多模式匹配的时候再把这里改了
+			for(JsonElement field: json_config.getValue().getAsJsonArray())
 			{
 				if(field.getAsJsonPrimitive().isString()) { fields.add(field.getAsString()); }
 				else if(field.getAsJsonPrimitive().isNumber()) { fields.add((Integer) field.getAsInt()); }

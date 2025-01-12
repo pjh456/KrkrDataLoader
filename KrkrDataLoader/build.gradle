@@ -1,36 +1,32 @@
+
 plugins {
     id 'java'
-    id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'idea'
+    id 'org.springframework.boot' version '2.7.15'
 }
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 
 group = 'com.KrkrData'
 version = '1.0-SNAPSHOT'
 
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/public' }
     mavenCentral()
 }
 
 dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.11.0'
-    // https://mvnrepository.com/artifact/org.openjfx/javafx-controls// https://mvnrepository.com/artifact/org.openjfx/javafx-controls
-    implementation 'org.openjfx:javafx-controls:17.0.11'
-    // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
-    implementation 'org.controlsfx:controlsfx:11.2.1'
-    // https://mvnrepository.com/artifact/us.ihmc/jfoenix
-    implementation 'us.ihmc:jfoenix:17-0.1.1'
-    // https://mvnrepository.com/artifact/com.googlecode.soundlibs/vorbisspi
-    implementation 'com.googlecode.soundlibs:vorbisspi:1.0.3.3'
-    // https://mvnrepository.com/artifact/com.googlecode.soundlibs/mp3spi
-    implementation 'com.googlecode.soundlibs:mp3spi:1.9.5.4'
-    // https://mvnrepository.com/artifact/dev.mccue/vorbisspi
-//    implementation 'dev.mccue:vorbisspi:2024.04.19'
 
-}
+    // 添加 spring-boot-starter-web 的依赖 必须 排除了security 根据自身需求
+    implementation('org.springframework.boot:spring-boot-starter-web') {
+        exclude group: 'org.springframework.security', module: 'spring-security-config'
+    }
 
-javafx {
-    version = "17.0.11"
-    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.media' ]
+    // 添加 spring-boot-starter-test 该依赖对于编译测试是必须的，默认包含编译产品依赖和编译时依赖
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {

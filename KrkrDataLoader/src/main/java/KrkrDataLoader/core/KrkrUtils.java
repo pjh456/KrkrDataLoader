@@ -4,6 +4,7 @@ import KrkrDataLoader.config.JsonPath;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sun.jdi.InvalidTypeException;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,6 +15,26 @@ import java.util.List;
 
 public class KrkrUtils
 {
+	public static JsonObject loadJsonFile(MultipartFile file)
+	throws FileNotFoundException, InvalidTypeException, IOException
+	{
+		
+		// 使用BufferedReader逐行读取文件内容
+		StringBuilder contentBuilder = new StringBuilder();
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream())))
+		{
+			String line;
+			while(( line = reader.readLine() ) != null)
+			{
+				contentBuilder.append(line);
+			}
+		}
+		// 创建Gson对象以解析JSON
+		Gson gson = new Gson();
+		// 将读取的内容解析为JsonObject并返回
+		return gson.fromJson(contentBuilder.toString(), JsonObject.class);
+	}
+	
 	public static JsonObject loadJsonFile(File file)
 	throws FileNotFoundException, InvalidTypeException, IOException
 	{

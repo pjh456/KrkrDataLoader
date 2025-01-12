@@ -1,6 +1,6 @@
 {
   "audio_suffix": ".ogg",
-  "config_path": "KrkrDataLoader/src/test/testConfig.json",
+  "config_path": "KrkrDataLoader/src/main/resources/configs.json",
   "speaker": "",
   "content": "",
   "scene_title": "",

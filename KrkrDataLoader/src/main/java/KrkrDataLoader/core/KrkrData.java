@@ -7,10 +7,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class KrkrData
+public class KrkrData implements AutoCloseable
 {
 	public String name;
 	private Map<String, KrkrData> children_map;
+	public KrkrData parent = null;
 	
 	public KrkrData(String name)
 	{
@@ -26,6 +27,7 @@ public class KrkrData
 	public void setChild(KrkrData child)
 	{
 		this.children_map.put(child.name, child);
+		child.parent = this;
 	}
 	
 	public List<KrkrData> listChildren()
@@ -42,5 +44,15 @@ public class KrkrData
 	public String toString()
 	{
 		return name;
+	}
+	
+	@Override
+	public void close()
+	throws Exception
+	{
+		for(KrkrData child : this.listChildren())
+		{
+			child.close();
+		}
 	}
 }
