@@ -16,7 +16,7 @@ import java.util.List;
 public class KrkrUtils
 {
 	public static JsonObject loadJsonFile(MultipartFile file)
-	throws FileNotFoundException, InvalidTypeException, IOException
+			throws FileNotFoundException, InvalidTypeException, IOException
 	{
 		
 		// 使用BufferedReader逐行读取文件内容
@@ -36,7 +36,7 @@ public class KrkrUtils
 	}
 	
 	public static JsonObject loadJsonFile(File file)
-	throws FileNotFoundException, InvalidTypeException, IOException
+			throws FileNotFoundException, InvalidTypeException, IOException
 	{
 		
 		// 使用BufferedReader逐行读取文件内容
@@ -68,7 +68,7 @@ public class KrkrUtils
 	 * @throws Throwable             如果文件读取过程中发生错误
 	 */
 	public static JsonObject loadJsonFile(String path)
-	throws FileNotFoundException, InvalidTypeException, IOException
+			throws FileNotFoundException, InvalidTypeException, IOException
 	{
 		// 检查指定路径是否为文件，如果不是，则抛出异常
 		if(! isFile(path))
@@ -108,7 +108,7 @@ public class KrkrUtils
 	 * @throws Throwable 如果指定路径不是一个文件夹，则抛出FileNotFoundException
 	 */
 	public static List<JsonObject> loadJsonFolder(String path)
-	throws Throwable
+			throws Throwable
 	{
 		// 检查指定路径是否为文件夹，如果不是，则抛出异常
 		if(! isFolder(path))
@@ -195,7 +195,7 @@ public class KrkrUtils
 	}
 	
 	public static List<JsonPath> removeSamePath(JsonPath parentPath, JsonPath childPath)
-	throws Exception
+			throws Exception
 	{
 		if(! isPathInPath(parentPath, childPath))
 		{
@@ -210,7 +210,7 @@ public class KrkrUtils
 	
 	
 	public static List<Object> removeSamePath_object(JsonPath parentPath, JsonPath childPath)
-	throws Exception
+			throws Exception
 	{
 		if(! isPathInPath(parentPath, childPath))
 		{

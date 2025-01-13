@@ -17,7 +17,7 @@ public class KrkrDialogue
 	}
 	
 	public KrkrDialogue(String name, JsonElement data)
-	throws Throwable
+			throws Throwable
 	{
 		super(name);
 		

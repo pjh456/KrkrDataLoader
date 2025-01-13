@@ -11,13 +11,16 @@ public class KrkrResponseBuilder
 	private String message = "default";
 	private Object data = null;
 	
-	public ResponseEntity<Map<String, Object>> build()
+	public ResponseEntity<Map<String,Object>> build()
 	{
-		Map<String, Object> responseBody = Map.of(
-				"status", status,
-				"code", code,
-				"message", message,
-				"data", (data==null)?Map.of():data
+		Map<String,Object> responseBody = Map.of("status",
+				status,
+				"code",
+				code,
+				"message",
+				message,
+				"data",
+				( data == null ) ? Map.of() : data
 		);
 		
 		return ResponseEntity.ok(responseBody);

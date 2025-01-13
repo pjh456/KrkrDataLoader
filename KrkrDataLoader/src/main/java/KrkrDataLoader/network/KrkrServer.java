@@ -6,22 +6,34 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/krkr/api")
 public class KrkrServer
 {
-	private boolean fileIsReady = false;
-	private KrkrData currentData = null;
+	private final Map<String,KrkrScenes> sceneMap = new LinkedHashMap<>();
 	
-	@PostMapping("/scene/upload/json")
-	public ResponseEntity<Map<String,Object>> sceneJsonUpload(@RequestBody String jsonData)
+	@PostMapping("/scene/upload-file/{taskId}")
+	public ResponseEntity<Map<String,Object>> sceneFileUpload(
+			@PathVariable String taskId, @RequestParam("file") MultipartFile file
+	)
 	{
 		try
 		{
-			currentData = new KrkrScenes(jsonData);
-			fileIsReady = false;
+			KrkrScenes newScene = new KrkrScenes(file, false);
+			sceneMap.put(taskId, newScene);
+			Thread thread = new Thread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					try{ newScene.initialize(); }
+					catch(Throwable ignored){ }
+				}
+			});
+			thread.start();
 			
 			return KrkrResponseFactory.sceneFileUploadSuccess();
 		}
@@ -31,106 +43,87 @@ public class KrkrServer
 		}
 	}
 	
-	@PostMapping("/scene/upload/file")
-	public ResponseEntity<Map<String,Object>> sceneFileUpload(@RequestParam("file") MultipartFile file)
+	@GetMapping("/scene/check/{taskId}")
+	public ResponseEntity<Map<String,Object>> checkFileAvailable(@PathVariable String taskId)
 	{
 		try
 		{
-			currentData = new KrkrScenes(file);
-			fileIsReady = false;
-			
-			return KrkrResponseFactory.sceneFileUploadSuccess();
+			return sceneMap.get(taskId).isInit() ?
+					KrkrResponseFactory.resourceReady(taskId) :
+					KrkrResponseFactory.resourceNotReady();
 		}
-		catch(Throwable e)
-		{
-			return KrkrResponseFactory.sceneFileUploadFailed(e.getMessage());
-		}
+		catch(NullPointerException e){ return KrkrResponseFactory.resourceNotReady(); }
 	}
 	
-	@GetMapping("/scene/check")
-	public ResponseEntity<Map<String,Object>> checkFileAvailable()
+	@GetMapping("/scene/info/{taskId}")
+	public ResponseEntity<Map<String,Object>> getDataInfo(
+			@PathVariable String taskId, @RequestHeader(value = "Range", required = false) String range
+	)
 	{
-		return KrkrResponseFactory.resourceReady("0d000721");
-	}
-	
-	@GetMapping("/scene/info")
-	public ResponseEntity<Map<String,Object>> getDataInfo(@RequestHeader(value = "Range", required = false) String range)
-	{
+		KrkrScenes currentData = sceneMap.get(taskId);
+		
 		if(range == null) return KrkrResponseFactory.krkrRangeInfo(currentData);
 		else
 		{
 			String[] rangeIndex = range.replace("-", " ").split(" ");
 			
-			if(rangeIndex.length < 2) return KrkrResponseFactory.error("Range value is valid!");
-			
-			return KrkrResponseFactory.krkrRangeInfo(currentData, Integer.decode(rangeIndex[0]), Integer.decode(rangeIndex[1]));
-		}
-	}
-	
-	@GetMapping("/scene/path")
-	public ResponseEntity<Map<String,Object>> openPath(@RequestHeader(value = "Index", required = false) String index)
-	{
-		if(currentData == null) return KrkrResponseFactory.resourceNotReady();
-		
-		if(index == null)
-		{
-			if(currentData.parent == null) return KrkrResponseFactory.error("Data doesn't have parent!");
-			else
-			{
-				currentData = currentData.parent;
-				return KrkrResponseFactory.success("Go to parent data: " + currentData.name);
-			}
-		}
-		else
-		{
 			try
 			{
-				for(String childIndex: index.split(","))
-				{ currentData = currentData.getChild(Integer.decode(childIndex)); }
+				if(rangeIndex.length == 1) return KrkrResponseFactory.krkrRangeInfo(currentData,
+						Integer.decode(rangeIndex[0]),
+						Integer.decode(rangeIndex[0]) + 1
+				);
+				else return KrkrResponseFactory.krkrRangeInfo(currentData,
+						Integer.decode(rangeIndex[0]),
+						Integer.decode(rangeIndex[1])
+				);
 			}
 			catch(NumberFormatException e){ return KrkrResponseFactory.unsupportedType(); }
-			catch(IndexOutOfBoundsException e){ return KrkrResponseFactory.outOfRange(); }
-			return KrkrResponseFactory.success("Go to child data: " + currentData.name);
 		}
 	}
 	
-	// TODO: 这里是有问题的，range对应的范围不清晰，应该与index区分开来，下次有机会再改。
-	@GetMapping("/scene/text")
-	public ResponseEntity<Map<String,Object>> getRangeText(@RequestHeader(value = "Range", required = false) String range, @RequestHeader(value = "Index", required = false) String index)
+	@GetMapping("/scene/text/{taskId}")
+	public ResponseEntity<Map<String,Object>> getRangeText(
+			@PathVariable String taskId,
+			@RequestHeader(value = "Range", required = false) String range,
+			@RequestHeader(value = "Index", required = false) String index
+	)
 	{
-		KrkrData dealingData;
+		KrkrData currentData = sceneMap.get(taskId);
 		
 		try
 		{
-			dealingData = currentData;
 			if(index != null)
 			{
 				for(String childIndex: index.split(","))
-				{ dealingData = dealingData.getChild(Integer.decode(childIndex)); }
+				{ currentData = currentData.getChild(Integer.decode(childIndex)); }
 			}
 		}
 		catch(NumberFormatException e){ return KrkrResponseFactory.unsupportedType(); }
 		catch(IndexOutOfBoundsException e){ return KrkrResponseFactory.outOfRange(); }
 		
-		if(range == null) return KrkrResponseFactory.krkrRangeText(dealingData, 0);
+		if(range == null) return KrkrResponseFactory.krkrRangeText(currentData, 0);
 		else
 		{
 			String[] rangeValue = range.split("-");
 			
-			if(rangeValue.length < 2) return KrkrResponseFactory.unsupportedType();
-			
 			try
 			{
-				return KrkrResponseFactory.krkrRangeText(dealingData, Integer.decode(rangeValue[0]), Integer.decode(rangeValue[1]));
+				if(rangeValue.length == 1) return KrkrResponseFactory.krkrRangeText(currentData,
+						Integer.decode(rangeValue[0]),
+						Integer.decode(rangeValue[0]) + 1
+				);
+				else return KrkrResponseFactory.krkrRangeText(currentData,
+						Integer.decode(rangeValue[0]),
+						Integer.decode(rangeValue[1])
+				);
 			}
-			catch(NumberFormatException e){ return KrkrResponseFactory.error(e.getMessage()); }
+			catch(NumberFormatException e){ return KrkrResponseFactory.unsupportedType(); }
 		}
 	}
 	
 	@GetMapping("/greet/{name}")
-	
 	public String greet(@PathVariable String name) { return "Hello, " + name + "!"; }
-	
 	
 	@PostMapping("/greet")
 	public String greetWithBody(@PathVariable String name) { return "Hello, " + name + "!"; }

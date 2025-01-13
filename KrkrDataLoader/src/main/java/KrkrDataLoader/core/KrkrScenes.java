@@ -12,7 +12,7 @@ public class KrkrScenes
 {
 	@Override
 	public void initialize()
-	throws Throwable
+			throws Throwable
 	{
 		for(JsonElement object: Config.SceneConfig.getValueAsJsonArray(data))
 		{
@@ -24,7 +24,7 @@ public class KrkrScenes
 	}
 	
 	public KrkrScenes(JsonElement data, boolean init_now)
-	throws Throwable
+			throws Throwable
 	{
 		super(Config.ScenesNameConfig.getValueAsJsonPrimitive(data).getAsString());
 		this.data = data;
@@ -32,27 +32,27 @@ public class KrkrScenes
 	}
 	
 	public KrkrScenes(String path, boolean init_now)
-	throws Throwable
+			throws Throwable
 	{ this(KrkrUtils.loadJsonFile(path), init_now); }
 	
 	public KrkrScenes(File file, boolean init_now)
-	throws Throwable
+			throws Throwable
 	{ this(KrkrUtils.loadJsonFile(file), init_now); }
 	
 	public KrkrScenes(MultipartFile file, boolean init_now)
-	throws Throwable
+			throws Throwable
 	{ this(KrkrUtils.loadJsonFile(file), init_now); }
 	
 	public KrkrScenes(String path)
-	throws Throwable
+			throws Throwable
 	{ this(path, true); }
 	
 	public KrkrScenes(File file)
-	throws Throwable
+			throws Throwable
 	{ this(file, true); }
 	
 	public KrkrScenes(MultipartFile file)
-	throws Throwable
+			throws Throwable
 	{ this(file, true); }
 }
 

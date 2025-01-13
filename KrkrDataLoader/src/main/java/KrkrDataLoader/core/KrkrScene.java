@@ -12,7 +12,7 @@ public class KrkrScene
 {
 	@Override
 	public void initialize()
-	throws Throwable
+			throws Throwable
 	{
 		
 		JsonArray dialogues_array = null;
@@ -35,15 +35,15 @@ public class KrkrScene
 	}
 	
 	public KrkrScene(JsonElement data, boolean init_now)
-	throws Throwable
+			throws Throwable
 	{
 		super(Config.SceneNameConfig.getValueAsJsonPrimitive(data).getAsString());
 		this.data = data;
-		if(init_now)initialize();
+		if(init_now) initialize();
 	}
 	
 	public KrkrScene(JsonElement data)
-	throws Throwable
+			throws Throwable
 	{ this(data, true); }
 	
 	public List<String> listDialogues()

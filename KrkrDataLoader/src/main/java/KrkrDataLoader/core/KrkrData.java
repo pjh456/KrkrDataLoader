@@ -17,7 +17,7 @@ public class KrkrData
 	protected boolean is_init = false;
 	
 	public void initialize()
-	throws Throwable
+			throws Throwable
 	{ is_init = true; }
 	
 	public KrkrData(String name)
@@ -35,7 +35,7 @@ public class KrkrData
 	}
 	
 	public KrkrData getChild(int index)
-	throws IndexOutOfBoundsException
+			throws IndexOutOfBoundsException
 	{ return this.children_map.values().stream().toList().get(index); }
 	
 	public void setChild(KrkrData child)
@@ -62,7 +62,7 @@ public class KrkrData
 	
 	@Override
 	public void close()
-	throws Exception
+			throws Exception
 	{
 		for(KrkrData child: this.listChildren())
 		{

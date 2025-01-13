@@ -23,6 +23,7 @@ public class Main implements WebMvcConfigurer
 	public static void main(String[] args)
 	throws Throwable
 	{
+		// TODO：准备开始开发前端内容
 		Settings.loadFromJson();
 //		String scenePath = "KrkrDataLoader/src/test/001・アーサー王ver1.07.ks.json";
 //		KrkrScenes scenes = new KrkrScenes(scenePath);
