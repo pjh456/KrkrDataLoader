@@ -10,34 +10,49 @@ import java.io.File;
 public class KrkrScenes
 		extends KrkrData
 {
-	public KrkrScenes(JsonElement data) throws Throwable
+	@Override
+	public void initialize()
+	throws Throwable
 	{
-		//super(Config.getSingleConfig("scenes_name").getValueAsJsonPrimitive(data).getAsString());
-		super(Config.ScenesNameConfig.getValueAsJsonPrimitive(data).getAsString());
-		
-		//JsonArray scene_array = Config.getSingleConfig("scene").getValueAsJsonArray(data);
-		JsonArray scene_array = Config.SceneConfig.getValueAsJsonArray(data);
-		
-		for(JsonElement object: scene_array)
+		for(JsonElement object: Config.SceneConfig.getValueAsJsonArray(data))
 		{
 			setChild(new KrkrScene(object));
 		}
+		
+		this.data = null;
+		is_init = true;
 	}
 	
-	public KrkrScenes(String path) throws Throwable
+	public KrkrScenes(JsonElement data, boolean init_now)
+	throws Throwable
 	{
-		this(KrkrUtils.loadJsonFile(path));
+		super(Config.ScenesNameConfig.getValueAsJsonPrimitive(data).getAsString());
+		this.data = data;
+		if(init_now) initialize();
 	}
 	
-	public KrkrScenes(File file) throws Throwable
-	{
-		this(KrkrUtils.loadJsonFile(file));
-	}
+	public KrkrScenes(String path, boolean init_now)
+	throws Throwable
+	{ this(KrkrUtils.loadJsonFile(path), init_now); }
 	
-	public KrkrScenes(MultipartFile file) throws Throwable
-	{
-		this(KrkrUtils.loadJsonFile(file));
-	}
+	public KrkrScenes(File file, boolean init_now)
+	throws Throwable
+	{ this(KrkrUtils.loadJsonFile(file), init_now); }
 	
+	public KrkrScenes(MultipartFile file, boolean init_now)
+	throws Throwable
+	{ this(KrkrUtils.loadJsonFile(file), init_now); }
+	
+	public KrkrScenes(String path)
+	throws Throwable
+	{ this(path, true); }
+	
+	public KrkrScenes(File file)
+	throws Throwable
+	{ this(file, true); }
+	
+	public KrkrScenes(MultipartFile file)
+	throws Throwable
+	{ this(file, true); }
 }
 

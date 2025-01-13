@@ -85,51 +85,53 @@ public class KrkrServer
 		{
 			try
 			{
-				int indexValue = Integer.decode(index);
-				if(indexValue < 0 || indexValue >= currentData.size()) return KrkrResponseFactory.outOfRange();
-				
-				currentData = currentData.listChildren().get(indexValue);
-				return KrkrResponseFactory.success("Go to child data: " + currentData.name);
+				for(String childIndex: index.split(","))
+				{ currentData = currentData.getChild(Integer.decode(childIndex)); }
 			}
-			catch(NumberFormatException e)
-			{
-				return KrkrResponseFactory.error(e.getMessage());
-			}
+			catch(NumberFormatException e){ return KrkrResponseFactory.unsupportedType(); }
+			catch(IndexOutOfBoundsException e){ return KrkrResponseFactory.outOfRange(); }
+			return KrkrResponseFactory.success("Go to child data: " + currentData.name);
 		}
 	}
 	
+	// TODO: 这里是有问题的，range对应的范围不清晰，应该与index区分开来，下次有机会再改。
 	@GetMapping("/scene/text")
-	public ResponseEntity<Map<String,Object>> getRangeText(@RequestHeader(value = "Range", required = false) String range)
+	public ResponseEntity<Map<String,Object>> getRangeText(@RequestHeader(value = "Range", required = false) String range, @RequestHeader(value = "Index", required = false) String index)
 	{
-		if(range == null) return KrkrResponseFactory.krkrRangeText(currentData, 0);
+		KrkrData dealingData;
+		
+		try
+		{
+			dealingData = currentData;
+			if(index != null)
+			{
+				for(String childIndex: index.split(","))
+				{ dealingData = dealingData.getChild(Integer.decode(childIndex)); }
+			}
+		}
+		catch(NumberFormatException e){ return KrkrResponseFactory.unsupportedType(); }
+		catch(IndexOutOfBoundsException e){ return KrkrResponseFactory.outOfRange(); }
+		
+		if(range == null) return KrkrResponseFactory.krkrRangeText(dealingData, 0);
 		else
 		{
-			String[] rangeValue = range.replace("-", " ").split(" ");
+			String[] rangeValue = range.split("-");
 			
-			if(rangeValue.length < 2) return KrkrResponseFactory.error("Range value is valid!");
+			if(rangeValue.length < 2) return KrkrResponseFactory.unsupportedType();
 			
 			try
 			{
-				return KrkrResponseFactory.krkrRangeText(currentData, Integer.decode(rangeValue[0]), Integer.decode(rangeValue[1]));
+				return KrkrResponseFactory.krkrRangeText(dealingData, Integer.decode(rangeValue[0]), Integer.decode(rangeValue[1]));
 			}
-			catch(NumberFormatException e)
-			{
-				return KrkrResponseFactory.error(e.getMessage());
-			}
+			catch(NumberFormatException e){ return KrkrResponseFactory.error(e.getMessage()); }
 		}
 	}
 	
 	@GetMapping("/greet/{name}")
 	
-	public String greet(@PathVariable String name)
-	{
-		return "Hello, " + name + "!";
-	}
+	public String greet(@PathVariable String name) { return "Hello, " + name + "!"; }
 	
 	
 	@PostMapping("/greet")
-	public String greetWithBody(@PathVariable String name)
-	{
-		return "Hello, " + name + "!";
-	}
+	public String greetWithBody(@PathVariable String name) { return "Hello, " + name + "!"; }
 }

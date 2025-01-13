@@ -1,0 +1,25 @@
+{
+  "scenes_name": [
+    "name"
+  ],
+  "scene": [
+    "scenes"
+  ],
+  "scene_label": [
+    "label"
+  ],
+  "dialogues": [
+    "texts"
+  ],
+  "speaker": [
+    0
+  ],
+  "content": [
+    2
+  ],
+  "voice": [
+    3,
+    0,
+    "voice"
+  ]
+}

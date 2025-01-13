@@ -78,6 +78,14 @@ public class KrkrResponseFactory
 										.build();
 	}
 	
+	public static ResponseEntity<Map<String, Object>> unsupportedType()
+	{
+		return new KrkrResponseBuilder().setStatus("Failed")
+										.setCode(416)
+										.setMessage("Type is not supported!")
+										.build();
+	}
+	
 	public static ResponseEntity<Map<String,Object>> krkrRangeInfo(KrkrData data, int begin, int end)
 	{
 		if(data == null) return resourceNotReady();

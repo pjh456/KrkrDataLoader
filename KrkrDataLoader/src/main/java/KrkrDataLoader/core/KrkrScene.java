@@ -10,17 +10,15 @@ import java.util.List;
 public class KrkrScene
 		extends KrkrData
 {
-	
-	public KrkrScene(JsonElement data) throws Throwable
+	@Override
+	public void initialize()
+	throws Throwable
 	{
-		//super(Config.getSingleConfig("scene_label").getValueAsJsonPrimitive(data).getAsString());
-		super(Config.SceneNameConfig.getValueAsJsonPrimitive(data).getAsString());
 		
 		JsonArray dialogues_array = null;
 		
 		try
 		{
-			//dialogues_array = Config.getSingleConfig("dialogues").getValueAsJsonArray(data);
 			dialogues_array = Config.DialoguesConfig.getValueAsJsonArray(data);
 			
 			int index = 0;
@@ -30,18 +28,30 @@ public class KrkrScene
 				index++;
 			}
 		}
-		catch(Throwable ignored)
-		{
+		catch(Throwable ignored){ }
 		
-		}
+		this.data = null;
+		is_init = true;
 	}
+	
+	public KrkrScene(JsonElement data, boolean init_now)
+	throws Throwable
+	{
+		super(Config.SceneNameConfig.getValueAsJsonPrimitive(data).getAsString());
+		this.data = data;
+		if(init_now)initialize();
+	}
+	
+	public KrkrScene(JsonElement data)
+	throws Throwable
+	{ this(data, true); }
 	
 	public List<String> listDialogues()
 	{
 		List<String> dialogueList = new ArrayList<>();
 		for(KrkrData child: listChildren())
 		{
-			dialogueList.add(((KrkrDialogue)child).toString());
+			dialogueList.add(( (KrkrDialogue) child ).toString());
 		}
 		return dialogueList;
 	}
