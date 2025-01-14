@@ -28,7 +28,7 @@ public class Main implements WebMvcConfigurer
 //		String scenePath = "KrkrDataLoader/src/test/001・アーサー王ver1.07.ks.json";
 //		KrkrScenes scenes = new KrkrScenes(scenePath);
 //		System.out.println(scenes.name);
-//
+
 //		for(KrkrData scene : scenes.listChildren())
 //		{
 //			for(KrkrData dialogue : ((KrkrScene) scene).listChildren())
@@ -37,7 +37,7 @@ public class Main implements WebMvcConfigurer
 //			}
 //		}
 		
-//		System.setProperty("server.port", "8080");
+		System.setProperty("server.port", "8080");
 		
 		SpringApplication.run(Main.class, args);
 	}

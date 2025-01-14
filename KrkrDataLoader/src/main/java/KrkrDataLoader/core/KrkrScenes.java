@@ -6,6 +6,8 @@ import com.google.gson.JsonElement;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KrkrScenes
 		extends KrkrData
@@ -14,10 +16,24 @@ public class KrkrScenes
 	public void initialize()
 			throws Throwable
 	{
+//		System.out.println("Start to initialize KrkrScenes: " + name);
+		
+		List<Thread> threadList = new ArrayList<>();
 		for(JsonElement object: Config.SceneConfig.getValueAsJsonArray(data))
 		{
-			setChild(new KrkrScene(object));
+			KrkrScene newChild = new KrkrScene(object, false);
+			setChild(newChild);
+			
+			Thread thread = new Thread(() ->
+			{
+				try{ newChild.initialize(); }
+				catch(Throwable ignored){ }
+			});
+			threadList.add(thread);
+			thread.start();
 		}
+		
+		for(Thread thread: threadList) { thread.join(); }
 		
 		this.data = null;
 		is_init = true;

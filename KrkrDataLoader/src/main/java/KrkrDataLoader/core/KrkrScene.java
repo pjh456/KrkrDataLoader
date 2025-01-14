@@ -14,6 +14,7 @@ public class KrkrScene
 	public void initialize()
 			throws Throwable
 	{
+//		System.out.println("Start to initialize KrkrScene: " + name);
 		
 		JsonArray dialogues_array = null;
 		

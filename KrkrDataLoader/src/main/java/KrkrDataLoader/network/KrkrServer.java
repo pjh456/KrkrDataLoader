@@ -15,7 +15,7 @@ public class KrkrServer
 {
 	private final Map<String,KrkrScenes> sceneMap = new LinkedHashMap<>();
 	
-	@PostMapping("/scene/upload-file/{taskId}")
+	@PostMapping("/scene/{taskId}/upload-file")
 	public ResponseEntity<Map<String,Object>> sceneFileUpload(
 			@PathVariable String taskId, @RequestParam("file") MultipartFile file
 	)
@@ -24,14 +24,10 @@ public class KrkrServer
 		{
 			KrkrScenes newScene = new KrkrScenes(file, false);
 			sceneMap.put(taskId, newScene);
-			Thread thread = new Thread(new Runnable()
+			Thread thread = new Thread(() ->
 			{
-				@Override
-				public void run()
-				{
-					try{ newScene.initialize(); }
-					catch(Throwable ignored){ }
-				}
+				try{ newScene.initialize(); }
+				catch(Throwable ignored){ }
 			});
 			thread.start();
 			
@@ -43,7 +39,7 @@ public class KrkrServer
 		}
 	}
 	
-	@GetMapping("/scene/check/{taskId}")
+	@GetMapping("/scene/{taskId}/check")
 	public ResponseEntity<Map<String,Object>> checkFileAvailable(@PathVariable String taskId)
 	{
 		try
@@ -55,7 +51,7 @@ public class KrkrServer
 		catch(NullPointerException e){ return KrkrResponseFactory.resourceNotReady(); }
 	}
 	
-	@GetMapping("/scene/info/{taskId}")
+	@GetMapping("/scene/{taskId}/info")
 	public ResponseEntity<Map<String,Object>> getDataInfo(
 			@PathVariable String taskId, @RequestHeader(value = "Range", required = false) String range
 	)
@@ -82,7 +78,7 @@ public class KrkrServer
 		}
 	}
 	
-	@GetMapping("/scene/text/{taskId}")
+	@GetMapping("/scene/{taskId}/text")
 	public ResponseEntity<Map<String,Object>> getRangeText(
 			@PathVariable String taskId,
 			@RequestHeader(value = "Range", required = false) String range,
