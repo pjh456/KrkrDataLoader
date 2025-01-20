@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
+@CrossOrigin(origins="*",allowedHeaders = "*")
 @RequestMapping("/krkr/api")
 public class KrkrServer
 {

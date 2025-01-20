@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resizable Panels</title>
+    <style>
+        body{
+            margin: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+        .con{
+            display: flex;
+            height: 500px;
+            outline: 4px solid rosybrown;
+        }
+        aside{
+            position: relative;
+            align-self: stretch;
+            overflow: hidden;
+            /* background-color: antiquewhite; */
+            
+        }
+        .resize{
+            min-width: 10vw;
+            width: 200px;
+            max-width: 50vw;
+            height: 16px;
+            transform: scaleY(100);
+            /* background-color: cadetblue; */
+            overflow: scroll;
+            resize: horizontal;
+            opacity: 0;
+        }
+        .line{
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            bottom: 0;
+            background-color: royalblue;
+            opacity: 0;
+            transition: .3s;
+            pointer-events: none;
+        }
+    
+        .resize:hover+.line,
+        .resize:active+.line{
+            opacity: 1;
+        }
+        main{
+            flex: 1;
+            align-self: stretch;
+            padding: 8px;
+            background-color:#e3f2fd;
+        }
+        section{
+            position: absolute;
+            inset: 0 4px 0 0;
+            padding: 8px;
+            overflow: auto;
+            background-color: antiquewhite;
+        }
+        .resize-left{
+            transform: scale(-1, 100);
+        }
+        .resize-left+.line{
+            left: 0;
+            right: auto;
+        }
+        .resize-left~section{
+            inset: 0 0 0 4px;
+        }
+    </style>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+</head>
+
+<body>
+    <div class="con">
+        <aside>
+            <div class="resize"></div>
+            <div class="line"></div>
+            <section>SIDE</section>
+        </aside>
+        <main>
+            MAIN
+        </main>
+        <aside class="right">
+            <div class="resize resize-left"></div>
+            <div class="line"></div>
+            <section>SIDE</section>
+        </aside>
+    </div>
+</body>
+
+</html>

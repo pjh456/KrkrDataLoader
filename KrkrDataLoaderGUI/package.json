@@ -10,6 +10,12 @@
   "author": "pjh456",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^33.3.1"
+    "electron": "^33.3.1",
+    "split.js": "^1.6.5",
+    "webpack": "^5.97.1"
+  },
+  "dependencies": {
+    "@monaco-editor/loader": "^1.4.0",
+    "monaco-editor": "^0.52.2"
   }
 }

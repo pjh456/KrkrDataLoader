@@ -1,0 +1,55 @@
+aside{
+    width:20vw;
+    position: relative;
+    overflow: hidden;
+    background-color: rgb(35, 35, 35);
+}
+/* 
+.resizable{
+    
+    position: relative;
+    
+    transform: scaleY(100);
+    overflow: scroll;
+    resize: horizontal;
+    opacity: 0;
+
+}
+
+.resize-line{
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    width: 4px;
+    background-color: royalblue;
+    opacity: 0;
+    transform: .3s;
+    pointer-events: none;
+
+}
+
+
+.right .resizable{
+    transform: scale(-1, 100);
+}
+
+#file-tree-container{
+    background-color:rgb(35, 35, 35);
+}
+
+#file-tree-box{
+    min-width: 20vw;
+}
+
+#function-column{
+    position:relative;
+    right:0;
+
+    width:20vw;
+    min-width: 10vw;
+
+    background-color: grey;
+
+} */

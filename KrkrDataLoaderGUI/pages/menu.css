@@ -1,0 +1,177 @@
+* {
+    --background-color: rgb(30, 30, 30);
+    --side-bar-color: #454545;
+
+    --side-bar-width: 85px;
+}
+
+body {
+    overflow: hidden;
+    margin: 0;
+}
+
+.main-window {
+    width: 100%;
+    height: 100%;
+}
+
+.split-view-container {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.split-view-view {
+    width: 100%;
+    height: 100%;
+
+    background-color: var(--background-color);
+
+    flex-grow: 1;
+}
+
+#top-bar {
+    flex-grow: 0;
+    flex-shrink: 0;
+    height: 30px;
+
+    background-color: rgb(100, 100, 100);
+
+
+    display: flex;
+    flex-direction: row;
+
+    justify-content: left;
+    align-items: center;
+}
+
+#content-bar {
+    display: flex;
+    flex-direction: row;
+}
+
+#menu-bar {
+    display: flex;
+    flex-direction: row;
+}
+
+#menu-bar .menu-item {
+    background-color: rgb(50, 50, 50);
+    border-radius: 5%;
+}
+
+.content-container {
+    x: 0;
+    height: 100%;
+}
+
+#side-bar {
+    width: var(--side-bar-width);
+    height: 100%;
+    x: 0;
+
+    background-color: var(--side-bar-color);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#page-bar {
+    width: 80%;
+    height: 100%;
+    padding-top: 10%;
+    padding-bottom: 10%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-button {
+    width: 100%;
+
+    font-size: 100%;
+    color: white;
+    border: none;
+
+    text-align: center;
+    padding-top: 10%;
+    padding-bottom: 10%;
+
+    opacity: 0.5;
+    transition: opacity 0.2s ease, background-color 0.1s ease;
+
+}
+
+.page-button:hover {
+    opacity: 1;
+}
+
+#settings {
+    y: 100%;
+}
+
+aside {
+    height: 100%;
+}
+
+#resizable-columns {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    left: var(--side-bar-width);
+    right: 0;
+}
+
+#file-tree {
+    position: relative;
+
+    top: 0;
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+
+    z-index: 1;
+}
+
+#file-tree-container {
+    background-color: rgb(35, 35, 35);
+}
+
+#upload-file-label{
+    font-size:80%;
+    margin:1vh;
+    color:white;
+    opacity: 0.5;
+    transition: opacity 0.1s ease;
+}
+
+#upload-file-label:hover{
+    opacity: 1;
+}
+
+#function-column {
+    position: relative;
+    right: 0;
+
+    width: 20vw;
+    min-width: 10vw;
+
+    background-color: grey;
+
+}

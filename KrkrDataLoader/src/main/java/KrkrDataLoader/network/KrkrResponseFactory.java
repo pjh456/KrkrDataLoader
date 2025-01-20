@@ -118,7 +118,7 @@ public class KrkrResponseFactory
 										 .build();
 	}
 	
-	public static ResponseEntity<Map<String,Object>> krkrRangeText(KrkrData data, int begin, int end)
+	public static ResponseEntity<Map<String,Object>> 	krkrRangeText(KrkrData data, int begin, int end)
 	{
 		if(data == null) return resourceNotReady();
 		

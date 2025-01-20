@@ -1,0 +1,125 @@
+<html>
+
+<head>
+    <link rel='stylesheet' href="menu.css">
+    <link rel='stylesheet' href="flex_column.css">
+    <link rel='stylesheet' href="file_tree.css">
+    <script src="../node_modules/monaco-editor/min/vs/loader.js"></script>
+</head>
+
+<body>
+    <div class="main-window">
+        <div class="split-view-container">
+            <div class="split-view-view" id="top-bar">
+                <div id="menu-bar"></div>
+            </div>
+            <div class="split-view-view" id="content-bar">
+                <div class="content-container" id="side-bar">
+                    <div id="page-bar">
+                        <div class="page-button" id="scene">Scene Load</div>
+                        <div class="page-button" id="config">Config</div>
+                        <div class="page-button" id="image">Image View </div>
+                    </div>
+                    <div class="page-button" id="settings">Settings</div>
+                </div>
+                <div class="content-container" style="flex:1; display:flex; flex-direction:row;">
+                    <aside id="file-tree-container" style="position:relative;left:0;">
+                        <section id="file-tree">
+                            <span style="color:white; user-select:none;">Loaded File Path</span>
+                            <label id="upload-file-label" for="upload-file">Upload New File</label>
+                            <input type="file" id="upload-file" accept=".json" enctype="multipart/form-data" style="display: none;" onchange="upload_scene_file(event)">
+                            <file-tree></file-tree>
+                        </section>
+                    </aside>
+                    <main id="editor-container" style="flex:1;"></main>
+                    <script type="module">
+                        require.config({ paths: { 'vs': '../node_modules/monaco-editor/min/vs' } });
+
+                        window.MonacoEnvironment = {
+                            getWorkerUrl: (moduleId, label) => {
+                                return require.resolve('monaco-editor/esm/vs/editor/editor.worker');
+                            }
+                        };
+                        var editorContainer = document.getElementById("editor-container");
+                        
+                        
+                        require(['vs/editor/editor.main'], () => {
+                            monaco.languages.register({id:'krkrLang'});
+
+                            monaco.languages.setMonarchTokensProvider('krkrLang', {
+                                tokenizer: {
+                                    root: [
+                                        //[/\【/, 'speaker'],
+                                        //[/\】/, 'speaker'],
+                                        [/\「/, 'content'],
+                                        [/\」/, 'content'],
+                                        [/\『/, 'quote'],
+                                        [/\』/, 'quote'],
+                                        //[/\[/, 'definition'],
+                                        //[/\]/, 'definition'],
+                                        [/\【(.*?)\】/,'speaker'],
+                                        [/\[(.*?)\]/,'definition'],
+                                    ]
+                                }
+                            });
+                            
+
+                            monaco.editor.defineTheme('krkrTheme', {
+                                base: 'vs-dark',  // 基础主题
+                                inherit: true,  // 继承默认主题
+                                rules: [
+                                    { token: 'speaker', foreground: "#a8ffff" },
+                                    { token: 'content', foreground: "#8ad8ff" },
+                                    { token: 'quote', foreground: "#8ad8ff" },
+                                    { token: 'definition', foreground: "#fbffad" },
+                                ],
+                                colors: {}
+                            });
+
+                            var editor = monaco.editor.create(editorContainer, {
+                                value: '',
+                                language: 'krkrLang',
+                                theme: 'krkrTheme',
+                                fontSize: 30,
+                                cursorBlinking: 'Solid',
+                                minimap: {
+                                    enabled: true
+                                },
+                                folding: false,
+                                scrollBeyondLastLine: false,
+                                diagnosticsOptions: {
+                                    // 禁用错误标记
+                                    validate: false,
+                                    lint: false
+                                },
+                                lineNumbers: true
+                            });
+                            
+                            document.addEventListener("updateSceneContent", function(event){
+                                //console.log(event.detail);
+                                editor.setValue(event.detail);
+                            });
+
+                            document.addEventListener("loadFile", function(event){
+                                editor.setValue(textMap.get(event.detail));
+                                //console.log(textMap.get(event.detail));
+                            });
+                        })
+                    </script>
+                    <aside id="right-column" style="position:relative;right:0;"></aside>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="./scene_file_func.js"></script>
+<script type="module">
+    import { fileTree } from './file_tree.js';
+    customElements.define('file-tree', fileTree);
+</script>
+<script>
+    //var editor = document.getElementsByClassName("monaco-editor");
+    //console.log(editor)
+</script>
+
+</html>
