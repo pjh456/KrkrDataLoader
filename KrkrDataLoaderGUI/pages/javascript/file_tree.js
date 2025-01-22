@@ -13,10 +13,10 @@ class fileTree extends HTMLElement {
         window.addEventListener("updateFilePath",function(event){
             var new_data = this.data;
             new_data[event.detail.scene_name] = event.detail.path_data;
-            console.log(new_data);
+            // console.log(new_data);
             this.data = new_data;
             // file_tree = createFolderStructure(data);
-            console.log("update!");
+            // console.log("update!");
             this.createFileTree();
         }.bind(this));
       }
@@ -24,10 +24,10 @@ class fileTree extends HTMLElement {
     createFileTree(){
         // const shadowRoot = this.attachShadow({ mode: 'open' });
         this.shadowRoot.innerHTML = `
-            <link rel='stylesheet' href="file_tree.css">
+            <link rel='stylesheet' href="./css/file_tree.css">
         `;
 
-        console.log(this.data);
+        // console.log(this.data);
         const file_tree = this.createFolderStructure(this.data);
         file_tree.id = "file-tree-list";
         file_tree.className = "active";
@@ -90,17 +90,6 @@ class fileTree extends HTMLElement {
     }
 
     get data(){
-        // return this.getAttribute('data')||{
-        //     "asd":{
-        //         "aaa":[
-        //             "aaa",
-        //             "bbb",
-        //             "ccc"
-        //         ]
-        //     },
-        //     "aaaaa":""
-        // };
-        // return this.getAttribute('data')||{"asd":["aaa"]};
         const dataAttr = this.getAttribute('data');
         return dataAttr ? JSON.parse(dataAttr) : {};
     }

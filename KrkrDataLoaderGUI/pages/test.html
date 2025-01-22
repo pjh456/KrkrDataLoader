@@ -85,7 +85,7 @@
             <section>SIDE</section>
         </aside>
         <main>
-            MAIN
+            <text-editor>  </text-editor>
         </main>
         <aside class="right">
             <div class="resize resize-left"></div>
@@ -94,5 +94,12 @@
         </aside>
     </div>
 </body>
+<script>
+
+</script>
+<script type="module">
+    import {editor} from './javascript/editor.js'
+    customElements.define('text-editor', editor);
+</script>
 
 </html>

@@ -105,6 +105,9 @@ body {
     padding-top: 10%;
     padding-bottom: 10%;
 
+    cursor: pointer;
+    user-select: none;
+
     opacity: 0.5;
     transition: opacity 0.2s ease, background-color 0.1s ease;
 
@@ -116,6 +119,12 @@ body {
 
 #settings {
     y: 100%;
+}
+
+#scene-loader,#config-loader,#image-viewer{
+    flex: 1;
+    display: flex;
+    flex-direction: row;
 }
 
 aside {
@@ -153,15 +162,15 @@ aside {
     background-color: rgb(35, 35, 35);
 }
 
-#upload-file-label{
-    font-size:80%;
-    margin:1vh;
-    color:white;
+#upload-file-label {
+    font-size: 80%;
+    margin: 1vh;
+    color: white;
     opacity: 0.5;
     transition: opacity 0.1s ease;
 }
 
-#upload-file-label:hover{
+#upload-file-label:hover {
     opacity: 1;
 }
 
@@ -174,4 +183,12 @@ aside {
 
     background-color: grey;
 
+}
+
+.hidden {
+    display: none!important;
+}
+
+.display-flex {
+    display: flex;
 }

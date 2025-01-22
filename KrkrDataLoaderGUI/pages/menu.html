@@ -1,10 +1,14 @@
 <html>
 
 <head>
-    <link rel='stylesheet' href="menu.css">
-    <link rel='stylesheet' href="flex_column.css">
-    <link rel='stylesheet' href="file_tree.css">
-    <script src="../node_modules/monaco-editor/min/vs/loader.js"></script>
+    <link rel='stylesheet' href="./css/menu.css">
+    <link rel='stylesheet' href="./css/flex_column.css">
+    <link rel='stylesheet' href="./css/text_editor.css">
+    <script src="./javascript/scene_file_func.js"></script>
+    <!-- <script src="../node_modules/monaco-editor/min/vs/loader.js"></script> -->
+    <script>
+        editors = [];
+    </script>
 </head>
 
 <body>
@@ -22,7 +26,7 @@
                     </div>
                     <div class="page-button" id="settings">Settings</div>
                 </div>
-                <div class="content-container" style="flex:1; display:flex; flex-direction:row;">
+                <div class="content-container" id="scene-loader">
                     <aside id="file-tree-container" style="position:relative;left:0;">
                         <section id="file-tree">
                             <span style="color:white; user-select:none;">Loaded File Path</span>
@@ -31,95 +35,52 @@
                             <file-tree></file-tree>
                         </section>
                     </aside>
-                    <main id="editor-container" style="flex:1;"></main>
-                    <script type="module">
-                        require.config({ paths: { 'vs': '../node_modules/monaco-editor/min/vs' } });
-
-                        window.MonacoEnvironment = {
-                            getWorkerUrl: (moduleId, label) => {
-                                return require.resolve('monaco-editor/esm/vs/editor/editor.worker');
-                            }
-                        };
-                        var editorContainer = document.getElementById("editor-container");
-                        
-                        
-                        require(['vs/editor/editor.main'], () => {
-                            monaco.languages.register({id:'krkrLang'});
-
-                            monaco.languages.setMonarchTokensProvider('krkrLang', {
-                                tokenizer: {
-                                    root: [
-                                        //[/\【/, 'speaker'],
-                                        //[/\】/, 'speaker'],
-                                        [/\「/, 'content'],
-                                        [/\」/, 'content'],
-                                        [/\『/, 'quote'],
-                                        [/\』/, 'quote'],
-                                        //[/\[/, 'definition'],
-                                        //[/\]/, 'definition'],
-                                        [/\【(.*?)\】/,'speaker'],
-                                        [/\[(.*?)\]/,'definition'],
-                                    ]
-                                }
-                            });
-                            
-
-                            monaco.editor.defineTheme('krkrTheme', {
-                                base: 'vs-dark',  // 基础主题
-                                inherit: true,  // 继承默认主题
-                                rules: [
-                                    { token: 'speaker', foreground: "#a8ffff" },
-                                    { token: 'content', foreground: "#8ad8ff" },
-                                    { token: 'quote', foreground: "#8ad8ff" },
-                                    { token: 'definition', foreground: "#fbffad" },
-                                ],
-                                colors: {}
-                            });
-
-                            var editor = monaco.editor.create(editorContainer, {
-                                value: '',
-                                language: 'krkrLang',
-                                theme: 'krkrTheme',
-                                fontSize: 30,
-                                cursorBlinking: 'Solid',
-                                minimap: {
-                                    enabled: true
-                                },
-                                folding: false,
-                                scrollBeyondLastLine: false,
-                                diagnosticsOptions: {
-                                    // 禁用错误标记
-                                    validate: false,
-                                    lint: false
-                                },
-                                lineNumbers: true
-                            });
-                            
-                            document.addEventListener("updateSceneContent", function(event){
-                                //console.log(event.detail);
-                                editor.setValue(event.detail);
-                            });
-
-                            document.addEventListener("loadFile", function(event){
-                                editor.setValue(textMap.get(event.detail));
-                                //console.log(textMap.get(event.detail));
-                            });
-                        })
-                    </script>
+                    <!-- <main id="editor-container" style="flex:1;"></main> -->
+                    <main id="editor-container" style="flex:1;">
+                        <text-editor style="height:100%"></text-editor>
+                    </main>
+                    <!-- <script src="./javascript/monaco_editor.js"></script> -->
                     <aside id="right-column" style="position:relative;right:0;"></aside>
                 </div>
+                <div class="content-container" id="config-loader">
+                    <!-- <main id="editor-container" style="flex:1;"></main>
+                    <script src="./javascript/monaco_editor.js"></script> -->
+
+                </div>
+                <div class="content-container" id="image-viewer"></div>
             </div>
+            <script>
+                function showContainer(elementId){
+                    var containers = document.querySelectorAll(".content-container");
+                    
+                    containers.forEach(container => container.classList.add("hidden"));
+
+                    document.getElementById("side-bar").classList.remove("hidden");
+                    const targetContainer = document.getElementById(elementId);
+                    if (targetContainer) {
+                        targetContainer.classList.remove('hidden');
+                    }
+                }
+
+                document.getElementById("scene").onclick = ()=>showContainer("scene-loader");
+
+                document.getElementById("config").onclick = ()=>showContainer("config-loader");
+
+                document.getElementById("image").onclick = ()=>showContainer("image-viewer");
+                
+                showContainer("scene-loader");
+
+            </script>
         </div>
     </div>
 </body>
-<script src="./scene_file_func.js"></script>
 <script type="module">
-    import { fileTree } from './file_tree.js';
+    import { fileTree } from './javascript/file_tree.js';
     customElements.define('file-tree', fileTree);
 </script>
-<script>
-    //var editor = document.getElementsByClassName("monaco-editor");
-    //console.log(editor)
-</script>
 
+<script type="module">
+    import {editor} from './javascript/editor.js'
+    customElements.define('text-editor', editor);
+</script>
 </html>
