@@ -62,9 +62,8 @@ class fileTree extends HTMLElement {
                 span.textContent = contents;
                 span.className = 'file';
                 span.addEventListener("click", function() {
-                    // console.log(this.textContent);
                     document.dispatchEvent(new CustomEvent('loadFile', {
-                        detail: this.textContent,
+                        detail: textMap.get(this.textContent),
                         bubbles: true,  // 确保事件冒泡
                         composed: true  // 允许事件穿透 shadow DOM
                     }));  // 触发自定义事件
@@ -72,11 +71,9 @@ class fileTree extends HTMLElement {
             }
 
             if(Array.isArray(contents)){
-                console.log(folderName);
                 span.addEventListener("click", function() {
-                    // console.log(this.textContent);
                     document.dispatchEvent(new CustomEvent('loadFile', {
-                        detail: folderName,
+                        detail: textMap.get(folderName),
                         bubbles: true,  // 确保事件冒泡
                         composed: true  // 允许事件穿透 shadow DOM
                     }));  // 触发自定义事件

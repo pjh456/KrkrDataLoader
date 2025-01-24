@@ -70,10 +70,9 @@ require(['vs/editor/editor.main'], () => {
 
     document.addEventListener("loadFile", function (event) {
         editor.setValue(textMap.get(event.detail));
-
     });
 
-    editors.push(editor);
+    // editors.push(editor);
 
 
     // while(1)

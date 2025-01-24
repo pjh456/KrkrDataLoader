@@ -15,9 +15,9 @@ async function upload_scene_file(event) {
 
     const taskId = file.name;
 
-    console.log(taskId);
+    // console.log(taskId);
 
-    console.log(file);
+    // console.log(file);
     await fetch('http://localhost:8080/krkr/api/scene/' + taskId + '/upload-file',
         {
             method: 'POST',
@@ -37,12 +37,12 @@ async function get_scene_info(taskId) {
         .then(data => {
             if (data.code == 200) {
                 countMap.set(taskId, data.data.scene_count);
-                console.log(data);
+                // console.log(data);
                 clearInterval(intervalMap.get(taskId));
                 load_scenes_text(taskId);
             }
             else {
-                console.log(data);
+                // console.log(data);
             }
         }).catch(error => console.log(error));
 }

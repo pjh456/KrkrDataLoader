@@ -1,4 +1,16 @@
-## [0.1.1] - 2025.1.22 **latest**
+## [0.1.2] - 2025.1.24 **latest**
+
+### Added
+- 添加了完整的 Monaco Editor Web Component，目前可以自主传参设置容器名称和传入文本的事件组名称。
+
+### Changed
+- 将 menu.html 中的编辑器组件替换为 Web Component 版本。
+- 更改了 FileTree loadFile 事件的 detail 内容，统一化了编辑器调用方式。
+
+### Fixed
+- 修复了若干由 Monaco Editor 产生的 bug。
+
+## [0.1.1] - 2025.1.22
 
 ### Added
 - 增添了对切换页面的支持。
