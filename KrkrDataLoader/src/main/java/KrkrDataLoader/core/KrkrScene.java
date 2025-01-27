@@ -7,15 +7,20 @@ import com.google.gson.JsonElement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Single scene in KrkrScene, including dialogues.
+ */
 public class KrkrScene
 		extends KrkrData
 {
+	/**
+	 * Initialize KrkrScene. ( part of a whole file )
+	 * @throws Throwable If initialization failed.
+	 */
 	@Override
 	public void initialize()
 			throws Throwable
 	{
-//		System.out.println("Start to initialize KrkrScene: " + name);
-		
 		JsonArray dialogues_array = null;
 		
 		try
@@ -47,6 +52,10 @@ public class KrkrScene
 			throws Throwable
 	{ this(data, true); }
 	
+	/**
+	 * Get all dialogues in this scene.
+	 * @return List of dialogues.
+	 */
 	public List<String> listDialogues()
 	{
 		List<String> dialogueList = new ArrayList<>();

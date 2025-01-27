@@ -14,15 +14,18 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.11.0" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-web:2.7.15" level="project" />
+    <orderEntry type="library" name="Gradle: org.springdoc:springdoc-openapi-ui:1.7.0" level="project" />
     <orderEntry type="library" name="Gradle: com.google.errorprone:error_prone_annotations:2.27.0" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-json:2.7.15" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter:2.7.15" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-starter-tomcat:2.7.15" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-webmvc:5.3.29" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-web:5.3.29" level="project" />
+    <orderEntry type="library" name="Gradle: org.springdoc:springdoc-openapi-webmvc-core:1.7.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.webjars:swagger-ui:4.18.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.13.5" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.5" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.module:jackson-module-parameter-names:2.13.5" level="project" />
-    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.13.5" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.13.5" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot-autoconfigure:2.7.15" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.boot:spring-boot:2.7.15" level="project" />
@@ -37,14 +40,23 @@
     <orderEntry type="library" name="Gradle: org.springframework:spring-aop:5.3.29" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-beans:5.3.29" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-expression:5.3.29" level="project" />
-    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.13.5" level="project" />
+    <orderEntry type="library" name="Gradle: org.springdoc:springdoc-openapi-common:1.7.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.13.5" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.13.5" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.2.12" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-to-slf4j:2.17.2" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:jul-to-slf4j:1.7.36" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework:spring-jcl:5.3.29" level="project" />
+    <orderEntry type="library" name="Gradle: io.swagger.core.v3:swagger-core:2.2.9" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-core:1.2.12" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.36" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-api:2.17.2" level="project" />
+    <orderEntry type="library" name="Gradle: io.swagger.core.v3:swagger-models:2.2.9" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.5" level="project" />
+    <orderEntry type="library" name="Gradle: jakarta.xml.bind:jakarta.xml.bind-api:2.3.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.12.0" level="project" />
+    <orderEntry type="library" name="Gradle: io.swagger.core.v3:swagger-annotations:2.2.9" level="project" />
+    <orderEntry type="library" name="Gradle: jakarta.validation:jakarta.validation-api:2.0.2" level="project" />
+    <orderEntry type="library" name="Gradle: jakarta.activation:jakarta.activation-api:1.2.2" level="project" />
   </component>
 </module>

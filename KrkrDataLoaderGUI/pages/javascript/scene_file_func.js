@@ -37,7 +37,7 @@ async function get_scene_info(taskId) {
         .then(data => {
             if (data.code == 200) {
                 countMap.set(taskId, data.data.scene_count);
-                // console.log(data);
+                
                 clearInterval(intervalMap.get(taskId));
                 load_scenes_text(taskId);
             }
@@ -53,7 +53,9 @@ async function load_scenes_text(taskId) {
     var whole_data = [];
     var info_data;
 
-    await fetch('http://localhost:8080/krkr/api/scene/' + taskId + '/info', {
+    console.log(countMap.get(taskId));
+
+    await fetch('http://localhost:8080/krkr/api/scene/' + taskId + '/range-info', {
         method: 'GET',
         headers: {
             'Range': "0-" + countMap.get(taskId)
@@ -63,6 +65,9 @@ async function load_scenes_text(taskId) {
         .then(data => {
             if (data.code == 200) {
                 info_data = data.data;
+            }
+            else{
+                console.log(data);
             }
         });
     

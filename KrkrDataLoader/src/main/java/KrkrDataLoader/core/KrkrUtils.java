@@ -15,86 +15,51 @@ import java.util.List;
 
 public class KrkrUtils
 {
+	/**
+	 * Load and parse single scene file.
+	 *
+	 * @param file File to parse. ( json type )
+	 *
+	 * @return Loaded json object.
+	 *
+	 * @throws IOException If error happens when parsing.
+	 */
 	public static JsonObject loadJsonFile(MultipartFile file)
-			throws FileNotFoundException, InvalidTypeException, IOException
-	{
-		
-		// 使用BufferedReader逐行读取文件内容
-		StringBuilder contentBuilder = new StringBuilder();
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream())))
-		{
-			String line;
-			while(( line = reader.readLine() ) != null)
-			{
-				contentBuilder.append(line);
-			}
-		}
-		// 创建Gson对象以解析JSON
-		Gson gson = new Gson();
-		// 将读取的内容解析为JsonObject并返回
-		return gson.fromJson(contentBuilder.toString(), JsonObject.class);
-	}
-	
-	public static JsonObject loadJsonFile(File file)
-			throws FileNotFoundException, InvalidTypeException, IOException
-	{
-		
-		// 使用BufferedReader逐行读取文件内容
-		StringBuilder contentBuilder = new StringBuilder();
-		try(BufferedReader reader = new BufferedReader(new FileReader(file.getPath())))
-		{
-			String line;
-			while(( line = reader.readLine() ) != null)
-			{
-				contentBuilder.append(line);
-			}
-		}
-		// 创建Gson对象以解析JSON
-		Gson gson = new Gson();
-		// 将读取的内容解析为JsonObject并返回
-		return gson.fromJson(contentBuilder.toString(), JsonObject.class);
-	}
+			throws IOException
+	{ return loadJsonFile(new BufferedReader(new InputStreamReader(file.getInputStream()))); }
 	
 	/**
-	 * 加载并解析JSON文件
-	 * 该方法首先验证给定路径的文件是否存在且为JSON文件，然后读取文件内容并将其解析为JsonObject
+	 * Load and parse single scene file.
 	 *
-	 * @param path JSON文件的路径
+	 * @param file File to parse. ( json type )
 	 *
-	 * @return 解析后的JsonObject对象
+	 * @return Loaded json object.
 	 *
-	 * @throws FileNotFoundException 如果指定路径的文件不存在
-	 * @throws InvalidTypeException  如果文件扩展名不是.json
-	 * @throws Throwable             如果文件读取过程中发生错误
+	 * @throws IOException If error happens when parsing.
+	 */
+	public static JsonObject loadJsonFile(File file)
+			throws IOException
+	{ return loadJsonFile(new BufferedReader(new FileReader(file.getPath()))); }
+	
+	/**
+	 * Load and parse single scene file by path.
+	 * @param path Path to file.
+	 * @return Loaded json object.
+	 * @throws FileNotFoundException If the file does not exist or is not a file.
+	 * @throws InvalidTypeException If the file does not have a .json extension.
+	 * @throws IOException If error happens when parsing.
 	 */
 	public static JsonObject loadJsonFile(String path)
 			throws FileNotFoundException, InvalidTypeException, IOException
 	{
-		// 检查指定路径是否为文件，如果不是，则抛出异常
-		if(! isFile(path))
-		{
-			throw new FileNotFoundException(path);
-		}
+		if(! isFile(path)){throw new FileNotFoundException(path);}
 		
 		if(! path.toLowerCase().endsWith(".json"))
 		{
 			throw new InvalidTypeException("Invalid file type: " + path.substring(path.lastIndexOf(".")));
 		}
 		
-		// 使用BufferedReader逐行读取文件内容
-		StringBuilder contentBuilder = new StringBuilder();
-		try(BufferedReader reader = new BufferedReader(new FileReader(path)))
-		{
-			String line;
-			while(( line = reader.readLine() ) != null)
-			{
-				contentBuilder.append(line);
-			}
-		}
-		// 创建Gson对象以解析JSON
-		Gson gson = new Gson();
-		// 将读取的内容解析为JsonObject并返回
-		return gson.fromJson(contentBuilder.toString(), JsonObject.class);
+		return loadJsonFile(new BufferedReader(new FileReader(path)));
 	}
 	
 	/**
@@ -145,36 +110,25 @@ public class KrkrUtils
 	}
 	
 	/**
-	 * 判断给定路径是否为文件
-	 *
-	 * @param path 文件路径
-	 *
-	 * @return 如果路径表示为文件，则返回true；否则返回false
+	 * Check if path is a file.
+	 * @param path Path to file.
+	 * @return True if the path is a file, otherwise false.
 	 */
 	public static boolean isFile(String path)
 	{
-		// 对路径进行规范化，防止路径注入攻击
-		Path normalizedPath = Paths.get(path).normalize();
-		
-		// 使用Files类的方法一次性检查文件的存在性和类型
-		try{ return Files.isRegularFile(normalizedPath); }
+		try{ return Files.isRegularFile(Paths.get(path).normalize()); }
 		catch(Throwable e){ return false; }
+		// 这俩函数都是通义千问修改的，如果有bug给我提个issue
 	}
 	
 	/**
-	 * 判断给定路径是否为文件夹
-	 *
-	 * @param path 文件或目录的路径
-	 *
-	 * @return 如果路径表示的是一个文件夹，则返回true；否则返回false
+	 * Check if path is a folder.
+	 * @param path Path to folder.
+	 * @return True if the path is a folder, otherwise false.
 	 */
 	public static boolean isFolder(String path)
 	{
-		// 对路径进行规范化，防止路径注入攻击
-		Path normalizedPath = Paths.get(path).normalize();
-		
-		// 使用Files类的方法一次性检查文件的存在性和类型
-		try{ return Files.isDirectory(normalizedPath); }
+		try{ return Files.isDirectory(Paths.get(path).normalize()); }
 		catch(Throwable e){ return false; }
 	}
 	
@@ -194,6 +148,13 @@ public class KrkrUtils
 		return true;
 	}
 	
+	/**
+	 * Remove same prefix in two paths.
+	 * @param parentPath Parent path. ( include child )
+	 * @param childPath Child path. ( included by parent )
+	 * @return List of child path after removing same prefix.
+	 * @throws Exception If the child path is not in the parent path.
+	 */
 	public static List<JsonPath> removeSamePath(JsonPath parentPath, JsonPath childPath)
 			throws Exception
 	{
@@ -221,5 +182,23 @@ public class KrkrUtils
 		List<Object> childPathList = childPath.listObjectPath();
 		
 		return childPathList.subList(parentPathList.size(), childPathList.size());
+	}
+	
+	/**
+	 * Load json file by reader.
+	 * @param reader Reader to read json file.
+	 * @return Loaded file.
+	 * @throws IOException If error happens when parsing.
+	 */
+	private static JsonObject loadJsonFile(BufferedReader reader)
+			throws IOException
+	{
+		
+		StringBuilder contentBuilder = new StringBuilder();
+		String line;
+		
+		while(( line = reader.readLine() ) != null) { contentBuilder.append(line); }
+		
+		return new Gson().fromJson(contentBuilder.toString(), JsonObject.class);
 	}
 }

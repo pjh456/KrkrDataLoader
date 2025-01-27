@@ -1,12 +1,6 @@
 package KrkrDataLoader;
 
-import KrkrDataLoader.command.CommandAutoLoader;
 import KrkrDataLoader.config.*;
-import KrkrDataLoader.core.KrkrData;
-import KrkrDataLoader.core.KrkrDialogue;
-import KrkrDataLoader.core.KrkrScene;
-import KrkrDataLoader.core.KrkrScenes;
-import KrkrDataLoader.network.KrkrServer;
 import com.google.gson.Gson;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,6 +1,8 @@
 package KrkrDataLoader.core;
 
-
+/**
+ * Single voice in KrkrDialogue. ( no longer supported )
+ */
 public class KrkrVoice
 		extends KrkrData
 {
@@ -12,12 +14,7 @@ public class KrkrVoice
 		this.path = path;
 	}
 	
-	public void play()
-	{
+	public void play(){}
 	
-	}
-	
-	public void stop()
-	{
-	}
+	public void stop(){}
 }

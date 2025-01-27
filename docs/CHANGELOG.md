@@ -1,4 +1,18 @@
-## [0.1.2] - 2025.1.24 **latest**
+## [0.1.3] - 2025.1.27 **latest**
+### Added
+- 定义了 KrkrResponse， 进一步封装了 Http 返回值。
+- 添加了对 Spring Boot api 函数的签名 。
+- 封装了部分内部函数用于简化 Controller 处理的逻辑，提高了代码的可读性。
+- 添加了可支持范围下标的 RangeCallback 接口，可以在 Controller 中被调用，简化了 Range 字符串的处理逻辑。
+- 增添了大量类和函数签名，提高了可读性。
+
+### Changed
+- 将 Controller 细化为场景文件处理的 SceneController，细化了 Controller 的权责。
+- 将 Controller 与 Service 分离，降低了框架的耦合度。
+- 将部分原来由 KrkrResponseFactory 处理的逻辑交由 Service 处理，更为合理。
+- 将获取部分文件信息的 api 与获取全体文件的 url 路径划分开来，使得各自实现逻辑更为合理。
+
+## [0.1.2] - 2025.1.24
 
 ### Added
 - 添加了完整的 Monaco Editor Web Component，目前可以自主传参设置容器名称和传入文本的事件组名称。

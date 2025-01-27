@@ -27,6 +27,10 @@ dependencies {
 
     // 添加 spring-boot-starter-test 该依赖对于编译测试是必须的，默认包含编译产品依赖和编译时依赖
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
+    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+
 }
 
 test {

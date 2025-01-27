@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class KrkrResponseFactory
 {
-	public static ResponseEntity<Map<String,Object>> success(String message)
+	public static KrkrResponse success(String message)
 	{
 		return new KrkrResponseBuilder().setStatus("success")
 										.setCode(200)
@@ -20,7 +20,7 @@ public class KrkrResponseFactory
 										.build();
 	}
 	
-	public static ResponseEntity<Map<String,Object>> error(String message)
+	public static KrkrResponse error(String message)
 	{
 		return new KrkrResponseBuilder().setStatus("failed")
 										.setCode(400)
@@ -28,7 +28,7 @@ public class KrkrResponseFactory
 										.build();
 	}
 	
-	public static ResponseEntity<Map<String,Object>> sceneFileUploadFailed(String message)
+	public static KrkrResponse sceneFileUploadFailed(String message)
 	{
 		return new KrkrResponseBuilder().setStatus("failed")
 										.setCode(400)
@@ -36,7 +36,7 @@ public class KrkrResponseFactory
 										.build();
 	}
 	
-	public static ResponseEntity<Map<String,Object>> sceneFileUploadSuccess()
+	public static KrkrResponse sceneFileUploadSuccess()
 	{
 		return new KrkrResponseBuilder().setStatus("success")
 										.setCode(200)
@@ -44,16 +44,7 @@ public class KrkrResponseFactory
 										.build();
 	}
 	
-	public static ResponseEntity<Map<String,Object>> sceneFileParsingProgress(int progress)
-	{
-		return new KrkrResponseBuilder().setStatus("success")
-										.setCode(200)
-										.setMessage("Getting scene file parsing progress.")
-										.setData(progress)
-										.build();
-	}
-	
-	public static ResponseEntity<Map<String,Object>> resourceNotReady()
+	public static KrkrResponse resourceNotReady()
 	{
 		return new KrkrResponseBuilder().setStatus("accepted")
 										.setCode(202)
@@ -61,7 +52,7 @@ public class KrkrResponseFactory
 										.build();
 	}
 	
-	public static ResponseEntity<Map<String,Object>> resourceReady(String taskId)
+	public static KrkrResponse resourceReady(String taskId)
 	{
 		return new KrkrResponseBuilder().setStatus("success")
 										.setCode(200)
@@ -70,7 +61,7 @@ public class KrkrResponseFactory
 										.build();
 	}
 	
-	public static ResponseEntity<Map<String,Object>> outOfRange()
+	public static KrkrResponse outOfRange()
 	{
 		return new KrkrResponseBuilder().setStatus("Failed")
 										.setCode(416)
@@ -78,72 +69,9 @@ public class KrkrResponseFactory
 										.build();
 	}
 	
-	public static ResponseEntity<Map<String,Object>> unsupportedType()
+	public static KrkrResponse unsupportedType()
 	{
 		return new KrkrResponseBuilder().setStatus("Failed").setCode(416).setMessage("Type is not supported!").build();
 	}
 	
-	public static ResponseEntity<Map<String,Object>> krkrRangeInfo(KrkrData data, int begin, int end)
-	{
-		if(data == null) return resourceNotReady();
-		
-		if(begin < 0 || end > data.size()) return outOfRange();
-		
-		List<Map<String,Object>> childrenList = new ArrayList<>();
-		for(KrkrData child: data.listChildren().subList(begin, end))
-		{
-			childrenList.add(Map.of("name", child.name, "scene_count", child.size()));
-		}
-		
-		return new KrkrResponseBuilder().setStatus("success")
-										.setCode(200)
-										.setMessage("The information of parsed data")
-										.setData(childrenList)
-										.build();
-	}
-	
-	public static ResponseEntity<Map<String,Object>> krkrRangeInfo(KrkrData data, int begin)
-	{
-		return data == null ? resourceNotReady() : krkrRangeInfo(data, begin, data.size());
-	}
-	
-	public static ResponseEntity<Map<String,Object>> krkrRangeInfo(KrkrData data)
-	{
-		return data == null ?
-				resourceNotReady() :
-				new KrkrResponseBuilder().setStatus("success")
-										 .setCode(200)
-										 .setMessage("The information of parsed data")
-										 .setData(Map.of("name", data.name, "scene_count", data.size()))
-										 .build();
-	}
-	
-	public static ResponseEntity<Map<String,Object>> 	krkrRangeText(KrkrData data, int begin, int end)
-	{
-		if(data == null) return resourceNotReady();
-		
-		if(begin < 0 || end > data.size()) return outOfRange();
-		
-		List<String> childrenList = new ArrayList<>();
-		if(data instanceof KrkrScenes)
-		{
-			for(KrkrData scene: data.listChildren().subList(begin, end))
-			{
-				childrenList.addAll(( (KrkrScene) scene ).listDialogues());
-			}
-		}
-		else if(data instanceof KrkrScene) childrenList = ( (KrkrScene) data ).listDialogues().subList(begin, end);
-		else return error("Bad Request: Type Error when getting Text. Promise current data is valid.");
-		
-		return new KrkrResponseBuilder().setStatus("success")
-										.setCode(206)
-										.setMessage("The information of parsed data")
-										.setData(childrenList)
-										.build();
-	}
-	
-	public static ResponseEntity<Map<String,Object>> krkrRangeText(KrkrData data, int begin)
-	{
-		return data == null ? resourceNotReady() : krkrRangeText(data, begin, data.size());
-	}
 }
