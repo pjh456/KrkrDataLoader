@@ -3,14 +3,11 @@ package KrkrDataLoader.network.service;
 import KrkrDataLoader.core.KrkrData;
 import KrkrDataLoader.network.KrkrResponse;
 import KrkrDataLoader.network.KrkrResponseBuilder;
-import KrkrDataLoader.network.KrkrResponseFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static KrkrDataLoader.network.KrkrResponseFactory.resourceNotReady;
 
 
 @Service
@@ -26,12 +23,14 @@ public class KrkrSceneInfoService
 	public KrkrResponse krkrInfo(KrkrData data)
 	{
 		return data == null ?
-				resourceNotReady() :
-				new KrkrResponseBuilder().setStatus("success")
-										 .setCode(200)
-										 .setMessage("The information of parsed data")
-										 .setData(Map.of("name", data.name, "scene_count", data.size()))
-										 .build();
+			   new KrkrResponseBuilder().setStatus("accepted").setCode(202).setMessage(
+					   "Resource is not ready, please try again later.").build() :
+			   new KrkrResponseBuilder().setStatus("success").setCode(200).setMessage(
+					   "The information of parsed data").setData(Map.of("name",
+																		data.name,
+																		"scene_size",
+																		data.size()
+			   )).build();
 	}
 	
 	/**
@@ -45,23 +44,28 @@ public class KrkrSceneInfoService
 	 */
 	public KrkrResponse krkrRangeInfo(KrkrData data, int begin, int end)
 	{
-		if(data == null) return resourceNotReady();
+		if(data == null)
+		{
+			return new KrkrResponseBuilder().setStatus("accepted").setCode(202).setMessage(
+					"Resource is not ready, please try again later.").build();
+		}
 		
 		if(begin < 0) { begin = data.size() + begin; }
 		if(end < 0) { end = data.size() + end; }
 		
-		if(begin < 0 || begin >= end || end > data.size()) return KrkrResponseFactory.outOfRange();
+		if(begin < 0 || begin >= end || end > data.size())
+		{
+			return new KrkrResponseBuilder().setStatus("Failed").setCode(416).setMessage(
+					"Request is out of range!").build();
+		}
 		
 		List<Map<String,Object>> childrenList = new ArrayList<>();
 		for(KrkrData child: data.listChildren().subList(begin, end))
 		{
-			childrenList.add(Map.of("name", child.name, "scene_count", child.size()));
+			childrenList.add(Map.of("name", child.name, "scene_size", child.size()));
 		}
 		
-		return new KrkrResponseBuilder().setStatus("success")
-										.setCode(200)
-										.setMessage("The information of parsed data")
-										.setData(childrenList)
-										.build();
+		return new KrkrResponseBuilder().setStatus("success").setCode(200).setMessage(
+				"The information of parsed data").setData(childrenList).build();
 	}
 }

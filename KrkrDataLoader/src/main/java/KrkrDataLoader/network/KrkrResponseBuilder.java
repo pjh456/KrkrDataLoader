@@ -7,9 +7,9 @@ import java.util.Map;
 public class KrkrResponseBuilder
 {
 	
-	private KrkrResponse response = new KrkrResponse();
+	private final KrkrResponse response = new KrkrResponse();
 	
-	public KrkrResponse build(){return this.response;}
+	public KrkrResponse build() { return this.response; }
 	
 	public KrkrResponseBuilder setStatus(String status)
 	{

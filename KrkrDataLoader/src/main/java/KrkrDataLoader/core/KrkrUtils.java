@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,13 @@ public class KrkrUtils
 	 */
 	public static JsonObject loadJsonFile(MultipartFile file)
 			throws IOException
-	{ return loadJsonFile(new BufferedReader(new InputStreamReader(file.getInputStream()))); }
+//	{ return loadJsonFile(new BufferedReader(new InputStreamReader(file.getInputStream()))); }
+	{
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream())))
+		{
+			return loadJsonFile(reader);
+		}
+	}
 	
 	/**
 	 * Load and parse single scene file.
@@ -39,27 +44,41 @@ public class KrkrUtils
 	 */
 	public static JsonObject loadJsonFile(File file)
 			throws IOException
-	{ return loadJsonFile(new BufferedReader(new FileReader(file.getPath()))); }
+//	{ return loadJsonFile(new BufferedReader(new FileReader(file.getPath()))); }
+	{
+		try(BufferedReader reader = new BufferedReader(new FileReader(file.getPath())))
+		{
+			return loadJsonFile(reader);
+		}
+	}
 	
 	/**
 	 * Load and parse single scene file by path.
+	 *
 	 * @param path Path to file.
+	 *
 	 * @return Loaded json object.
+	 *
 	 * @throws FileNotFoundException If the file does not exist or is not a file.
-	 * @throws InvalidTypeException If the file does not have a .json extension.
-	 * @throws IOException If error happens when parsing.
+	 * @throws InvalidTypeException  If the file does not have a .json extension.
+	 * @throws IOException           If error happens when parsing.
 	 */
 	public static JsonObject loadJsonFile(String path)
 			throws FileNotFoundException, InvalidTypeException, IOException
 	{
-		if(! isFile(path)){throw new FileNotFoundException(path);}
+		if(! isFile(path)) { throw new FileNotFoundException(path); }
 		
 		if(! path.toLowerCase().endsWith(".json"))
 		{
-			throw new InvalidTypeException("Invalid file type: " + path.substring(path.lastIndexOf(".")));
+			throw new InvalidTypeException(
+					"Invalid file type: " + path.substring(path.lastIndexOf(".")));
 		}
 		
-		return loadJsonFile(new BufferedReader(new FileReader(path)));
+//		return loadJsonFile(new BufferedReader(new FileReader(path)));
+		try(BufferedReader reader = new BufferedReader(new FileReader(path)))
+		{
+			return loadJsonFile(reader);
+		}
 	}
 	
 	/**
@@ -97,7 +116,8 @@ public class KrkrUtils
 			// 分割文件路径以获取文件扩展名
 			String[] single_path = file.getPath().split("\\.");
 			// 检查文件是否为.json且倒数第二个部分为.ks，如果是，则加载文件
-			if(single_path[single_path.length - 1].equals("json") && single_path[single_path.length - 2].equals("ks"))
+			if(single_path[single_path.length - 1].equals("json") &&
+			   single_path[single_path.length - 2].equals("ks"))
 			{
 				// 打印加载文件的路径
 				System.out.println("loading " + file.getPath());
@@ -111,7 +131,9 @@ public class KrkrUtils
 	
 	/**
 	 * Check if path is a file.
+	 *
 	 * @param path Path to file.
+	 *
 	 * @return True if the path is a file, otherwise false.
 	 */
 	public static boolean isFile(String path)
@@ -123,7 +145,9 @@ public class KrkrUtils
 	
 	/**
 	 * Check if path is a folder.
+	 *
 	 * @param path Path to folder.
+	 *
 	 * @return True if the path is a folder, otherwise false.
 	 */
 	public static boolean isFolder(String path)
@@ -150,9 +174,12 @@ public class KrkrUtils
 	
 	/**
 	 * Remove same prefix in two paths.
+	 *
 	 * @param parentPath Parent path. ( include child )
-	 * @param childPath Child path. ( included by parent )
+	 * @param childPath  Child path. ( included by parent )
+	 *
 	 * @return List of child path after removing same prefix.
+	 *
 	 * @throws Exception If the child path is not in the parent path.
 	 */
 	public static List<JsonPath> removeSamePath(JsonPath parentPath, JsonPath childPath)
@@ -186,8 +213,11 @@ public class KrkrUtils
 	
 	/**
 	 * Load json file by reader.
+	 *
 	 * @param reader Reader to read json file.
+	 *
 	 * @return Loaded file.
+	 *
 	 * @throws IOException If error happens when parsing.
 	 */
 	private static JsonObject loadJsonFile(BufferedReader reader)

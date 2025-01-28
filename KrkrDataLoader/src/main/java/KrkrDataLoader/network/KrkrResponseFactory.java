@@ -28,14 +28,6 @@ public class KrkrResponseFactory
 										.build();
 	}
 	
-	public static KrkrResponse sceneFileUploadFailed(String message)
-	{
-		return new KrkrResponseBuilder().setStatus("failed")
-										.setCode(400)
-										.setMessage("Scene file upload failed because: " + message)
-										.build();
-	}
-	
 	public static KrkrResponse sceneFileUploadSuccess()
 	{
 		return new KrkrResponseBuilder().setStatus("success")

@@ -84,19 +84,7 @@
 
 ## API Reference
 
-All the API start with ``http://localhost:port/krkr/api``, ``port`` is 8080 in current version.
-
-### 1. Scene Parsing
-
-All the API here start with ''/scene''.
-
-#### ``/upload-file/{taskId}``:
-Upload a JSON scene file whose id is ``taskId``.
-
-``taskId`` is the only way to get the uploaded data.
-
-
-
+运行 Main.java 后访问 http://localhost:8080/swagger-ui.html 阅读 API 文档。
 
 # FAQ
 

@@ -1,4 +1,15 @@
-## [0.1.3] - 2025.1.27 **latest**
+## [0.1.4] -2025.1.28 **latest**
+新年前的最后一更，之后在高考结束前会减少更新频率。
+### Added
+- 为 API 添加了 springdoc 的文档说明。
+
+### Changed
+- 移除了部分 KrkrResponseFactory 的方法，转而在 Controller 中使用 KrkrResponseBuilder 生成 KrkrResponse，提高了文件的可读性。
+
+### Fixed
+- 修复了未关闭 BufferedReader 导致的无法删除文件问题。
+
+## [0.1.3] - 2025.1.27
 ### Added
 - 定义了 KrkrResponse， 进一步封装了 Http 返回值。
 - 添加了对 Spring Boot api 函数的签名 。

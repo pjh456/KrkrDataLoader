@@ -25,18 +25,26 @@ public class KrkrSceneTextService
 	 */
 	public KrkrResponse krkrRangeText(KrkrData data, int begin, int end)
 	{
-		if(data == null) return KrkrResponseFactory.resourceNotReady();
-		if(data.size() == 0) return new KrkrResponseBuilder().setStatus("success")
-															 .setCode(206)
-															 .setMessage("The information of parsed data")
-															 .setData(new ArrayList<>())
-															 .build();
+		if(data == null)
+		{
+			return new KrkrResponseBuilder().setStatus("accepted").setCode(202).setMessage(
+					"Resource is not ready, please try again later.").build();
+		}
+		if(data.size() == 0)
+		{
+			return new KrkrResponseBuilder().setStatus("success").setCode(206).setMessage(
+					"The information of parsed data").setData(new ArrayList<>()).build();
+		}
 		
 		// 转换负数下标为正数
 		if(begin < 0) { begin = data.size() + begin; }
 		if(end < 0) { end = data.size() + end; }
 		
-		if(begin < 0 || begin >= end || end > data.size()) return KrkrResponseFactory.outOfRange();
+		if(begin < 0 || begin >= end || end > data.size())
+		{
+			return new KrkrResponseBuilder().setStatus("Failed").setCode(416).setMessage(
+					"Request is out of range!").build();
+		}
 		
 		List<String> childrenList = new ArrayList<>();
 		if(data instanceof KrkrScenes)
@@ -46,14 +54,15 @@ public class KrkrSceneTextService
 				childrenList.addAll(( (KrkrScene) scene ).listDialogues());
 			}
 		}
-		else if(data instanceof KrkrScene) childrenList = ( (KrkrScene) data ).listDialogues().subList(begin, end);
+		else if(data instanceof KrkrScene)
+		{ childrenList = ( (KrkrScene) data ).listDialogues().subList(begin, end); }
 		else
-			return KrkrResponseFactory.error("Bad Request: Type Error when getting Text. Promise current data is valid.");
+		{
+			return KrkrResponseFactory.error(
+					"Bad Request: Type Error when getting Text. Promise current data is valid.");
+		}
 		
-		return new KrkrResponseBuilder().setStatus("success")
-										.setCode(206)
-										.setMessage("The information of parsed data")
-										.setData(childrenList)
-										.build();
+		return new KrkrResponseBuilder().setStatus("success").setCode(206).setMessage(
+				"The information of parsed data").setData(childrenList).build();
 	}
 }

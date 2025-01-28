@@ -78,10 +78,7 @@ public class KrkrSceneFileService
 	{
 		int progress = 100;
 		
-		return new KrkrResponseBuilder().setStatus("success")
-										.setCode(200)
-										.setMessage("Getting scene file parsing progress.")
-										.setData(progress)
-										.build();
+		return new KrkrResponseBuilder().setStatus("success").setCode(200).setMessage(
+				"Getting scene file parsing progress.").setData(progress).build();
 	}
 }

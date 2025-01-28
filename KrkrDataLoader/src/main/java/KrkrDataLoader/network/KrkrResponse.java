@@ -1,18 +1,24 @@
 package KrkrDataLoader.network;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Schema(description = "Standard response format for Krkr data loader API response.")
 public class KrkrResponse
 {
+	@Schema(description = "Status of the response.")
 	private String status;
 	
+	@Schema(description = "HTTP status code")
 	private int code;
 	
+	@Schema(description = "Message of the response.")
 	private String message;
 	
+	@Schema(description = "Data of the response.")
 	private Object data;
 	
 	public KrkrResponse()
