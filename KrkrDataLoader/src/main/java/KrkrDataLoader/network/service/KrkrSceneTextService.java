@@ -36,9 +36,9 @@ public class KrkrSceneTextService
 					"The information of parsed data").setData(new ArrayList<>()).build();
 		}
 		
-		// 转换负数下标为正数
-		if(begin < 0) { begin = data.size() + begin; }
-		if(end < 0) { end = data.size() + end; }
+		// 转换负数下标为正数，注意 -1 是最后一个，所以要 +1 ！
+		if(begin < 0) { begin = data.size() + begin + 1; }
+		if(end < 0) { end = data.size() + end + 1; }
 		
 		if(begin < 0 || begin >= end || end > data.size())
 		{

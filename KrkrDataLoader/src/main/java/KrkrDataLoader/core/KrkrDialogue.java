@@ -1,7 +1,7 @@
 package KrkrDataLoader.core;
 
-import KrkrDataLoader.config.Config;
-import KrkrDataLoader.config.Settings;
+import KrkrDataLoader.config.GlobalConfig;
+import KrkrDataLoader.setting.GlobalSetting;
 import com.google.gson.JsonElement;
 
 /**
@@ -10,9 +10,9 @@ import com.google.gson.JsonElement;
 public class KrkrDialogue
 		extends KrkrData
 {
-	private String speaker = Settings.speaker;
+	private String speaker = (String) GlobalSetting.getCurrentSetting().getSetting("speaker").getState();
 	
-	private String content = Settings.content;
+	private String content = (String) GlobalSetting.getCurrentSetting().getSetting("content").getState();
 	
 	private KrkrVoice voice = null;
 	
@@ -37,14 +37,28 @@ public class KrkrDialogue
 		super(name);
 		
 		this.speaker = null;
-		try{ this.speaker = Config.SpeakerConfig.getValueAsJsonPrimitive(data).getAsString(); }
+		try{
+			this.speaker = GlobalConfig.getCurrentConfigs()
+									   .getConfig("speaker")
+									   .matchValueAsJsonPrimitive(data)
+									   .getAsString();
+		}
 		catch(Throwable ignored){ }
 		
 		// Content is necessary.
-		this.content = Config.ContentConfig.getValueAsJsonPrimitive(data).getAsString();
+		this.content = GlobalConfig.getCurrentConfigs()
+								   .getConfig("content")
+								   .matchValueAsJsonPrimitive(data)
+								   .getAsString();
 		
 		this.voice = null;
-		try{ setChild(voice = new KrkrVoice("voice", Config.VoiceConfig.getValueAsJsonPrimitive(data).getAsString())); }
+		try{ setChild(voice = new KrkrVoice("voice",
+											GlobalConfig.getCurrentConfigs()
+														.getConfig("voice")
+														.matchValueAsJsonPrimitive(data)
+														.getAsString()
+		));
+		}
 		catch(Throwable ignored){ }
 	}
 	
@@ -69,9 +83,9 @@ public class KrkrDialogue
 		return speaker == null ? ( content ) : ( "【" + speaker + "】" + content );
 	}
 	
-	public String getSpeaker(){return this.speaker;}
+	public String getSpeaker() { return this.speaker; }
 	
-	public String getContent(){return this.content;}
+	public String getContent() { return this.content; }
 	
-	public KrkrVoice getVoice(){return this.voice;}
+	public KrkrVoice getVoice() { return this.voice; }
 }

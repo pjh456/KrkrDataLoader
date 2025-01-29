@@ -1,6 +1,6 @@
 package KrkrDataLoader.core;
 
-import KrkrDataLoader.config.Config;
+import KrkrDataLoader.config.GlobalConfig;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
@@ -25,8 +25,7 @@ public class KrkrScene
 		
 		try
 		{
-			dialogues_array = Config.DialoguesConfig.getValueAsJsonArray(data);
-			
+			dialogues_array = GlobalConfig.getCurrentConfigs().getConfig("dialogues").matchValueAsJsonArray(data);
 			int index = 0;
 			for(JsonElement element: dialogues_array)
 			{
@@ -43,7 +42,7 @@ public class KrkrScene
 	public KrkrScene(JsonElement data, boolean init_now)
 			throws Throwable
 	{
-		super(Config.SceneNameConfig.getValueAsJsonPrimitive(data).getAsString());
+		super(GlobalConfig.getCurrentConfigs().getConfig("scene_label").matchValueAsJsonPrimitive(data).getAsString());
 		this.data = data;
 		if(init_now) initialize();
 	}

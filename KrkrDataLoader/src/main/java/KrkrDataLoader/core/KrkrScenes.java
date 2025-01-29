@@ -1,7 +1,6 @@
 package KrkrDataLoader.core;
 
-import KrkrDataLoader.config.Config;
-import com.google.gson.JsonArray;
+import KrkrDataLoader.config.GlobalConfig;
 import com.google.gson.JsonElement;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +20,7 @@ public class KrkrScenes
 			throws Throwable
 	{
 		List<Thread> threadList = new ArrayList<>();
-		for(JsonElement object: Config.SceneConfig.getValueAsJsonArray(data))
+		for(JsonElement object: GlobalConfig.getCurrentConfigs().getConfig("scene").matchValueAsJsonArray(data))
 		{
 			KrkrScene newChild = new KrkrScene(object, false);
 			setChild(newChild);
@@ -50,7 +49,7 @@ public class KrkrScenes
 	public KrkrScenes(JsonElement data, boolean init_now)
 			throws Throwable
 	{
-		super(Config.ScenesNameConfig.getValueAsJsonPrimitive(data).getAsString());
+		super(GlobalConfig.getCurrentConfigs().getConfig("scenes_name").matchValueAsJsonPrimitive(data).getAsString());
 		this.data = data;
 		if(init_now) initialize();
 	}

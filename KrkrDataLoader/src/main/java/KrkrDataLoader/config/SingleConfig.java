@@ -1,6 +1,5 @@
 package KrkrDataLoader.config;
 
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -11,89 +10,113 @@ import java.util.List;
 
 public class SingleConfig
 {
-	public String name;                // 配置的唯一标识符
-	// 由于提供对多种匹配模式的支持，这里是一个列表嵌套
-	public List<List<Object>> fieldsList = new ArrayList<>();// 相对于上一层级的相对路径
+	private final String name;
 	
-	public SingleConfig(String name)
+	// 未来可能有多模式匹配，因此暂时先是列表嵌套
+	// 每一个 Object 都是 String 或 int 类型，分别用于指定该层级相对于上一层级的位置，分别对应 JsonObject 和 JsonArray
+	private final List<List<Object>> fieldsList = new ArrayList<>();
+	
+	public SingleConfig(String name, List<Object> fieldList)
+			throws NullPointerException, IllegalArgumentException
 	{
 		this.name = name;
+		addFields(fieldList);
 	}
 	
-	public SingleConfig(String name, List<Object> fields)
-	throws Exception
+	public SingleConfig(String name) { this(name, null); }
+	
+	/**
+	 * Add new list of fields for matching data value.
+	 *
+	 * @param fieldList List of fields.
+	 *
+	 * @throws NullPointerException     If fieldsList is null.
+	 * @throws IllegalArgumentException If fieldsList is not fully made up of String and Integer.
+	 */
+	public void addFields(List<Object> fieldList)
+			throws NullPointerException, IllegalArgumentException
 	{
-		this.name = name;
+		if(fieldList == null) { throw new NullPointerException("FieldList cannot be null!"); }
 		
-		addFields(fields);
-	}
-	
-	public List<List<Object>> getFieldsList(){return fieldsList;}
-	
-	public void clearFields() {this.fieldsList = new ArrayList<>();}
-	
-	public void addFields(List<Object> fields)
-	throws Exception
-	{
-		List<Object> newList = new ArrayList<>();
-		for(Object field: fields)
+		if(! SingleConfig.checkFields(fieldList))
 		{
-			if(( field instanceof String ) || ( field instanceof Integer )){newList.add(field);}
-			else if(field instanceof JsonPath){newList.add(( (JsonPath) field ).name);}
-			else{throw new Exception("Fields only support String, Integer or JsonPath !");}
+			throw new IllegalArgumentException("Type of objects in fieldsList must be String or Integer!");
 		}
-		this.fieldsList.add(newList);
+		
+		fieldsList.add(new ArrayList<>(fieldList));
 	}
 	
-	public JsonObject getValueAsJsonObject(JsonElement data)
-	throws Throwable
-	{return getValueAsJsonElement(data).getAsJsonObject();}
+	public List<List<Object>> getFieldsList() { return fieldsList; }
 	
-	public JsonArray getValueAsJsonArray(JsonElement data)
-	throws Throwable
-	{return getValueAsJsonElement(data).getAsJsonArray();}
+	public void clearFields() { fieldsList.clear(); }
 	
-	public JsonPrimitive getValueAsJsonPrimitive(JsonElement data)
-	throws Throwable
-	{return getValueAsJsonElement(data).getAsJsonPrimitive();}
+	// 每一项必须是 String 或 int 类型，分别对应 JsonObject 和 JsonArray
+	public static boolean checkFields(List<Object> fieldList)
+	{
+		for(Object field: fieldList)
+		{
+			if(field instanceof String || field instanceof Integer) { continue; }
+			return false;
+		}
+		return true;
+	}
 	
-	private JsonElement getValueAsJsonElement(JsonElement data)
-	throws Throwable
+	public String getName() { return this.name; }
+	
+	public JsonObject matchValueAsJsonObject(JsonElement data) { return matchValueAsJsonELement(data).getAsJsonObject(); }
+	
+	public JsonArray matchValueAsJsonArray(JsonElement data) { return matchValueAsJsonELement(data).getAsJsonArray(); }
+	
+	public JsonPrimitive matchValueAsJsonPrimitive(JsonElement data) { return matchValueAsJsonELement(data).getAsJsonPrimitive(); }
+	
+	
+	/**
+	 * Match value from json data.
+	 *
+	 * @param data Json data.
+	 *
+	 * @return Matched json element value.
+	 */
+	private JsonElement matchValueAsJsonELement(JsonElement data)
 	{
 		JsonElement new_data = null;
-		for(List<Object> fields: fieldsList)
+		// 多个模式匹配数据
+		for(List<Object> field: fieldsList)
 		{
-			if(new_data != null){break;}
-			new_data = getValueFromList(data, fields);
+			if(new_data != null) { break; }
+			try{ new_data = matchValueFromData(data, field); }
+			catch(NoSuchFieldException ignored){ }
 		}
-		if(new_data == null){throw new NoSuchFieldError("Load Json Error in field " + name + ": Can't get data from fields!");}
 		return new_data;
 	}
 	
-	private JsonElement getValueFromList(JsonElement data, List<Object> fields)
+	/**
+	 * Match value from json data using field list.
+	 *
+	 * @param data      Json data.
+	 * @param fieldList List of fields, each field is String or Integer.
+	 *
+	 * @return Matched json element value.
+	 *
+	 * @throws NoSuchFieldException if field type and data are not matched.
+	 */
+	private JsonElement matchValueFromData(JsonElement data, List<Object> fieldList)
+			throws NoSuchFieldException
 	{
 		JsonElement cache_element = data;
-		for(Object field: fields)
+		for(Object field: fieldList)
 		{
-			if(field instanceof String)
+			if(field instanceof String && cache_element.isJsonObject())
 			{
-				if(cache_element.isJsonObject()){cache_element = cache_element.getAsJsonObject().get(field.toString());}
-				else
-				{
-					// throw new Exception();
-				}
+				cache_element = cache_element.getAsJsonObject().get(field.toString());
 			}
-			else if(field instanceof Integer)
+			else if(field instanceof Integer && cache_element.isJsonArray())
 			{
-				if(cache_element.isJsonArray()){cache_element = cache_element.getAsJsonArray().get((Integer) field);}
-				else
-				{
-					// throw new Exception();
-				}
+				cache_element = cache_element.getAsJsonArray().get((Integer) field);
 			}
 			else
 			{
-				// throw new Exception();
+				throw new NoSuchFieldException("Field type and Data are not matched!");
 			}
 		}
 		return cache_element;

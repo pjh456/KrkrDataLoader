@@ -1,6 +1,5 @@
 package KrkrDataLoader.core;
 
-import KrkrDataLoader.config.JsonPath;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sun.jdi.InvalidTypeException;
@@ -156,61 +155,61 @@ public class KrkrUtils
 		catch(Throwable e){ return false; }
 	}
 	
-	// 检验是否来自同一个路径
-	public static boolean isPathInPath(JsonPath parentPath, JsonPath childPath)
-	{
-		List<JsonPath> parentPathList = parentPath.listPath();
-		List<JsonPath> childPathList = childPath.listPath();
-		
-		if(parentPathList.size() > childPathList.size()) { return false; }
-		
-		for(int index = 0; index < parentPathList.size(); ++ index)
-		{
-			if(! parentPathList.get(index).equals(childPathList.get(index))) { return false; }
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Remove same prefix in two paths.
-	 *
-	 * @param parentPath Parent path. ( include child )
-	 * @param childPath  Child path. ( included by parent )
-	 *
-	 * @return List of child path after removing same prefix.
-	 *
-	 * @throws Exception If the child path is not in the parent path.
-	 */
-	public static List<JsonPath> removeSamePath(JsonPath parentPath, JsonPath childPath)
-			throws Exception
-	{
-		if(! isPathInPath(parentPath, childPath))
-		{
-			throw new Exception("Check ChildPath is in ParentPath before calling this method!");
-		}
-		
-		List<JsonPath> parentPathList = parentPath.listPath();
-		List<JsonPath> childPathList = childPath.listPath();
-		
-		return childPathList.subList(parentPathList.size(), childPathList.size());
-	}
-	
-	
-	public static List<Object> removeSamePath_object(JsonPath parentPath, JsonPath childPath)
-			throws Exception
-	{
-		if(! isPathInPath(parentPath, childPath))
-		{
-			throw new Exception("Check ChildPath is in ParentPath before calling this method!");
-		}
-		
-		List<Object> parentPathList = parentPath.listObjectPath();
-		List<Object> childPathList = childPath.listObjectPath();
-		
-		return childPathList.subList(parentPathList.size(), childPathList.size());
-	}
-	
+//	// 检验是否来自同一个路径
+//	public static boolean isPathInPath(JsonPath parentPath, JsonPath childPath)
+//	{
+//		List<JsonPath> parentPathList = parentPath.listPath();
+//		List<JsonPath> childPathList = childPath.listPath();
+//
+//		if(parentPathList.size() > childPathList.size()) { return false; }
+//
+//		for(int index = 0; index < parentPathList.size(); ++ index)
+//		{
+//			if(! parentPathList.get(index).equals(childPathList.get(index))) { return false; }
+//		}
+//
+//		return true;
+//	}
+//
+//	/**
+//	 * Remove same prefix in two paths.
+//	 *
+//	 * @param parentPath Parent path. ( include child )
+//	 * @param childPath  Child path. ( included by parent )
+//	 *
+//	 * @return List of child path after removing same prefix.
+//	 *
+//	 * @throws Exception If the child path is not in the parent path.
+//	 */
+//	public static List<JsonPath> removeSamePath(JsonPath parentPath, JsonPath childPath)
+//			throws Exception
+//	{
+//		if(! isPathInPath(parentPath, childPath))
+//		{
+//			throw new Exception("Check ChildPath is in ParentPath before calling this method!");
+//		}
+//
+//		List<JsonPath> parentPathList = parentPath.listPath();
+//		List<JsonPath> childPathList = childPath.listPath();
+//
+//		return childPathList.subList(parentPathList.size(), childPathList.size());
+//	}
+//
+//
+//	public static List<Object> removeSamePath_object(JsonPath parentPath, JsonPath childPath)
+//			throws Exception
+//	{
+//		if(! isPathInPath(parentPath, childPath))
+//		{
+//			throw new Exception("Check ChildPath is in ParentPath before calling this method!");
+//		}
+//
+//		List<Object> parentPathList = parentPath.listObjectPath();
+//		List<Object> childPathList = childPath.listObjectPath();
+//
+//		return childPathList.subList(parentPathList.size(), childPathList.size());
+//	}
+
 	/**
 	 * Load json file by reader.
 	 *
@@ -223,12 +222,12 @@ public class KrkrUtils
 	private static JsonObject loadJsonFile(BufferedReader reader)
 			throws IOException
 	{
-		
+
 		StringBuilder contentBuilder = new StringBuilder();
 		String line;
-		
+
 		while(( line = reader.readLine() ) != null) { contentBuilder.append(line); }
-		
+
 		return new Gson().fromJson(contentBuilder.toString(), JsonObject.class);
 	}
 }
