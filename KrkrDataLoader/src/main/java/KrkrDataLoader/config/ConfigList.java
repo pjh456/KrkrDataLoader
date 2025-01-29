@@ -1,5 +1,7 @@
 package KrkrDataLoader.config;
 
+import com.google.gson.JsonObject;
+
 public class ConfigList
 {
 	
@@ -11,6 +13,7 @@ public class ConfigList
 	private static JsonPath ContentPath = null;
 	private static JsonPath VoicePath = null;
 	
+	public ConfigList(){}
 	
 	public void setScenesNamePath(JsonPath path) { ScenesNamePath = path; }
 	

@@ -1,4 +1,10 @@
-## [0.1.4] -2025.1.28 **latest**
+## [0.1.5] -2025.1.29 **latest**
+为接下来路径自动配置器的大规模重构留档。
+
+### Added
+- 新增了配置用的 KrkrConfigController 和 KrkrConfigFileService 类，但内容暂未编写。
+
+## [0.1.4] -2025.1.28
 新年前的最后一更，之后在高考结束前会减少更新频率。
 ### Added
 - 为 API 添加了 springdoc 的文档说明。

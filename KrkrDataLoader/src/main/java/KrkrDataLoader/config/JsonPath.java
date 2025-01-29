@@ -23,7 +23,7 @@ public class JsonPath
 	public JsonPath parent = null;
 	
 	public JsonPath(JsonElement data, Object name, JsonPath parent, Boolean isInRow)
-	throws Exception
+			throws Exception
 	{
 		this.data = data;
 		
@@ -39,7 +39,10 @@ public class JsonPath
 		{
 			for(JsonElement childData: (JsonArray) data)
 			{
-				childMap.put(Integer.toString(childMap.size()), new JsonPath(childData, childMap.size(), this, true));
+				childMap.put(
+						Integer.toString(childMap.size()),
+						new JsonPath(childData, childMap.size(), this, true)
+				);
 			}
 		}
 		else if(data instanceof JsonObject)
@@ -47,7 +50,10 @@ public class JsonPath
 			Map<String,JsonElement> jsonMap = ( (JsonObject) data ).asMap();
 			for(String childName: jsonMap.keySet())
 			{
-				childMap.put(childName, new JsonPath(jsonMap.get(childName), childName, this, false));
+				childMap.put(
+						childName,
+						new JsonPath(jsonMap.get(childName), childName, this, false)
+				);
 			}
 		}
 		else
@@ -58,19 +64,19 @@ public class JsonPath
 	}
 	
 	public JsonPath(JsonElement data, Object name, Boolean isInRow)
-	throws Exception
+			throws Exception
 	{ this(data, name, null, isInRow); }
 	
 	public JsonPath(JsonElement data, Boolean isInRow)
-	throws Exception
+			throws Exception
 	{ this(data, getDefaultName(), null, isInRow); }
 	
 	public JsonPath(JsonElement data, Object name)
-	throws Exception
+			throws Exception
 	{ this(data, name, null, false); }
 	
 	public JsonPath(JsonElement data)
-	throws Exception
+			throws Exception
 	{ this(data, getDefaultName(), null, false); }
 	
 	public boolean isInRow() { return isInRow; }
@@ -112,10 +118,12 @@ public class JsonPath
 	
 	public JsonElement getOriginalData() { return data; }
 	
-	public static String getDefaultName() { return "defaultPath(" + Integer.toString(JsonPath.defaultIndex++) + ")"; }
-	
-	public int size()
+	public static String getDefaultName()
 	{
-		return childMap.size();
+		return "defaultPath(" +
+			   Integer.toString(JsonPath.defaultIndex++) +
+			   ")";
 	}
+	
+	public int size() { return childMap.size(); }
 }
