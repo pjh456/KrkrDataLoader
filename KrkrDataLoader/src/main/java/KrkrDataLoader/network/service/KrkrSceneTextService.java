@@ -3,6 +3,7 @@ package KrkrDataLoader.network.service;
 import KrkrDataLoader.core.KrkrData;
 import KrkrDataLoader.core.KrkrScene;
 import KrkrDataLoader.core.KrkrScenes;
+import KrkrDataLoader.core.ParentChild;
 import KrkrDataLoader.network.KrkrResponse;
 import KrkrDataLoader.network.KrkrResponseBuilder;
 import KrkrDataLoader.network.KrkrResponseFactory;
@@ -49,7 +50,7 @@ public class KrkrSceneTextService
 		List<String> childrenList = new ArrayList<>();
 		if(data instanceof KrkrScenes)
 		{
-			for(KrkrData scene: data.listChildren().subList(begin, end))
+			for(ParentChild scene: data.listChildren().subList(begin, end))
 			{
 				childrenList.addAll(( (KrkrScene) scene ).listDialogues());
 			}

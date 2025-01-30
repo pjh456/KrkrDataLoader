@@ -52,7 +52,7 @@ public class KrkrDialogue
 								   .getAsString();
 		
 		this.voice = null;
-		try{ setChild(voice = new KrkrVoice("voice",
+		try{ addChild(voice = new KrkrVoice("voice",
 											GlobalConfig.getCurrentConfigs()
 														.getConfig("voice")
 														.matchValueAsJsonPrimitive(data)

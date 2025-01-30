@@ -1,6 +1,7 @@
 package KrkrDataLoader.network.service;
 
 import KrkrDataLoader.core.KrkrData;
+import KrkrDataLoader.core.ParentChild;
 import KrkrDataLoader.network.KrkrResponse;
 import KrkrDataLoader.network.KrkrResponseBuilder;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class KrkrSceneInfoService
 					   "Resource is not ready, please try again later.").build() :
 			   new KrkrResponseBuilder().setStatus("success").setCode(200).setMessage(
 					   "The information of parsed data").setData(Map.of("name",
-																		data.name,
+																		data.getName(),
 																		"scene_size",
 																		data.size()
 			   )).build();
@@ -61,9 +62,9 @@ public class KrkrSceneInfoService
 		}
 		
 		List<Map<String,Object>> childrenList = new ArrayList<>();
-		for(KrkrData child: data.listChildren().subList(begin, end))
+		for(ParentChild child: data.listChildren().subList(begin, end))
 		{
-			childrenList.add(Map.of("name", child.name, "scene_size", child.size()));
+			childrenList.add(Map.of("name", child.getName(), "scene_size", child.size()));
 		}
 		
 		return new KrkrResponseBuilder().setStatus("success").setCode(200).setMessage(

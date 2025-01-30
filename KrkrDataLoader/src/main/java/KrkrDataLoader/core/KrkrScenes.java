@@ -23,7 +23,7 @@ public class KrkrScenes
 		for(JsonElement object: GlobalConfig.getCurrentConfigs().getConfig("scene").matchValueAsJsonArray(data))
 		{
 			KrkrScene newChild = new KrkrScene(object, false);
-			setChild(newChild);
+			addChild(newChild);
 			
 			Thread thread = new Thread(() ->
 			{

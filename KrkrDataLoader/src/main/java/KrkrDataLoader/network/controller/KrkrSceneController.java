@@ -530,7 +530,7 @@ public class KrkrSceneController
 	 */
 	private KrkrData getDataChild(KrkrData data, int index)
 			throws IndexOutOfBoundsException
-	{ return data.getChild(index); }
+	{ return (KrkrData)data.getChild(index); }
 	
 	/**
 	 * Get child of data by index. ( any steps )

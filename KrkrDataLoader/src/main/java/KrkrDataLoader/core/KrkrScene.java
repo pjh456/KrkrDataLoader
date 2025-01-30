@@ -29,7 +29,7 @@ public class KrkrScene
 			int index = 0;
 			for(JsonElement element: dialogues_array)
 			{
-				this.setChild(new KrkrDialogue(Integer.toString(index), element));
+				this.addChild(new KrkrDialogue(Integer.toString(index), element));
 				index++;
 			}
 		}
@@ -58,7 +58,7 @@ public class KrkrScene
 	public List<String> listDialogues()
 	{
 		List<String> dialogueList = new ArrayList<>();
-		for(KrkrData child: listChildren())
+		for(ParentChild child: listChildren())
 		{
 			dialogueList.add(( (KrkrDialogue) child ).toString());
 		}
