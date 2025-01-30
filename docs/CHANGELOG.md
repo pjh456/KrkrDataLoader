@@ -1,4 +1,14 @@
-## [0.2.1] -2025.1.30 **latest**
+## [0.2.2] -2025.1.30 **latest**
+
+## Added
+- 为 ParentChild 添加了部分方法以简化代码。
+- 新增 JsonFile 类用于加载 Json 文件。
+
+## Changed
+- 修改了解析命令的逻辑，部分实现了更为规范安全的 ConfigCommander 用于解析命令行数据。
+
+
+## [0.2.1] -2025.1.30
 
 ### Added
 - 新增父子节点基类 ParentChild，用于复用 KrkrData 和 JsonPath 等具有嵌套层级关系类。

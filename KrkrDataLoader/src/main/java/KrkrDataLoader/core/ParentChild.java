@@ -1,5 +1,6 @@
 package KrkrDataLoader.core;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,13 +49,14 @@ public abstract class ParentChild
 	public void addAllChildren(List<ParentChild> childrenList)
 	{ for(ParentChild child: childrenList) { addChild(child); } }
 	
-	
 	/**
 	 * List all child data.
 	 *
 	 * @return A List of child data. ( List<ParentChild> )
 	 */
 	public List<ParentChild> listChildren() { return childrenMap.values().stream().toList(); }
+	
+	public List<String> listChildrenName() { return listChildren().stream().map(ParentChild::getName).toList(); }
 	
 	/**
 	 * Get child data by name.
@@ -78,9 +80,25 @@ public abstract class ParentChild
 			throws IndexOutOfBoundsException
 	{ return listChildren().get(index); }
 	
+	public boolean hasChild(String name) { return childrenMap.containsKey(name); }
+	
+	public boolean hasChild(int index) { return index < size() && index >= 0; }
+	
 	public void setName(String name) { this.name = name; }
 	
 	public String getName() { return name; }
+	
+	public List<ParentChild> listAbstractPath()
+	{
+		List<ParentChild> parentList = getParent() == null ? new ArrayList<>() : getParent().listAbstractPath();
+		parentList.add(this);
+		return parentList;
+	}
+	
+	public List<String> listAbstractPathName()
+	{
+		return listAbstractPath().stream().map(ParentChild::getName).toList();
+	}
 	
 	/**
 	 * Get size of child data.
