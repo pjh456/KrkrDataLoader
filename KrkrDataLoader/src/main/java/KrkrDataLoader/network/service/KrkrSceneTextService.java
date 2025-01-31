@@ -4,9 +4,9 @@ import KrkrDataLoader.core.KrkrData;
 import KrkrDataLoader.core.KrkrScene;
 import KrkrDataLoader.core.KrkrScenes;
 import KrkrDataLoader.core.ParentChild;
-import KrkrDataLoader.network.KrkrResponse;
-import KrkrDataLoader.network.KrkrResponseBuilder;
-import KrkrDataLoader.network.KrkrResponseFactory;
+import KrkrDataLoader.network.response.KrkrResponse;
+import KrkrDataLoader.network.response.KrkrResponseBuilder;
+import KrkrDataLoader.network.response.KrkrResponseFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
 package KrkrDataLoader.network.controller;
 
 import KrkrDataLoader.core.KrkrData;
-import KrkrDataLoader.network.KrkrResponse;
-import KrkrDataLoader.network.KrkrResponseBuilder;
+import KrkrDataLoader.network.response.KrkrResponse;
+import KrkrDataLoader.network.response.KrkrResponseBuilder;
 import KrkrDataLoader.network.RangeCallback;
 import KrkrDataLoader.network.service.KrkrSceneFileService;
 import KrkrDataLoader.network.service.KrkrSceneInfoService;

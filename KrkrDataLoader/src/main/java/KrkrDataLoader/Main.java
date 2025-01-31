@@ -22,7 +22,7 @@ public class Main
 		// TODO：准备开始开发前端内容
 		GlobalSetting.loadFromJson();
 		
-//		String scenePath = "KrkrDataLoader/src/test/001・アーサー王ver1.07.ks.json";
+//		String scenePath = "KrkrDataLoader/src/test/resources/001・アーサー王ver1.07.ks.json";
 //		ConfigCommander configCommander = new ConfigCommander(scenePath);
 //		configCommander.commandMain();
 

@@ -1,4 +1,4 @@
-package KrkrDataLoader.network;
+package KrkrDataLoader.network.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.ResponseEntity;

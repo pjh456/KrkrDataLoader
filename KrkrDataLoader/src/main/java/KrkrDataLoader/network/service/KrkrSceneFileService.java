@@ -1,8 +1,8 @@
 package KrkrDataLoader.network.service;
 
 import KrkrDataLoader.core.KrkrScenes;
-import KrkrDataLoader.network.KrkrResponse;
-import KrkrDataLoader.network.KrkrResponseBuilder;
+import KrkrDataLoader.network.response.KrkrResponse;
+import KrkrDataLoader.network.response.KrkrResponseBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

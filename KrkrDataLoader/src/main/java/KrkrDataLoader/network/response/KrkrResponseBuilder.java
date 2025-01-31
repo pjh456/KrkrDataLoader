@@ -1,8 +1,4 @@
-package KrkrDataLoader.network;
-
-import org.springframework.http.ResponseEntity;
-
-import java.util.Map;
+package KrkrDataLoader.network.response;
 
 public class KrkrResponseBuilder
 {

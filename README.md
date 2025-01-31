@@ -1,5 +1,9 @@
 # KrkrDataLoader
 
+[中文开发者文档](docs/README-zh.md)
+
+[English Documentation](docs/README-en.md)。
+
 ## 1.项目概述
 
 ### 1.1 项目背景：
@@ -271,4 +275,4 @@ Scenes -> scenes_name
 
 ## 5.开发者文档
 
-详见 [中文开发者文档](docs/README-zh.md) 及 [英文开发者文档](docs/README-en.md)。
+详见 [中文开发者文档](docs/README-zh.md) 及 [English Documentation](docs/README-en.md)。

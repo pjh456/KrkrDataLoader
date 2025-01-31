@@ -1,7 +1,7 @@
 package KrkrDataLoader.network.controller;
 
-import KrkrDataLoader.network.KrkrResponse;
-import KrkrDataLoader.network.KrkrResponseBuilder;
+import KrkrDataLoader.network.response.KrkrResponse;
+import KrkrDataLoader.network.response.KrkrResponseBuilder;
 import KrkrDataLoader.network.service.KrkrConfigFileService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;

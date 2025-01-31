@@ -1,5 +1,7 @@
 package KrkrDataLoader.network;
 
+import KrkrDataLoader.network.response.KrkrResponse;
+
 public interface RangeCallback
 {
 	public KrkrResponse callback(Object data, int begin, int end);

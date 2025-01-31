@@ -1,14 +1,4 @@
-package KrkrDataLoader.network;
-
-import KrkrDataLoader.core.KrkrData;
-import KrkrDataLoader.core.KrkrDialogue;
-import KrkrDataLoader.core.KrkrScene;
-import KrkrDataLoader.core.KrkrScenes;
-import org.springframework.http.ResponseEntity;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+package KrkrDataLoader.network.response;
 
 public class KrkrResponseFactory
 {

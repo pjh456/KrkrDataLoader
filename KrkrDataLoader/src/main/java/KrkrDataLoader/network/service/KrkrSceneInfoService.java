@@ -2,8 +2,8 @@ package KrkrDataLoader.network.service;
 
 import KrkrDataLoader.core.KrkrData;
 import KrkrDataLoader.core.ParentChild;
-import KrkrDataLoader.network.KrkrResponse;
-import KrkrDataLoader.network.KrkrResponseBuilder;
+import KrkrDataLoader.network.response.KrkrResponse;
+import KrkrDataLoader.network.response.KrkrResponseBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
