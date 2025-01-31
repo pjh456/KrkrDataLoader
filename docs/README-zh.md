@@ -77,7 +77,6 @@
 #### Config
 ``SingleConfig`` 的集合，使用 ``ListMap`` 进行存储。
 
-
 #### Settings
 表示默认参数或者系统设置。
 

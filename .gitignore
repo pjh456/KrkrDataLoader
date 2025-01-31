@@ -1,2 +1,4 @@
 /KrkrDataLoaderGUI/node_modules
-/node_modules
+/KrkrDataLoader/build
+/.idea
+/.vscode
