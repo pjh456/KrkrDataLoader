@@ -60,4 +60,12 @@ public class JsonPath
 		catch(NumberFormatException e){ return getName(); }
 	}
 	
+	public List<Object> listAbsolutePathObject()
+	{
+		List<Object> parentList = getParent() == null ?
+								  new ArrayList<>() :
+								  ( (JsonPath) getParent() ).listAbsolutePathObject();
+		parentList.add(getObjectName());
+		return parentList;
+	}
 }

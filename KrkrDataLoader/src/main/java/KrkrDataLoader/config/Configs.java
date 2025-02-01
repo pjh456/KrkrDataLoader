@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Configs
 {
@@ -100,13 +101,13 @@ public class Configs
 		writer.close();
 	}
 	
-	public static boolean checkConfigs(Configs configs)
+	public static String checkConfigs(Configs configs)
 	{
 		for(String configName: necessaryConfigs)
 		{
-			if(configs.getConfig(configName) == null) { return false; }
+			if(configs.getConfig(configName) == null) { return configName; }
 		}
-		return true;
+		return null;
 	}
 	
 	public SingleConfig getConfig(String name) { return configMap.get(name); }
@@ -115,5 +116,15 @@ public class Configs
 	
 	public void setConfig(SingleConfig config) { setConfig(config.getName(), config); }
 	
+	public void removeConfig(String name) { configMap.remove(name); }
 	
+	public void clear() { configMap.clear(); }
+	
+	@Override
+	public String toString()
+	{
+		return configMap.entrySet().stream().map(entry -> "\t" + entry.getKey() + ": " + entry.getValue().toString()).collect(
+				Collectors.joining(",\n", "{\n", "\n}"));
+		
+	}
 }

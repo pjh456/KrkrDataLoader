@@ -121,4 +121,10 @@ public class SingleConfig
 		}
 		return cache_element;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "SingleConfig\n\t{\n\t\t" + "name='" + name + '\'' + ", \n\t\tfieldsList=" + fieldsList + "\n\t}";
+	}
 }

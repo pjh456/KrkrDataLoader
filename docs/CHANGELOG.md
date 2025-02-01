@@ -1,4 +1,19 @@
-## [0.2.6] -2025.2.1 **latest**
+## [0.2.7] -2025.2.1 **latest**
+
+## Added
+- 进一步封装了 `ConfigCommander` 的方法，提供了传入 `InputStream` 和 `OutputStream` 的方法。
+- 为 `Configs` 新增了 `removeConfig` 方法，并在 `ConfigCommander` 中提供了对应的 `rm` 指令。
+- 提供了连续打开 `JsonPath` 的 `cd` 指令。
+- 为 `ck` 指令添加了输出值，明确了缺少配置项。
+
+## Changed
+- 修改了 `JsonFile` 和 `ConfigCommander` 的部分返回值为更符合逻辑的返回值。
+- 修改了 `Configs` 和 `SingleConfig` 的 `toString()` 方法，规范化了输出。
+- 合并了 `cd` 指令和 `open/goto` 指令。
+- 修改了 `Configs.checkConfigs(Configs configs)` 的返回值，使其返回缺少的配置项，便于调试。
+
+
+## [0.2.6] -2025.2.1
 部分添加了开发者文档。之后等写完配置文件的所有逻辑之后，会继续更新开发者文档。
 
 ## Added

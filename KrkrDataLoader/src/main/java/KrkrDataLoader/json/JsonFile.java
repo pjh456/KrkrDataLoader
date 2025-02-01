@@ -1,7 +1,8 @@
 package KrkrDataLoader.json;
 
+import KrkrDataLoader.config.Configs;
+import KrkrDataLoader.config.SingleConfig;
 import KrkrDataLoader.core.KrkrUtils;
-import KrkrDataLoader.core.ParentChild;
 import com.google.gson.JsonElement;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +17,8 @@ public class JsonFile
 	private JsonPath root = null;
 	
 	private JsonPath currentPath = null;
+	
+	private final Configs configs = new Configs();
 	
 	public JsonFile(String name, JsonElement data)
 	{
@@ -37,26 +40,37 @@ public class JsonFile
 			throws Throwable
 	{ this(file.getName(), KrkrUtils.loadJsonFile(file)); }
 	
-	public JsonPath gotoChild(String name)
+	public void gotoChild(String name)
 	{
-		return currentPath.hasChild(name) ? currentPath = (JsonPath) currentPath.getChild(name) : currentPath;
+		if(currentPath.hasChild(name)) { currentPath = (JsonPath) currentPath.getChild(name); }
 	}
 	
-	public JsonPath gotoChild(int index)
+	public void gotoChild(int index)
 	{
-		return currentPath.hasChild(index) ? currentPath = (JsonPath) currentPath.getChild(index) : currentPath;
+		if(currentPath.hasChild(index)) { currentPath = (JsonPath) currentPath.getChild(index); }
 	}
 	
-	public ParentChild gotoParent()
+	public void gotoParent()
 	{
-		return currentPath.getParent() != null ? currentPath = (JsonPath) currentPath.getParent() : currentPath;
+		if(currentPath.getParent() != null) { currentPath = (JsonPath) currentPath.getParent(); }
 	}
+	
+	public void setCurrentPathAsConfig(String name)
+	{
+		JsonPath newPath = getCurrentPath();
+		if(newPath != null) { configs.setConfig(new SingleConfig(name, newPath.listAbsolutePathObject())); }
+	}
+	
+	public Configs getConfigs() { return configs; }
 	
 	public void setName(String name) { this.name = name; }
 	
 	public String getName() { return this.name; }
 	
 	public JsonPath getCurrentPath() { return currentPath; }
+	
+	// 这里必须是当前 File 内部的 JsonPath！不然会错位出 BUG 的！
+	public void setCurrentPath(JsonPath currentPath){this.currentPath = currentPath;}
 	
 	public void setRoot(JsonPath root) { data = ( currentPath = this.root = root ).getData(); }
 	
