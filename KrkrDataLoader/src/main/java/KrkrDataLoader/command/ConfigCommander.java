@@ -37,7 +37,7 @@ public class ConfigCommander
 		
 		while(isLoop)
 		{
-			List<String> pathList = file.getCurrentPath().listAbstractPathName();
+			List<String> pathList = file.getCurrentPath().listAbsolutePathName();
 			for(int index = 0; index < pathList.size() - 1; ++ index) { System.out.print(pathList.get(index) + "/"); }
 			System.out.print(pathList.get(pathList.size() - 1) + ">>");
 			

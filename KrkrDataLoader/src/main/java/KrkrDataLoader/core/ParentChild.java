@@ -49,6 +49,8 @@ public abstract class ParentChild
 	public void addAllChildren(List<ParentChild> childrenList)
 	{ for(ParentChild child: childrenList) { addChild(child); } }
 	
+	public void addAllChildren(ParentChild... children) { for(ParentChild child: children) { addChild(child); } }
+	
 	/**
 	 * List all child data.
 	 *
@@ -88,16 +90,16 @@ public abstract class ParentChild
 	
 	public String getName() { return name; }
 	
-	public List<ParentChild> listAbstractPath()
+	public List<ParentChild> listAbsolutePath()
 	{
-		List<ParentChild> parentList = getParent() == null ? new ArrayList<>() : getParent().listAbstractPath();
+		List<ParentChild> parentList = getParent() == null ? new ArrayList<>() : getParent().listAbsolutePath();
 		parentList.add(this);
 		return parentList;
 	}
 	
-	public List<String> listAbstractPathName()
+	public List<String> listAbsolutePathName()
 	{
-		return listAbstractPath().stream().map(ParentChild::getName).toList();
+		return listAbsolutePath().stream().map(ParentChild::getName).toList();
 	}
 	
 	/**
