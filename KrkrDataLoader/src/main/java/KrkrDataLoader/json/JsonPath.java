@@ -13,13 +13,10 @@ public class JsonPath
 {
 	private JsonElement data = null;
 	
-	// 是否在一个 JsonArray 之中
-	private boolean isInRow = false;
 	
 	public JsonPath(String name, ParentChild parent, JsonElement data, boolean isInRow)
 	{
 		super(name, parent);
-		this.isInRow = isInRow;
 		loadFromJson(data);
 	}
 	
@@ -51,8 +48,6 @@ public class JsonPath
 	public void setData(JsonElement data) { this.data = data; }
 	
 	public JsonElement getData() { return data; }
-	
-	public boolean isInRow() { return isInRow; }
 	
 	/**
 	 * Get path name in JsonArray and JsonObject differently.

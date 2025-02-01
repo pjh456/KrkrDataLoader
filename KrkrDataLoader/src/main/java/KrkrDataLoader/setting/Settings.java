@@ -10,6 +10,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -85,6 +87,8 @@ public class Settings
 	public void save(String path)
 			throws NullPointerException, IOException
 	{
+		Path filePath = Paths.get(path);
+		
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		Map<String,Object> root = new LinkedHashMap<>();
 		
@@ -93,7 +97,7 @@ public class Settings
 			root.put(setting.getKey(), setting.getValue().getState());
 		}
 		
-		BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()));
 		writer.write(gson.toJson(root));
 		
 		writer.close();

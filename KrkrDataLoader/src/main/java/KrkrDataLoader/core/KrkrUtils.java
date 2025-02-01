@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,10 +70,9 @@ public class KrkrUtils
 		
 		if(! path.toLowerCase().endsWith(".json"))
 		{
-			throw new InvalidTypeException(
-					"Invalid file type: " + path.substring(path.lastIndexOf(".")));
+			throw new InvalidTypeException("Invalid file type: " + path.substring(path.lastIndexOf(".")));
 		}
-		
+
 //		return loadJsonFile(new BufferedReader(new FileReader(path)));
 		try(BufferedReader reader = new BufferedReader(new FileReader(path)))
 		{
@@ -87,26 +87,23 @@ public class KrkrUtils
 	 * @param path 文件夹的路径，用于指定要加载JSON文件的目录
 	 *
 	 * @return 返回一个包含所有加载的JsonObject的列表
-	 *
-	 * @throws Throwable 如果指定路径不是一个文件夹，则抛出FileNotFoundException
 	 */
 	public static List<JsonObject> loadJsonFolder(String path)
-			throws Throwable
+			throws FileNotFoundException, IOException, InvalidTypeException
 	{
+		Path filePath = Paths.get(path);
+		
 		// 检查指定路径是否为文件夹，如果不是，则抛出异常
-		if(! isFolder(path))
-		{
-			throw new FileNotFoundException(path);
-		}
+		if(! isFolder(filePath.toString())) { throw new FileNotFoundException(filePath.toString()); }
 		
 		// 创建File对象以访问指定路径下的文件和文件夹
-		File folder = new File(path);
+		File folder = filePath.toFile();
 		// 获取文件夹下的所有文件和子文件夹的数组
 		File[] files = folder.listFiles();
 		// 如果files为空，则抛出异常
 		if(files == null)
 		{
-			throw new IOException("Failed to list files in directory: " + path);
+			throw new IOException("Failed to list files in directory: " + filePath);
 		}
 		// 创建一个列表以存储所有的JsonObject
 		List<JsonObject> json_list = new ArrayList<>();
@@ -115,8 +112,7 @@ public class KrkrUtils
 			// 分割文件路径以获取文件扩展名
 			String[] single_path = file.getPath().split("\\.");
 			// 检查文件是否为.json且倒数第二个部分为.ks，如果是，则加载文件
-			if(single_path[single_path.length - 1].equals("json") &&
-			   single_path[single_path.length - 2].equals("ks"))
+			if(single_path[single_path.length - 1].equals("json") && single_path[single_path.length - 2].equals("ks"))
 			{
 				// 打印加载文件的路径
 				System.out.println("loading " + file.getPath());
@@ -154,7 +150,7 @@ public class KrkrUtils
 		try{ return Files.isDirectory(Paths.get(path).normalize()); }
 		catch(Throwable e){ return false; }
 	}
-	
+
 //	// 检验是否来自同一个路径
 //	public static boolean isPathInPath(JsonPath parentPath, JsonPath childPath)
 //	{
@@ -209,7 +205,7 @@ public class KrkrUtils
 //
 //		return childPathList.subList(parentPathList.size(), childPathList.size());
 //	}
-
+	
 	/**
 	 * Load json file by reader.
 	 *
@@ -222,12 +218,12 @@ public class KrkrUtils
 	private static JsonObject loadJsonFile(BufferedReader reader)
 			throws IOException
 	{
-
+		
 		StringBuilder contentBuilder = new StringBuilder();
 		String line;
-
+		
 		while(( line = reader.readLine() ) != null) { contentBuilder.append(line); }
-
+		
 		return new Gson().fromJson(contentBuilder.toString(), JsonObject.class);
 	}
 }

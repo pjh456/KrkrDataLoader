@@ -12,6 +12,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Configs
@@ -75,6 +77,8 @@ public class Configs
 	public void save(String path)
 			throws NullPointerException, IOException
 	{
+		Path filePath = Paths.get(path);
+		
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		Map<String,List<List<Object>>> root = new LinkedHashMap<>();
 		
@@ -84,13 +88,13 @@ public class Configs
 			root.put(configName, getConfig(configName).getFieldsList());
 		}
 		
-		BufferedWriter writer = new BufferedWriter(new FileWriter(path));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()));
 		writer.write(gson.toJson(root));
 		
 		if(GlobalSetting.hasCurrentSetting())
 		{
-			GlobalSetting.getCurrentSetting().setSetting("config_path", path);
-			GlobalSetting.saveCurrentSetting(path);
+			GlobalSetting.getCurrentSetting().setSetting("config_path", filePath.toString());
+			GlobalSetting.saveCurrentSetting(filePath.toString());
 		}
 		
 		writer.close();

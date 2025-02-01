@@ -131,8 +131,6 @@ ParentChild
 
 ### 3.2 `core` 核心类说明
 
-在以下类方法的说明中，抛出的异常将会以 `throws` 标注，继承的基类都会用 `extends` 标注。
-
 所有字段均拥有 getter，部分拥有 setter。
 
 每个方法的所有参数版本均会被列出以简化理解。
@@ -141,7 +139,7 @@ ParentChild
 
 `ParentChild` 是所有需要存储父子双向关系类的基类。
 
-##### 构造方法
+##### 构造函数
 
 ###### `ParentChild(String name, ParentChild parent)`：构建一个带父节点的 `ParentChild` 实例。
 
@@ -219,7 +217,7 @@ ParentChild
 
 它包含了语音的文件路径和该语音的名称。
 
-##### 构造方法：
+##### 构造函数：
 
 ###### `KrkrVoice(String name, String path)`：使用指定的名称和路径创建一个新的 `KrkrVoice` 实例。
 
@@ -245,17 +243,17 @@ ParentChild
 
 它包含了对话的发言者、内容和可选的语音对象。
 
-##### 构造方法：
+##### 构造函数：
 
 ###### `KrkrDialogue(String name)`：使用指定的名称创建一个新的 `KrkrDialogue` 实例。
 
-此构造方法**不包含**对话数据。
+此构造函数**不包含**对话数据。
 
 ###### `KrkrDialogue(String name, JsonElement data) throws Throwable`：使用指定的名称和 JSON 数据创建一个新的
 
 `KrkrDialogue` 实例。
 
-该构造方法从 `data` 中提取发言者、内容和语音信息，并根据配置加载对应数据。
+该构造函数从 `data` 中提取发言者、内容和语音信息，并根据配置加载对应数据。
 
 如果数据无效或缺少必要的字段，将抛出异常。
 
@@ -287,7 +285,7 @@ ParentChild
 
 它包括其中的所有 `KrkrDialogue` 对话，负责管理该场景的对话内容。
 
-##### 构造方法：
+##### 构造函数：
 
 ###### `KrkrScene(JsonElement data, boolean init_now) throws Throwable`：通过提供的 `JsonElement` 数据创建一个新的
 
@@ -324,7 +322,7 @@ ParentChild
 
 它负责管理多个 `KrkrScene` 剧情场景实例。
 
-##### 构造方法：
+##### 构造函数：
 
 ###### `KrkrScenes(JsonElement data, boolean init_now) throws Throwable`：通过提供的 JSON 数据创建一个新的
 
@@ -366,7 +364,7 @@ ParentChild
 然后，它为每个 `KrkrScene` 创建一个新线程进行初始化，所有线程执行完毕后，将 `data` 设置为 `null`，并将 `is_init` 设置为
 `true`。
 
-### 3.3 核心工具类 `KrkrUtils`
+#### 3.2.7 核心工具类 `KrkrUtils`
 
 `KrkrUtils` 是一个工具类，主要提供与 JSON 文件相关的加载、解析功能。
 
@@ -374,23 +372,23 @@ ParentChild
 
 该类还包含对文件类型和目录的验证方法，以确保正确处理文件和路径。
 
-#### 方法说明
+##### 方法说明
 
-##### `JsonObject loadJsonFile(MultipartFile file)`：从 `MultipartFile` 类型的文件中加载并解析 JSON 数据。
-
-当文件解析过程中发生错误时，抛出 `IOException`。
-
-##### `JsonObject loadJsonFile(File file)`：从指定的 `File` 类型文件中加载并解析 JSON 数据。
+###### `JsonObject loadJsonFile(MultipartFile file)`：从 `MultipartFile` 类型的文件中加载并解析 JSON 数据。
 
 当文件解析过程中发生错误时，抛出 `IOException`。
 
-##### `JsonObject loadJsonFile(String path)`: 从指定的本地文件路径加载并解析 JSON 文件。
+###### `JsonObject loadJsonFile(File file)`：从指定的 `File` 类型文件中加载并解析 JSON 数据。
+
+当文件解析过程中发生错误时，抛出 `IOException`。
+
+###### `JsonObject loadJsonFile(String path)`: 从指定的本地文件路径加载并解析 JSON 文件。
 
 如果路径不是一个有效的文件，抛出 `FileNotFoundException`。
 如果文件类型不是 `.json`，抛出 `InvalidTypeException`。
 当文件解析过程中发生错误时，抛出 `IOException`。
 
-#####
+######
 
 `List<JsonObject> loadJsonFolder(String path)`: 加载指定本地文件夹路径下所有符合条件的 JSON 剧情文本文件（`.ks.json`
 扩展名）。
@@ -398,15 +396,15 @@ ParentChild
 如果指定路径不是一个文件夹，抛出 `FileNotFoundException`。
 当遍历文件夹或读取文件时发生错误，抛出 `IOException`。
 
-##### `boolean isFile(String path)`: 检查指定路径是否是一个文件。
+###### `boolean isFile(String path)`: 检查指定路径是否是一个文件。
 
-##### `boolean isFolder(String path)`: 检查指定路径是否是一个文件夹。
+###### `boolean isFolder(String path)`: 检查指定路径是否是一个文件夹。
 
-##### `JsonObject loadJsonFile(BufferedReader reader)`: 从 `BufferedReader` 中读取 JSON 数据并解析。
+###### `JsonObject loadJsonFile(BufferedReader reader)`: 从 `BufferedReader` 中读取 JSON 数据并解析。
 
 当文件解析过程中发生错误时，抛出 `IOException`。
 
-#### 内部实现
+##### 内部实现
 
 `loadJsonFile` 方法通过读取文件内容并使用 `Gson` 库将其解析为 `JsonObject` 类型。对于不同的文件输入类型，提供了不同的加载方式（
 `MultipartFile`、`File`、路径）。
@@ -414,8 +412,9 @@ ParentChild
 `loadJsonFolder` 方法遍历指定目录中的文件，筛选出符合条件（`.ks.json` 扩展名）的文件，并将其内容加载为 `JsonObject`
 对象，最终返回一个包含所有 `JsonObject` 数据的列表。
 
-#### 使用示例
-##### 加载单个 JSON 文件:
+##### 使用示例
+
+###### 加载单个 JSON 文件:
 
 ```java
 MultipartFile multipartFile = null;
@@ -427,31 +426,190 @@ JsonObject jsonObject2 = KrkrUtils.loadJsonFile(file);
 JsonObject jsonObject3 = KrkrUtils.loadJsonFile(path);
 ```
 
-##### 加载指定路径下的所有 JSON 文件:
+###### 加载指定路径下的所有 JSON 文件:
 
 ```java
 String folderPath = "path/to/folder";
 List<JsonObject> jsonList = KrkrUtils.loadJsonFolder(folderPath);
 ```
 
-##### 验证文件是否为文件或文件夹:
+###### 验证文件是否为文件或文件夹:
 
 ```java
 boolean isFile = KrkrUtils.isFile("path/to/file");
 boolean isFolder = KrkrUtils.isFolder("path/to/folder");
 ```
 
-#### 注意事项
+##### 注意事项
+
 `loadJsonFolder` 方法仅支持加载扩展名为 `.ks.json` 的文件。如果目录中存在其他格式的文件，它们将被忽略。
 
 文件路径和文件名的大小写在不同操作系统中可能有所不同，需注意路径的准确性。
 
 ### 3.3 `config` 配置类说明
 
-在以下类方法的说明中，抛出的异常将会以 `throws` 标注，继承的基类都会用 `extends` 标注。
+所有字段均拥有 getter，部分拥有 setter。
+
+每个方法的所有参数版本均会被列出以简化理解。
+
+#### 3.3.1 `SingleConfig`
+
+`SingleConfig` 类是中用于解析和匹配剧情文本数据的配置类。
+
+它主要用于自定义配置 JSON 剧情文件的解析规则，以便从结构化的 JSON 数据中提取所需的内容。
+
+##### 构造函数
+
+###### `SingleConfig(String name, List<Object> fieldList) throws NullPointerException, IllegalArgumentException`：使用指定的配置名称和字段列表初始化 `SingleConfig` 实例。
+
+字段列表定义了如何匹配 JSON 数据中的值。
+
+每个字段要么是字符串（对应 `JsonObject` 的键），要么是整数（对应 `JsonArray` 的索引）。
+
+`fieldList` 为 `null` 时，抛出 `NullPointerException`。
+`fieldList` 包含非 `String` 或 `Integer` 类型时，抛出 `IllegalArgumentException`。
+
+###### `SingleConfig(String name)`：使用指定的 `name` 初始化 `SingleConfig` 实例，`fieldList` 默认为 `null`。
+
+##### 字段
+
+- `name`：配置名称，用于标识该配置。
+- `fieldList`：字段列表，用于解析 JSON 数据。（目前只支持单模式解析）
+
+##### 方法
+
+###### `void addFields(List<Object> fieldList)`：添加一组新的字段列表，用于解析 JSON 数据。
+
+`fieldList` 为 `null` 时，抛出 `NullPointerException`。
+`fieldList` 包含非 `String` 或 `Integer` 类型时，抛出 `IllegalArgumentException`。
+
+###### `void List<List<Object>> getFieldsList()`：获取当前配置中所有的字段列表。
+
+###### `void clearFields()`：清空当前所有的字段列表。
+
+###### `static boolean checkFields(List<Object> fieldList)`：检查给定的字段列表是否仅包含 `String` 和 `Integer` 类型的元素。
+
+###### `JsonObject matchValueAsJsonObject(JsonElement data)`：根据配置中的字段列表匹配并返回 `JsonObject` 类型的数据。
+
+###### `JsonArray matchValueAsJsonArray(JsonElement data)`：根据配置中的字段列表匹配并返回 `JsonArray` 类型的数据。
+
+###### `JsonPrimitive matchValueAsJsonPrimitive(JsonElement data)`：根据配置中的字段列表匹配并返回 `JsonPrimitive` 类型的数据。
+
+###### `private JsonElement matchValueAsJsonELement(JsonElement data)`：根据配置中的所有字段列表匹配并返回匹配的数据
+
+当前版本部分支持多模式匹配，如果存在匹配项则返回**第一项先匹配到**的，否则返回 `null`。
+
+`JsonElement` 是 `JsonObject`、`JsonArray` 和 `JsonPrimitive` 的基类，因此该方法不公开。
+
+###### `private JsonElement matchValueFromData(JsonElement data, List<Object> fieldList)`： 根据给定的单组字段列表和 JSON 数据，递归匹配并返回相应的 `JsonElement`。
+
+如果字段类型与数据不匹配时，抛出 `NoSuchFieldException`。
+
+##### 异常
+
+###### ``NullPointerException``：当字段列表为 `null`时，抛出此异常。
+
+###### ``IllegalArgumentException``：当字段列表包含非 `String` 或 `Integer` 类型的元素时，抛出此异常。
+
+###### ```NoSuchFieldException```：当字段类型与数据不匹配时，抛出此异常。
+
+#### 3.3.2 `Configs`
+
+`Configs` 类负责处理配置剧情文件解析规则的加载、使用和保存操作。
+
+它支持从多种来源（如 `JsonObject`、`File`、`MultipartFile` 和本地文件路径）加载配置，并提供相应的方法来验证和保存配置。
+
+该类通过管理多个 `SingleConfig` 对象来处理各种配置项，确保必要的配置项齐全。
+
+##### 构造函数
+
+###### `Configs()`：创建一个空的 `Configs` 对象。
+
+###### `Configs(JsonObject data)`：使用提供的 `JsonObject` 数据加载配置。
+
+###### `Configs(String path) throws Throwable`：使用提供的文件路径加载配置。
+
+###### `Configs(File file) throws Throwable`：使用提供的 `File` 对象加载配置。
+
+###### `Configs(MultipartFile file) throws Throwable`：使用提供的 `MultipartFile` 文件加载配置。
+
+##### 字段
+
+- `(static) necessaryConfigs`：该列表包含所有必须的配置项，配置文件中必须包含这些项，否则将抛出错误，类型为 `List<String>`，不支持修改。
+
+tips：每一个必需的配置项都是由配置文件决定好的，如果不了解项目运行逻辑，不建议进行修改。
+
+##### 方法
+
+###### `void loadFromJson(JsonObject data)`：从传入的 JsonObject 数据中加载配置。
+
+该方法会遍历 JSON 数据中的每个配置项，并解析其内容。
+
+每个配置项的值应该是一个 `JsonArray`，数组中的元素会被转换为 `SingleConfig` 的字段。
+
+###### `void loadFromJson(String path) throws Throwable`：从指定路径加载 JSON 配置文件并解析。
+
+###### `void loadFromJson(File file) throws Throwable`：从指定的 `File` 对象加载 JSON 配置文件并解析。
+
+###### `void loadFromJson(MultipartFile file) throws Throwable`：从上传的 `MultipartFile` 文件加载 JSON 配置并解析。
+
+###### `void save(String path) throws NullPointerException, IOException`：将当前的配置保存到指定的文件路径。
+
+保存时，会检查必要的配置项是否存在，如果缺少必需的配置项，则抛出 `NullPointerException`。
+
+文件内容会以格式化的 JSON 形式保存。
+
+###### `static boolean checkConfigs(Configs configs)`：检查传入的 `Configs` 对象是否包含所有必要的配置项。
+
+##### 注意事项
+确保传入的配置文件格式正确，并符合预期的 JSON 结构。
+
+如果缺少必要的配置项，`save()` 方法会抛出 `NullPointerException`，因此在调用该方法之前，建议使用 `checkConfigs()` 进行验证。
+
+#### 3.3.3 `GlobalConfig`
+
+`GlobalConfig` 类用于全局管理 `Configs` 对象的加载、保存及获取。
+
+它是一个静态类，负责操作当前配置实例。通过该类，可以方便地访问、修改和保存全局配置。
+
+支持从多种来源（如 JSON 数据、`File``、`MultipartFile`、文件路径）加载配置。
+
+##### 字段
+- `currentConfigs`：存储当前的 `Configs` 实例。该属性是静态的，表示全局唯一的配置对象。
+
+##### 方法
+
+###### `static void loadFromJson(JsonObject data)`：从传入的 JsonObject 数据中加载配置，并将其设置为当前配置。
+
+###### `static void loadFromJson(String path) throws Throwable`：从指定的文件路径（相对或绝对）加载配置，并将其设置为当前配置。
+
+###### `static void loadFromJson(File file) throws Throwable`：从指定的 `File` 对象加载配置，并将其设置为当前配置。
+
+###### `static void loadFromJson(MultipartFile file) throws Throwable`：从上传的 `MultipartFile` 文件加载配置，并将其设置为当前配置。
+
+此方法适用于 Web 应用程序中的文件上传场景。
+
+###### `static boolean isInit()`：检查当前配置是否已经初始化。
+
+###### `static boolean hasCurrentConfigs()`：检查当前是否有有效的配置对象。
+
+###### `static void saveCurrentConfigs(String path) throws NullPointerException, IOException`：将当前的配置保存到指定的文件路径。
+
+如果没有当前配置，抛出 `NullPointerException` 异常。
+
+该方法会调用 `Configs` 类的 `save` 方法来完成保存操作。
+
+##### 注意事项
+
+在调用 `saveCurrentConfigs` 方法时，确保当前配置已成功加载，否则会抛出 `NullPointerException` 异常。
+
+配置的加载是全局性的，因此对 `GlobalConfig` 的操作会影响整个应用程序的配置状态。
+
+### 3.4 `json` JSON 文件类说明
 
 所有字段均拥有 getter，部分拥有 setter。
 
 每个方法的所有参数版本均会被列出以简化理解。
 
-#### 3.3.1 
+#### 3.4.1 `JsonPath`
+
