@@ -22,43 +22,12 @@ KrkrDataLoader 是一个处理剧情文本数据并支持图像/音频导入处�
 
 ## 1.3 项目历史
 
-### 首次实现
-
-使用 Python + PySimpleGUI 实现，完成了所有目标。
-
-但由于未能实现配置的自动化和可视化，并不满足于 Python 的低效运行，因此进行重构。
-
-### 第零次重构
-
-基于 Python 版本设计思路，转向更为面向对象的设计方式。
-
-使用 C++ 实现，完成了数据的存储。
-
-然而 JSON 文件的解析难度较大，外部库的导入也难以支持 Unicode，因此进行重构。
-
-该版本尚未发布，未来如果找到合适的 JSON 库，可能会考虑重构回 C++ 版本来优化性能并发布。
-
-### 第一次重构
-
-基于 Python 版本设计思路，采用 C++ 版本的面向对象思想。
-
-引入了更为解耦合的数据存储方式，简化了实现的同时提高了可读性。
-
-使用 Gson 库进行 JSON 文件解析，解决了 C++ 版本中的遗留问题。
-
-使用 Java + JavaFX 实现，完成了剧情加载、配置文件和音频播放的功能。
-
-但由于 JavaFX 存在较多漏洞，以及管理的不方便和 FXML 编辑的难度，因此再次重构。
-
-### 第二次重构
-
-复用了 JavaFX 版本的核心数据存储类，并大幅进行了重构。
-
-将 Java 作为后端而非整体的运行方式，并使用 Spring Boot 作为服务器 API 设置。
-
-为简化可视化页面的设计流程，提高可视化部分的可定制性，引入了 Electron 作为前端框架。
-
-本次重构即为当前版本，旨在提供更规范和更高效的支持。
+| 逻辑端               | 渲染端         | 重构原因                     | 重构结果                               |
+|-------------------|-------------|--------------------------|------------------------------------|
+| Python            | PySimpleGUI | 实现 KrkrDataLoader 全部功能   | 完成了游戏解包、剧情读取、音频播放和立绘浏览的功能          |
+| C++               | 无           | 提供剧情文本解析的配置自动化           | 逻辑端数据存储部分完成，由于 JSON 库和文本编码问题暂时停止维护 |
+| Java              | JavaFx      | 继承 C++ 版本的面向对象设计，并提供完整实现 | 实现了剧情文本的加载、配置                      |
+| Java + SpringBoot | Electron    | 提供更优雅易用的界面设计，并支持更多功能     | 正在进行中，当前除继承上一版本功能外，已完成了配置文件的自动化指令  |
 
 ## 2.项目架构
 
@@ -117,7 +86,13 @@ KrkrDataLoader
 
 ## 3. 源码类说明
 
-### 3.1 源码类继承架构
+所有属性均拥有 getter，部分拥有 setter。
+
+除非有特殊说明，否则 getter 和 setter 不在方法中注明。
+
+每个方法的所有参数版本均会被列出以简化理解。
+
+### 源码类继承架构
 
 ```
 ParentChild
@@ -129,89 +104,89 @@ ParentChild
 └── JsonPath (in json package)
 ```
 
-### 3.2 `core` 核心类说明
+### `core` 核心类说明
 
-所有字段均拥有 getter，部分拥有 setter。
-
-每个方法的所有参数版本均会被列出以简化理解。
-
-#### 3.2.1 `ParentChild`
+#### 1. `ParentChild`
 
 `ParentChild` 是所有需要存储父子双向关系类的基类。
 
 ##### 构造函数
 
-###### `ParentChild(String name, ParentChild parent)`：构建一个带父节点的 `ParentChild` 实例。
+| 构造函数                                           | 参数                                  | 描述                               |
+|------------------------------------------------|-------------------------------------|----------------------------------|
+| `ParentChild(String name, ParentChild parent)` | `String name`, `ParentChild parent` | 构建一个带父节点的 `ParentChild` 实例。      |
+| `ParentChild(String name)`                     | `String name`                       | 构建一个不带父节点的 `ParentChild` 实例。     |
+| `ParentChild(ParentChild parent)`              | `ParentChild parent`                | 构建一个带父节点的默认名称 `ParentChild` 实例。  |
+| `ParentChild()`                                | 无                                   | 构建一个不带父节点的默认名称 `ParentChild` 实例。 |
 
-###### `ParentChild(String name)`：构建一个不带父节点的 `ParentChild` 实例。
+##### 属性
 
-###### `ParentChild(ParentChild parent)`：构建一个带父节点的默认名称 `ParentChild` 实例。
-
-###### `ParentChild()`：构建一个不带父节点的默认名称 `ParentChild` 实例。
-
-##### 字段
-
-- `parent`：父节点，类型为 `ParentChild`，默认为 `null`。
-- `childrenMap`：子节点集合，类型为 `Map<String, ParentChild>`，默认为 `new LinkedHashMap<>()`。
-- `name`：节点名称，类型为 `String`，默认为 `default`。
+| 字段名           | 含义    | 类型                         | 默认值                     |
+|---------------|-------|----------------------------|-------------------------|
+| `parent`      | 父节点   | `ParentChild`              | `null`                  |
+| `childrenMap` | 子节点集合 | `Map<String, ParentChild>` | `new LinkedHashMap<>()` |
+| `name`        | 节点名称  | `String`                   | `"default"`             |
 
 ##### 方法
 
-###### `void addChild(String name, ParentChild child)`：添加子节点到集合指定键值。
-
-所有的添加子节点方法均为双向关系，即设置 `child` 为子节点的同时，也调用 `child.setParent(this)`
-
-###### `void addChild(ParentChild child)`：添加子节点到集合。
-
-此时子节点对应键值为 `child.getName()`。
-
-###### `void addAllChildren(Map<String, ParentChild> childrenMap)`：添加 `Map<String, ParentChild>` 中所有子节点键值对到集合。
-
-###### `void addAllChildren(List<ParentChild> children)`：添加 `List<ParentChild>` 中所有子节点到集合。
-
-###### `void addAllChildren(ParentChild... children)`：添加所有子节点到集合。
-
-###### `List<ParentChild> listChildren()`：获取所有子节点列表。
-
-###### `List<String> listChildrenName()`：获取所有子节点名称列表。
-
-###### `ParentChild getChild(String name)`：通过指定键值获取指定子节点。
-
-###### `ParentChild getChild(int Index) throws IndexOutOfBoundsException`：通过指定索引获取指定子节点。
-
-当索引越界时，抛出 `IndexOutOfBoundsException`。
-
-###### `List<ParentChild> listAbsolutePath()`：获取绝对路径。
-
-###### `List<String> listAbsolutePathName()`：获取绝对路径名称。
+| 方法名                                                                | 参数                                     | 返回值                 | 描述                                                 |
+|--------------------------------------------------------------------|----------------------------------------|---------------------|----------------------------------------------------|
+| `void addChild(String name, ParentChild child)`                    | `String name`, `ParentChild child`     | `void`              | 添加子节点到集合指定键值。添加时同时设置子节点的父节点。                       |
+| `void addChild(ParentChild child)`                                 | `ParentChild child`                    | `void`              | 添加子节点到集合，子节点键值为 `child.getName()`。                 |
+| `void addAllChildren(Map<String, ParentChild> childrenMap)`        | `Map<String, ParentChild> childrenMap` | `void`              | 添加 `Map<String, ParentChild>` 中所有子节点键值对到集合。        |
+| `void addAllChildren(List<ParentChild> children)`                  | `List<ParentChild> children`           | `void`              | 添加 `List<ParentChild>` 中所有子节点到集合。                  |
+| `void addAllChildren(ParentChild... children)`                     | `ParentChild... children`              | `void`              | 添加所有子节点到集合。                                        |
+| `List<ParentChild> listChildren()`                                 | 无                                      | `List<ParentChild>` | 获取所有子节点列表。                                         |
+| `List<String> listChildrenName()`                                  | 无                                      | `List<String>`      | 获取所有子节点名称列表。                                       |
+| `ParentChild getChild(String name)`                                | `String name`                          | `ParentChild`       | 通过指定键值获取指定子节点。                                     |
+| `ParentChild getChild(int index) throws IndexOutOfBoundsException` | `int index`                            | `ParentChild`       | 通过指定索引获取指定子节点，索引越界时抛出 `IndexOutOfBoundsException`。 |
+| `List<ParentChild> listAbsolutePath()`                             | 无                                      | `List<ParentChild>` | 获取绝对路径。                                            |
+| `List<String> listAbsolutePathName()`                              | 无                                      | `List<String>`      | 获取绝对路径名称。                                          |
+| `void close() throws Exception`                                    | 无                                      | `void`              | 关闭所有子节点。实现 `AutoCloseable` 接口，确保资源正确释放。            |
 
 ##### 异常
 
-- `IndexOutOfBoundsException`：当获取子节点，索引越界时抛出。
+| 异常                          | 触发原因                |
+|-----------------------------|---------------------|
+| `IndexOutOfBoundsException` | 当获取子节点时，索引越界时抛出该异常。 |
 
-#### 3.2.2 `KrkrData extends ParentChild`
+---
+
+#### 2. `KrkrData extends ParentChild`
 
 `KrkrData` 是所有剧情文本数据的基类，所有剧情文本的嵌套架构都继承自 `KrkrData`。
 
 ##### 构造函数
 
-###### `KrkrData(String name)`：使用指定的名称创建一个新的 `KrkrData` 实例。
+| 构造函数                    | 参数            | 描述                           |
+|-------------------------|---------------|------------------------------|
+| `KrkrData(String name)` | `String name` | 使用指定的名称创建一个新的 `KrkrData` 实例。 |
 
 ##### 字段
 
-- 继承自 `ParentChild` 类，因此继承了 `parent`，`childrenMap` 和 `name` 字段。
-- `data`：剧情文本数据，类型为 `JsonElement`，默认为 `null`
-- `is_init`：是否初始化，类型为 `boolean`，默认为 `false`
+| 字段名           | 含义      | 类型                         | 默认值                     |
+|---------------|---------|----------------------------|-------------------------|
+| `parent`      | 父节点     | `ParentChild`              | `null`                  |
+| `childrenMap` | 子节点集合   | `Map<String, ParentChild>` | `new LinkedHashMap<>()` |
+| `name`        | 节点名称    | `String`                   | `"default"`             |
+| `data`        | 剧情文本数据  | `JsonElement`              | `null`                  |
+| `is_init`     | 是否初始化标识 | `boolean`                  | `false`                 |
 
 ##### 方法
 
-###### `void initialize() throws Throwable`：初始化（为延迟初始化而创建）。
+| 方法名                 | 参数 | 返回值    | 描述                |
+|---------------------|----|--------|-------------------|
+| `void initialize()` | 无  | `void` | 初始化剧情数据，为延迟初始化创建。 |
 
 ##### 异常
 
-- `Throwable`：当初始化时异常抛出。
+| 异常          | 触发原因            |
+|-------------|-----------------|
+| `Throwable` | 初始化时出现异常时抛出该异常。 |
 
-#### 3.2.3 `KrkrVoice extends KrkrData`
+---
+
+#### 3. `KrkrVoice extends KrkrData`
 
 `KrkrVoice` 类表示 `KrkrDialogue` 中的语音数据。
 
@@ -219,67 +194,76 @@ ParentChild
 
 ##### 构造函数：
 
-###### `KrkrVoice(String name, String path)`：使用指定的名称和路径创建一个新的 `KrkrVoice` 实例。
+| 构造函数                                  | 参数                         | 描述                          |
+|---------------------------------------|----------------------------|-----------------------------|
+| `KrkrVoice(String name, String path)` | `String name, String path` | 使用指定名称和路径创建 `KrkrVoice` 实例。 |
 
 ##### 字段
 
-- 继承自 `ParentChild` 类，因此继承了 `parent`，`childrenMap` 和 `name` 字段。
-- 继承自 `KrkrData` 类，因此继承了 `data` 和 `is_init` 字段。
-- `path`：类型为 `String`，表示语音文件的路径。
+| 字段名           | 含义      | 类型                         | 默认值                     |
+|---------------|---------|----------------------------|-------------------------|
+| `parent`      | 父节点     | `ParentChild`              | `null`                  |
+| `childrenMap` | 子节点集合   | `Map<String, ParentChild>` | `new LinkedHashMap<>()` |
+| `name`        | 节点名称    | `String`                   | `"default"`             |
+| `data`        | 剧情文本数据  | `JsonElement`              | `null`                  |
+| `is_init`     | 是否初始化标识 | `boolean`                  | `false`                 |
+| `path`        | 语音文件路径  | `String`                   | `null`                  |
 
 ##### 方法
 
-###### `void play()`：如果存在语音对象，播放该语音。
-
 已废弃，不再支持。
 
-###### `void stop()`： 如果存在语音对象，停止该语音。
-
-已废弃，不再支持。
-
-#### 3.2.4 `KrkrDialogue extends KrkrData`
-
-`KrkrDialogue` 类表示 `KrkrScene` 中的单条对话数据。
-
-它包含了对话的发言者、内容和可选的语音对象。
-
-##### 构造函数：
-
-###### `KrkrDialogue(String name)`：使用指定的名称创建一个新的 `KrkrDialogue` 实例。
-
-此构造函数**不包含**对话数据。
-
-###### `KrkrDialogue(String name, JsonElement data) throws Throwable`：使用指定的名称和 JSON 数据创建一个新的
-
-`KrkrDialogue` 实例。
-
-该构造函数从 `data` 中提取发言者、内容和语音信息，并根据配置加载对应数据。
-
-如果数据无效或缺少必要的字段，将抛出异常。
-
-##### 字段
-
-- 继承自 `ParentChild` 类，因此继承了 `parent`，`childrenMap` 和 `name` 字段。
-- 继承自 `KrkrData` 类，因此继承了 `data` 和 `is_init` 字段。
-- `speaker`：类型为 `String`，表示对话的发言者。默认值为从 `GlobalSetting` 中获取的当前设置的发言者值。
-- `content`：类型为 `String`，表示对话的内容。默认值为从 `GlobalSetting` 中获取的当前设置的内容值。
-- `voice`：类型为 `KrkrVoice`，表示对话对应的语音对象，默认为 `null`。
-
-##### 方法
-
-###### `void play()`：如果存在语音对象，播放该语音。
-
-已废弃，不再支持。
-
-###### `void stop()`：如果存在语音对象，停止该语音。
-
-已废弃，不再支持。
+| 方法名           | 参数 | 返回值    | 描述                           |
+|---------------|----|--------|------------------------------|
+| `void play()` | 无  | `void` | 如果语音对象存在，播放该语音。**已废弃，不再支持。** |
+| `void stop()` | 无  | `void` | 如果语音对象存在，停止该语音。**已废弃，不再支持。** |
 
 ##### 异常
 
-###### `Throwable`：在 构造函数中，如果 JSON 数据不包含所需字段或数据格式不正确，将抛出异常。
+无
 
-#### 3.2.5 `KrkrScene extends KrkrData`
+---
+
+#### 4. `KrkrDialogue extends KrkrData`
+
+`KrkrDialogue` 类表示 `KrkrScene` 中的单条对话数据。它包含了对话的发言者、内容和可选的语音对象。
+
+##### 构造函数
+
+| 构造函数                                                           | 参数                                | 描述                                                                |
+|----------------------------------------------------------------|-----------------------------------|-------------------------------------------------------------------|
+| `KrkrDialogue(String name)`                                    | `String name`                     | 使用指定的名称创建一个新的 `KrkrDialogue` 实例。**不包含对话数据**。                      |
+| `KrkrDialogue(String name, JsonElement data) throws Throwable` | `String name`, `JsonElement data` | 使用指定的名称和 JSON 数据创建一个新的 `KrkrDialogue` 实例，从 数据中提取信息，并根据配置加载对应数据路径。 |
+
+##### 字段
+
+| 字段名           | 含义    | 类型                         | 默认值                             |
+|---------------|-------|----------------------------|---------------------------------|
+| `parent`      | 父节点   | `ParentChild`              | `null`                          |
+| `childrenMap` | 子节点集合 | `Map<String, ParentChild>` | `new LinkedHashMap<>()`         |
+| `name`        | 节点名称  | `String`                   | `"default"`                     |
+| `data`        | 数据    | `JsonElement`              | `null`                          |
+| `is_init`     | 初始化标志 | `boolean`                  | `false`                         |
+| `speaker`     | 发言者   | `String`                   | 从 `GlobalSetting` 中获取的当前设置的发言者值 |
+| `content`     | 内容    | `String`                   | 从 `GlobalSetting` 中获取的当前设置的内容值  |
+| `voice`       | 语音对象  | `KrkrVoice`                | `null`                          |
+
+##### 方法
+
+| 方法名           | 参数 | 返回值    | 描述                          |
+|---------------|----|--------|-----------------------------|
+| `void play()` | 无  | `void` | 如果存在语音对象，播放该语音。**已废弃，不再支持** |
+| `void stop()` | 无  | `void` | 如果存在语音对象，停止该语音。**已废弃，不再支持** |
+
+##### 异常
+
+| 异常          | 触发原因                                     |
+|-------------|------------------------------------------|
+| `Throwable` | 在构造函数中，如果 JSON 数据不包含所需字段或数据格式不正确，将抛出该异常。 |
+
+---
+
+#### 5. `KrkrScene extends KrkrData`
 
 `KrkrScene` 类表示 `KrkrScene` 中的一整个场景。
 
@@ -287,36 +271,35 @@ ParentChild
 
 ##### 构造函数：
 
-###### `KrkrScene(JsonElement data, boolean init_now) throws Throwable`：通过提供的 `JsonElement` 数据创建一个新的
-
-`KrkrScene`
-
-实例，并根据 `init_now` 标志决定是否立即初始化该场景。
-
-###### `KrkrScene(JsonElement data) throws Throwable`：通过提供的 `JsonElement` 数据创建一个新的 `KrkrScene` 实例，并立即初始化。
+| 构造函数                                                             | 参数                                     | 描述                                                                         |
+|------------------------------------------------------------------|----------------------------------------|----------------------------------------------------------------------------|
+| `KrkrScene(JsonElement data, boolean init_now) throws Throwable` | `JsonElement data`, `boolean init_now` | 通过提供的 `JsonElement` 数据创建一个新的 `KrkrScene` 实例，并根据 `init_now` 标志决定是否立即初始化该场景。 |
+| `KrkrScene(JsonElement data) throws Throwable`                   | `JsonElement data`                     | 通过提供的 `JsonElement` 数据创建一个新的 `KrkrScene` 实例，并立即初始化。                        |
 
 ##### 字段：
 
-- 继承自 `ParentChild` 类，因此继承了 `parent`，`childrenMap` 和 `name` 字段。
-- 继承自 `KrkrData` 类，因此继承了 `data` 和 `is_init` 字段。
+| 字段名           | 含义    | 类型                         | 默认值                     |
+|---------------|-------|----------------------------|-------------------------|
+| `parent`      | 父节点   | `ParentChild`              | `null`                  |
+| `childrenMap` | 子节点集合 | `Map<String, ParentChild>` | `new LinkedHashMap<>()` |
+| `name`        | 节点名称  | `String`                   | `"default"`             |
+| `data`        | 数据    | `JsonElement`              | `null`                  |
+| `is_init`     | 初始化标志 | `boolean`                  | `false`                 |
 
 ##### 方法：
 
-###### `void initialize() throws Throwable`：初始化场景数据。
-
-该方法从 JSON 数据中提取 `dialogues` 字段，并为每个对话创建一个 `KrkrDialogue` 实例，最后将这些对话添加为子节点。
-
-初始化完成后，设置 `is_init` 为 `true`，并将 `data` 设置为 `null`。
-
-###### `List<String> listDialogues()`：获取当前场景中的所有对话内容。
-
-返回一个 `List<String>`，每个元素是场景中的一条对话的格式化输出。
+| 方法名                                  | 参数 | 返回值            | 描述                                                                                                                                   |
+|--------------------------------------|----|----------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `void initialize() throws Throwable` | 无  | `void`         | 初始化场景数据。该方法从 JSON 数据中提取 `dialogues` 字段，并为每个对话创建一个 `KrkrDialogue` 实例，最后将这些对话添加为子节点。初始化完成后，设置 `is_init` 为 `true`，并将 `data` 设置为 `null`。 |
+| `List<String> listDialogues()`       | 无  | `List<String>` | 获取当前场景中的所有对话内容。返回一个 `List<String>`，每个元素是场景中的一条对话的格式化输出。                                                                              |
 
 ##### 异常：
 
-###### `Throwable`：在 `initialize()` 方法中，如果 JSON 数据不包含所需字段或数据格式不正确，将抛出异常。
+| 异常          | 触发原因                                                   |
+|-------------|--------------------------------------------------------|
+| `Throwable` | 在 `initialize()` 方法中，如果 JSON 数据不包含所需字段或数据格式不正确，将抛出该异常。 |
 
-#### 3.2.6 `KrkrScenes extends KrkrData`
+#### 6. `KrkrScenes extends KrkrData`
 
 `KrkrScenes` 类表示一个完整的剧情场景集合。
 
@@ -324,47 +307,39 @@ ParentChild
 
 ##### 构造函数：
 
-###### `KrkrScenes(JsonElement data, boolean init_now) throws Throwable`：通过提供的 JSON 数据创建一个新的
-
-`KrkrScenes` 实例，是否初始化由 `init_now` 参数控制。
-
-###### `KrkrScenes(String path, boolean init_now) throws Throwable`：通过提供的本地文件路径加载 JSON 数据并创建一个新的
-
-`KrkrScenes` 实例，是否初始化由 `init_now` 参数控制。
-
-###### `KrkrScenes(File file, boolean init_now) throws Throwable`：通过提供的文件对象加载 JSON 数据并创建一个新的
-
-`KrkrScenes` 实例，是否初始化由 `init_now` 参数控制。
-
-###### `KrkrScenes(MultipartFile file, boolean init_now) throws Throwable`：通过提供的
-
-`MultipartFile` 对象加载 JSON 数据并创建一个新的 `KrkrScenes` 实例，是否初始化由 `init_now` 参数控制。
-
-###### `KrkrScenes(String path) throws Throwable`：通过提供的本地文件路径加载 JSON 数据并创建一个新的
-
-`KrkrScenes` 实例，并立即初始化。
-
-###### `KrkrScenes(File file) throws Throwable`：通过提供的文件对象加载 JSON 数据并创建一个新的 `KrkrScenes` 实例，并立即初始化。
-
-###### `KrkrScenes(MultipartFile file) throws Throwable`：通过提供的 `MultipartFile` 对象加载 JSON 数据并创建一个新的
-
-`KrkrScenes` 实例，并立即初始化。
+| 构造函数                                                                | 参数                                       | 描述                                                                                |
+|---------------------------------------------------------------------|------------------------------------------|-----------------------------------------------------------------------------------|
+| `KrkrScenes(JsonElement data, boolean init_now) throws Throwable`   | `JsonElement data`, `boolean init_now`   | 通过提供的 JSON 数据创建一个新的 `KrkrScenes` 实例，是否初始化由 `init_now` 参数控制。                       |
+| `KrkrScenes(String path, boolean init_now) throws Throwable`        | `String path`, `boolean init_now`        | 通过提供的本地文件路径加载 JSON 数据并创建一个新的 `KrkrScenes` 实例，是否初始化由 `init_now` 参数控制。              |
+| `KrkrScenes(File file, boolean init_now) throws Throwable`          | `File file`, `boolean init_now`          | 通过提供的文件对象加载 JSON 数据并创建一个新的 `KrkrScenes` 实例，是否初始化由 `init_now` 参数控制。                |
+| `KrkrScenes(MultipartFile file, boolean init_now) throws Throwable` | `MultipartFile file`, `boolean init_now` | 通过提供的 `MultipartFile` 对象加载 JSON 数据并创建一个新的 `KrkrScenes` 实例，是否初始化由 `init_now` 参数控制。 |
+| `KrkrScenes(String path) throws Throwable`                          | `String path`                            | 通过提供的本地文件路径加载 JSON 数据并创建一个新的 `KrkrScenes` 实例，并立即初始化。                              |
+| `KrkrScenes(File file) throws Throwable`                            | `File file`                              | 通过提供的文件对象加载 JSON 数据并创建一个新的 `KrkrScenes` 实例，并立即初始化。                                |
+| `KrkrScenes(MultipartFile file) throws Throwable`                   | `MultipartFile file`                     | 通过提供的 `MultipartFile` 对象加载 JSON 数据并创建一个新的 `KrkrScenes` 实例，并立即初始化。                 |
 
 ##### 字段：
 
-- 继承自 `ParentChild` 类，因此继承了 `parent`，`childrenMap` 和 `name` 字段。
-- 继承自 `KrkrData` 类，因此继承了 `data` 和 `is_init` 字段。
+| 字段名           | 含义    | 类型                         | 默认值                     |
+|---------------|-------|----------------------------|-------------------------|
+| `parent`      | 父节点   | `ParentChild`              | `null`                  |
+| `childrenMap` | 子节点集合 | `Map<String, ParentChild>` | `new LinkedHashMap<>()` |
+| `name`        | 节点名称  | `String`                   | `"default"`             |
+| `data`        | 数据    | `JsonElement`              | `null`                  |
+| `is_init`     | 初始化标志 | `boolean`                  | `false`                 |
 
 ##### 方法：
 
-###### `void initialize() throws Throwable`：初始化场景集合数据。
+| 方法名                                  | 参数 | 返回值    | 描述                                                                                                                                                                 |
+|--------------------------------------|----|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `void initialize() throws Throwable` | 无  | `void` | 初始化场景集合数据。该方法从 JSON 数据中提取 `scenes` 字段，为每个场景创建一个新的 `KrkrScene` 实例，并将其添加为子节点。然后，它为每个 `KrkrScene` 创建一个新线程进行初始化，所有线程执行完毕后，将 `data` 设置为 `null`，并将 `is_init` 设置为 `true`。 |
 
-该方法从 JSON 数据中提取 `scenes` 字段，为每个场景创建一个新的 `KrkrScene` 实例，并将其添加为子节点。
+##### 异常
 
-然后，它为每个 `KrkrScene` 创建一个新线程进行初始化，所有线程执行完毕后，将 `data` 设置为 `null`，并将 `is_init` 设置为
-`true`。
+| 异常          | 触发原因                                                   |
+|-------------|--------------------------------------------------------|
+| `Throwable` | 在 `initialize()` 方法中，如果 JSON 数据不包含所需字段或数据格式不正确，将抛出该异常。 |
 
-#### 3.2.7 核心工具类 `KrkrUtils`
+#### 7. 核心工具类 `KrkrUtils`
 
 `KrkrUtils` 是一个工具类，主要提供与 JSON 文件相关的加载、解析功能。
 
@@ -374,43 +349,22 @@ ParentChild
 
 ##### 方法说明
 
-###### `JsonObject loadJsonFile(MultipartFile file)`：从 `MultipartFile` 类型的文件中加载并解析 JSON 数据。
-
-当文件解析过程中发生错误时，抛出 `IOException`。
-
-###### `JsonObject loadJsonFile(File file)`：从指定的 `File` 类型文件中加载并解析 JSON 数据。
-
-当文件解析过程中发生错误时，抛出 `IOException`。
-
-###### `JsonObject loadJsonFile(String path)`: 从指定的本地文件路径加载并解析 JSON 文件。
-
-如果路径不是一个有效的文件，抛出 `FileNotFoundException`。
-如果文件类型不是 `.json`，抛出 `InvalidTypeException`。
-当文件解析过程中发生错误时，抛出 `IOException`。
-
-######
-
-`List<JsonObject> loadJsonFolder(String path)`: 加载指定本地文件夹路径下所有符合条件的 JSON 剧情文本文件（`.ks.json`
-扩展名）。
-
-如果指定路径不是一个文件夹，抛出 `FileNotFoundException`。
-当遍历文件夹或读取文件时发生错误，抛出 `IOException`。
-
-###### `boolean isFile(String path)`: 检查指定路径是否是一个文件。
-
-###### `boolean isFolder(String path)`: 检查指定路径是否是一个文件夹。
-
-###### `JsonObject loadJsonFile(BufferedReader reader)`: 从 `BufferedReader` 中读取 JSON 数据并解析。
-
-当文件解析过程中发生错误时，抛出 `IOException`。
+| 方法名                                              | 参数                      | 返回值                | 描述                                                                                                                                          |
+|--------------------------------------------------|-------------------------|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `JsonObject loadJsonFile(MultipartFile file)`    | `MultipartFile file`    | `JsonObject`       | 从 `MultipartFile` 类型的文件中加载并解析 JSON 数据。当文件解析过程中发生错误时，抛出 `IOException`。                                                                       |
+| `JsonObject loadJsonFile(File file)`             | `File file`             | `JsonObject`       | 从指定的 `File` 类型文件中加载并解析 JSON 数据。当文件解析过程中发生错误时，抛出 `IOException`。                                                                              |
+| `JsonObject loadJsonFile(String path)`           | `String path`           | `JsonObject`       | 从指定的本地文件路径加载并解析 JSON 文件。如果路径不是一个有效的文件，抛出 `FileNotFoundException`。如果文件类型不是 `.json`，抛出 `InvalidTypeException`。当文件解析过程中发生错误时，抛出 `IOException`。 |
+| `List<JsonObject> loadJsonFolder(String path)`   | `String path`           | `List<JsonObject>` | 加载指定本地文件夹路径下所有符合条件的 JSON 剧情文本文件（`.ks.json` 扩展名）。如果指定路径不是一个文件夹，抛出 `FileNotFoundException`。当遍历文件夹或读取文件时发生错误，抛出 `IOException`。                 |
+| `boolean isFile(String path)`                    | `String path`           | `boolean`          | 检查指定路径是否是一个文件。                                                                                                                              |
+| `boolean isFolder(String path)`                  | `String path`           | `boolean`          | 检查指定路径是否是一个文件夹。                                                                                                                             |
+| `JsonObject loadJsonFile(BufferedReader reader)` | `BufferedReader reader` | `JsonObject`       | 从 `BufferedReader` 中读取 JSON 数据并解析。当文件解析过程中发生错误时，抛出 `IOException`。                                                                           |
 
 ##### 内部实现
 
-`loadJsonFile` 方法通过读取文件内容并使用 `Gson` 库将其解析为 `JsonObject` 类型。对于不同的文件输入类型，提供了不同的加载方式（
-`MultipartFile`、`File`、路径）。
-
-`loadJsonFolder` 方法遍历指定目录中的文件，筛选出符合条件（`.ks.json` 扩展名）的文件，并将其内容加载为 `JsonObject`
-对象，最终返回一个包含所有 `JsonObject` 数据的列表。
+- `loadJsonFile` 方法通过读取文件内容并使用 `Gson` 库将其解析为 `JsonObject` 类型。对于不同的文件输入类型，提供了不同的加载方式（
+  `MultipartFile`、`File`、路径）。
+- `loadJsonFolder` 方法遍历指定目录中的文件，筛选出符合条件（`.ks.json` 扩展名）的文件，并将其内容加载为 `JsonObject`
+  对象，最终返回一个包含所有 `JsonObject` 数据的列表。
 
 ##### 使用示例
 
@@ -452,7 +406,7 @@ boolean isFolder = KrkrUtils.isFolder("path/to/folder");
 
 每个方法的所有参数版本均会被列出以简化理解。
 
-#### 3.3.1 `SingleConfig`
+#### 1. `SingleConfig`
 
 `SingleConfig` 类是中用于解析和匹配剧情文本数据的配置类。
 
@@ -460,60 +414,42 @@ boolean isFolder = KrkrUtils.isFolder("path/to/folder");
 
 ##### 构造函数
 
-###### `SingleConfig(String name, List<Object> fieldList) throws NullPointerException, IllegalArgumentException`：使用指定的配置名称和字段列表初始化 `SingleConfig` 实例。
-
-字段列表定义了如何匹配 JSON 数据中的值。
-
-每个字段要么是字符串（对应 `JsonObject` 的键），要么是整数（对应 `JsonArray` 的索引）。
-
-`fieldList` 为 `null` 时，抛出 `NullPointerException`。
-`fieldList` 包含非 `String` 或 `Integer` 类型时，抛出 `IllegalArgumentException`。
-
-###### `SingleConfig(String name)`：使用指定的 `name` 初始化 `SingleConfig` 实例，`fieldList` 默认为 `null`。
+| 构造函数                                                | 参数                                      | 描述                                                                                                                                                            |
+|-----------------------------------------------------|-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `SingleConfig(String name, List<Object> fieldList)` | `String name`, `List<Object> fieldList` | 使用指定的配置名称和字段列表初始化 `SingleConfig` 实例。`fieldList` 为 `null` 时抛出 `NullPointerException`。如果 `fieldList` 包含非 `String` 或 `Integer` 类型时抛出 `IllegalArgumentException`。 |
+| `SingleConfig(String name)`                         | `String name`                           | 使用指定的 `name` 初始化 `SingleConfig` 实例，`fieldList` 默认为 `null`。                                                                                                    |
 
 ##### 字段
 
-- `name`：配置名称，用于标识该配置。
-- `fieldList`：字段列表，用于解析 JSON 数据。（目前只支持单模式解析）
+| 字段名          | 含义                | 类型                   | 默认值                 |
+|--------------|-------------------|----------------------|---------------------|
+| `name`       | 配置名称              | `String`             | -                   |
+| `fieldsList` | 字段列表，用于解析 JSON 数据 | `List<List<Object>>` | `new ArrayList<>()` |
 
 ##### 方法
 
-###### `void addFields(List<Object> fieldList)`：添加一组新的字段列表，用于解析 JSON 数据。
-
-`fieldList` 为 `null` 时，抛出 `NullPointerException`。
-`fieldList` 包含非 `String` 或 `Integer` 类型时，抛出 `IllegalArgumentException`。
-
-###### `void List<List<Object>> getFieldsList()`：获取当前配置中所有的字段列表。
-
-###### `void clearFields()`：清空当前所有的字段列表。
-
-###### `static boolean checkFields(List<Object> fieldList)`：检查给定的字段列表是否仅包含 `String` 和 `Integer` 类型的元素。
-
-###### `JsonObject matchValueAsJsonObject(JsonElement data)`：根据配置中的字段列表匹配并返回 `JsonObject` 类型的数据。
-
-###### `JsonArray matchValueAsJsonArray(JsonElement data)`：根据配置中的字段列表匹配并返回 `JsonArray` 类型的数据。
-
-###### `JsonPrimitive matchValueAsJsonPrimitive(JsonElement data)`：根据配置中的字段列表匹配并返回 `JsonPrimitive` 类型的数据。
-
-###### `private JsonElement matchValueAsJsonELement(JsonElement data)`：根据配置中的所有字段列表匹配并返回匹配的数据
-
-当前版本部分支持多模式匹配，如果存在匹配项则返回**第一项先匹配到**的，否则返回 `null`。
-
-`JsonElement` 是 `JsonObject`、`JsonArray` 和 `JsonPrimitive` 的基类，因此该方法不公开。
-
-###### `private JsonElement matchValueFromData(JsonElement data, List<Object> fieldList)`： 根据给定的单组字段列表和 JSON 数据，递归匹配并返回相应的 `JsonElement`。
-
-如果字段类型与数据不匹配时，抛出 `NoSuchFieldException`。
+| 方法名                                                                                | 参数                                           | 返回值                  | 描述                                                                                                                                                |
+|------------------------------------------------------------------------------------|----------------------------------------------|----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `void addFields(List<Object> fieldList)`                                           | `List<Object> fieldList`                     | `void`               | 添加一组新的字段列表，用于解析 JSON 数据。`fieldList` 为 `null` 时抛出 `NullPointerException`。如果 `fieldList` 包含非 `String` 或 `Integer` 类型时抛出 `IllegalArgumentException`。 |
+| `List<List<Object>> getFieldsList()`                                               | 无                                            | `List<List<Object>>` | 获取当前配置中所有的字段列表。                                                                                                                                   |
+| `void clearFields()`                                                               | 无                                            | `void`               | 清空当前所有的字段列表。                                                                                                                                      |
+| `static boolean checkFields(List<Object> fieldList)`                               | `List<Object> fieldList`                     | `boolean`            | 检查给定的字段列表是否仅包含 `String` 和 `Integer` 类型的元素。                                                                                                        |
+| `JsonObject matchValueAsJsonObject(JsonElement data)`                              | `JsonElement data`                           | `JsonObject`         | 根据配置中的字段列表匹配并返回 `JsonObject` 类型的数据。                                                                                                               |
+| `JsonArray matchValueAsJsonArray(JsonElement data)`                                | `JsonElement data`                           | `JsonArray`          | 根据配置中的字段列表匹配并返回 `JsonArray` 类型的数据。                                                                                                                |
+| `JsonPrimitive matchValueAsJsonPrimitive(JsonElement data)`                        | `JsonElement data`                           | `JsonPrimitive`      | 根据配置中的字段列表匹配并返回 `JsonPrimitive` 类型的数据。                                                                                                            |
+| `private JsonElement matchValueAsJsonELement(JsonElement data)`                    | `JsonElement data`                           | `JsonElement`        | 根据配置中的所有字段列表匹配并返回匹配的数据。当前版本部分支持多模式匹配，如果存在匹配项则返回**第一项先匹配到的**，否则返回 `null`。                                                                          |
+| `private JsonElement matchValueFromData(JsonElement data, List<Object> fieldList)` | `JsonElement data`, `List<Object> fieldList` | `JsonElement`        | 根据给定的单组字段列表和 JSON 数据，递归匹配并返回相应的 `JsonElement`。如果字段类型与数据不匹配时，抛出 `NoSuchFieldException`。                                                            |
 
 ##### 异常
+| 异常                         | 触发原因                                        |
+|----------------------------|---------------------------------------------|
+| `NullPointerException`     | 当字段列表为 `null` 时，抛出此异常。                      |
+| `IllegalArgumentException` | 当字段列表包含非 `String` 或 `Integer` 类型的元素时，抛出此异常。 |
+| `NoSuchFieldException`     | 当字段类型与数据不匹配时，抛出此异常。                         |
 
-###### ``NullPointerException``：当字段列表为 `null`时，抛出此异常。
+---
 
-###### ``IllegalArgumentException``：当字段列表包含非 `String` 或 `Integer` 类型的元素时，抛出此异常。
-
-###### ```NoSuchFieldException```：当字段类型与数据不匹配时，抛出此异常。
-
-#### 3.3.2 `Configs`
+#### 2. `Configs`
 
 `Configs` 类负责处理配置剧情文件解析规则的加载、使用和保存操作。
 
@@ -523,50 +459,45 @@ boolean isFolder = KrkrUtils.isFolder("path/to/folder");
 
 ##### 构造函数
 
-###### `Configs()`：创建一个空的 `Configs` 对象。
-
-###### `Configs(JsonObject data)`：使用提供的 `JsonObject` 数据加载配置。
-
-###### `Configs(String path) throws Throwable`：使用提供的文件路径加载配置。
-
-###### `Configs(File file) throws Throwable`：使用提供的 `File` 对象加载配置。
-
-###### `Configs(MultipartFile file) throws Throwable`：使用提供的 `MultipartFile` 文件加载配置。
+| 构造函数                                           | 参数                   | 描述                            |
+|------------------------------------------------|----------------------|-------------------------------|
+| `Configs()`                                    | 无                    | 创建一个空的 `Configs` 对象。          |
+| `Configs(JsonObject data)`                     | `JsonObject data`    | 使用提供的 `JsonObject` 数据加载配置。    |
+| `Configs(String path) throws Throwable`        | `String path`        | 使用提供的文件路径加载配置。                |
+| `Configs(File file) throws Throwable`          | `File file`          | 使用提供的 `File` 对象加载配置。          |
+| `Configs(MultipartFile file) throws Throwable` | `MultipartFile file` | 使用提供的 `MultipartFile` 文件加载配置。 |
 
 ##### 字段
 
-- `(static) necessaryConfigs`：该列表包含所有必须的配置项，配置文件中必须包含这些项，否则将抛出错误，类型为 `List<String>`，不支持修改。
-
-tips：每一个必需的配置项都是由配置文件决定好的，如果不了解项目运行逻辑，不建议进行修改。
+| 字段名                         | 含义            | 类型                          | 默认值                                                                                                |
+|-----------------------------|---------------|-----------------------------|----------------------------------------------------------------------------------------------------|
+| `configMap`                 | 配置映射表         | `Map<String, SingleConfig>` | `new HashMap<>()`                                                                                  |
+| `(static) necessaryConfigs` | 必需的配置列表，不支持修改 | `List<String>`              | `Arrays.asList("scenes_name", "scene_label", "scene", "dialogues", "speaker", "content", "voice")` |
 
 ##### 方法
+| 方法名                                                               | 参数                                   | 返回值            | 描述                                                                   |
+|-------------------------------------------------------------------|--------------------------------------|----------------|----------------------------------------------------------------------|
+| `void loadFromJson(JsonObject data)`                              | `JsonObject data`                    | `void`         | 从传入的 `JsonObject` 数据中加载配置。遍历 JSON 数据中的每个配置项，并解析其内容。                  |
+| `void loadFromJson(String path) throws Throwable`                 | `String path`                        | `void`         | 从指定路径加载 JSON 配置文件并解析。                                                |
+| `void loadFromJson(File file) throws Throwable`                   | `File file`                          | `void`         | 从指定的 `File` 对象加载 JSON 配置文件并解析。                                       |
+| `void loadFromJson(MultipartFile file) throws Throwable`          | `MultipartFile file`                 | `void`         | 从上传的 `MultipartFile` 文件加载 JSON 配置并解析。                                |
+| `void save(String path) throws NullPointerException, IOException` | `String path`                        | `void`         | 将当前的配置保存到指定的文件路径。检查必要的配置项是否存在，如果缺少必需的配置项，则抛出 `NullPointerException`。 |
+| `static String checkConfigs(Configs configs)`                     | `Configs configs`                    | `String`       | 检查传入的 `Configs` 对象是否包含所有必要的配置项。返回缺失配置项的名称，如果没有缺失则返回 `null`。          |
+| `SingleConfig getConfig(String name)`                             | `String name`                        | `SingleConfig` | 根据名称获取配置对象。                                                          |
+| `void setConfig(String name, SingleConfig config)`                | `String name`, `SingleConfig config` | `void`         | 设置或更新名为 `name` 的配置对象。                                                |
+| `void setConfig(SingleConfig config)`                             | `SingleConfig config`                | `void`         | 根据 `SingleConfig` 对象的名称设置或更新配置对象。                                    |
+| `void removeConfig(String name)`                                  | `String name`                        | `void`         | 移除名为 `name` 的配置对象。                                                   |
+| `void clear()`                                                    | 无                                    | `void`         | 清空所有配置对象。                                                            |
 
-###### `void loadFromJson(JsonObject data)`：从传入的 JsonObject 数据中加载配置。
-
-该方法会遍历 JSON 数据中的每个配置项，并解析其内容。
-
-每个配置项的值应该是一个 `JsonArray`，数组中的元素会被转换为 `SingleConfig` 的字段。
-
-###### `void loadFromJson(String path) throws Throwable`：从指定路径加载 JSON 配置文件并解析。
-
-###### `void loadFromJson(File file) throws Throwable`：从指定的 `File` 对象加载 JSON 配置文件并解析。
-
-###### `void loadFromJson(MultipartFile file) throws Throwable`：从上传的 `MultipartFile` 文件加载 JSON 配置并解析。
-
-###### `void save(String path) throws NullPointerException, IOException`：将当前的配置保存到指定的文件路径。
-
-保存时，会检查必要的配置项是否存在，如果缺少必需的配置项，则抛出 `NullPointerException`。
-
-文件内容会以格式化的 JSON 形式保存。
-
-###### `static boolean checkConfigs(Configs configs)`：检查传入的 `Configs` 对象是否包含所有必要的配置项。
 
 ##### 注意事项
-确保传入的配置文件格式正确，并符合预期的 JSON 结构。
 
-如果缺少必要的配置项，`save()` 方法会抛出 `NullPointerException`，因此在调用该方法之前，建议使用 `checkConfigs()` 进行验证。
+- 确保传入的配置文件格式正确，并符合预期的 JSON 结构。
+- 如果缺少必要的配置项，`save()` 方法会抛出 `NullPointerException`，因此在调用该方法之前，建议使用 `checkConfigs()` 进行验证。
 
-#### 3.3.3 `GlobalConfig`
+---
+
+#### 3. `GlobalConfig`
 
 `GlobalConfig` 类用于全局管理 `Configs` 对象的加载、保存及获取。
 
@@ -574,42 +505,87 @@ tips：每一个必需的配置项都是由配置文件决定好的，如果不�
 
 支持从多种来源（如 JSON 数据、`File``、`MultipartFile`、文件路径）加载配置。
 
-##### 字段
-- `currentConfigs`：存储当前的 `Configs` 实例。该属性是静态的，表示全局唯一的配置对象。
+##### 属性
+| 属性名              | 含义     | 类型        | 默认值    |
+|------------------|--------|-----------|--------|
+| `currentConfigs` | 当前配置实例 | `Configs` | `null` |
 
 ##### 方法
 
-###### `static void loadFromJson(JsonObject data)`：从传入的 JsonObject 数据中加载配置，并将其设置为当前配置。
-
-###### `static void loadFromJson(String path) throws Throwable`：从指定的文件路径（相对或绝对）加载配置，并将其设置为当前配置。
-
-###### `static void loadFromJson(File file) throws Throwable`：从指定的 `File` 对象加载配置，并将其设置为当前配置。
-
-###### `static void loadFromJson(MultipartFile file) throws Throwable`：从上传的 `MultipartFile` 文件加载配置，并将其设置为当前配置。
-
-此方法适用于 Web 应用程序中的文件上传场景。
-
-###### `static boolean isInit()`：检查当前配置是否已经初始化。
-
-###### `static boolean hasCurrentConfigs()`：检查当前是否有有效的配置对象。
-
-###### `static void saveCurrentConfigs(String path) throws NullPointerException, IOException`：将当前的配置保存到指定的文件路径。
-
-如果没有当前配置，抛出 `NullPointerException` 异常。
-
-该方法会调用 `Configs` 类的 `save` 方法来完成保存操作。
+| 方法名                                                                                    | 参数                   | 返回值       | 描述                                                                    |
+|----------------------------------------------------------------------------------------|----------------------|-----------|-----------------------------------------------------------------------|
+| `static void loadFromJson(JsonObject data)`                                            | `JsonObject data`    | `void`    | 从传入的 `JsonObject` 数据中加载配置，并设置为当前配置实例。                                 |
+| `static void loadFromJson(String path) throws Throwable`                               | `String path`        | `void`    | 从指定路径加载 JSON 配置文件并解析，然后设置为当前配置实例。                                     |
+| `static void loadFromJson(File file) throws Throwable`                                 | `File file`          | `void`    | 从指定的 `File` 对象加载 JSON 配置文件并解析，然后设置为当前配置实例。                            |
+| `static void loadFromJson(MultipartFile file) throws Throwable`                        | `MultipartFile file` | `void`    | 从上传的 `MultipartFile` 文件加载 JSON 配置并解析，然后设置为当前配置实例。                     |
+| `static boolean isInit()`                                                              | 无                    | `boolean` | 检查当前配置是否已初始化。返回 `true` 如果已初始化，否则返回 `false`。                           |
+| `static Configs getCurrentConfigs()`                                                   | 无                    | `Configs` | 获取当前配置实例。如果未初始化则返回 `null`。                                            |
+| `static void setCurrentConfigs(Configs configs)`                                       | `Configs configs`    | `void`    | 设置当前配置实例。                                                             |
+| `static boolean hasCurrentConfigs()`                                                   | 无                    | `boolean` | 检查是否存在当前配置实例。返回 `true` 如果存在，否则返回 `false`。                             |
+| `static void saveCurrentConfigs(String path) throws NullPointerException, IOException` | `String path`        | `void`    | 将当前配置实例保存到指定的文件路径。检查必要的配置项是否存在，如果缺少必需的配置项，则抛出 `NullPointerException`。 |
 
 ##### 注意事项
 
-在调用 `saveCurrentConfigs` 方法时，确保当前配置已成功加载，否则会抛出 `NullPointerException` 异常。
-
-配置的加载是全局性的，因此对 `GlobalConfig` 的操作会影响整个应用程序的配置状态。
+- 确保在调用 `saveCurrentConfigs()` 方法之前使用 `hasCurrentConfigs()` 或 `isInit()` 来验证当前配置实例的存在。
+- 如果需要更新或修改当前配置，可以使用 `setCurrentConfigs()` 方法来设置新的 `Configs` 实例。
 
 ### 3.4 `json` JSON 文件类说明
 
-所有字段均拥有 getter，部分拥有 setter。
+#### 1. `JsonPath extends ParentChild`
 
-每个方法的所有参数版本均会被列出以简化理解。
+`JsonPath` 用于表示 JSON 文件中的路径。
 
-#### 3.4.1 `JsonPath`
+它展示了路径之间的嵌套层级关系。
 
+##### 构造函数
+
+| 构造函数                                                                           | 参数                                                                         | 描述                                                     |
+|--------------------------------------------------------------------------------|----------------------------------------------------------------------------|--------------------------------------------------------|
+| `JsonPath(String name, ParentChild parent, JsonElement data, boolean isInRow)` | `String name`, `ParentChild parent`, `JsonElement data`, `boolean isInRow` | 使用指定名称、父节点、JSON数据及是否在行内标志初始化 `JsonPath` 实例，并从JSON数据加载。 |
+| `JsonPath(String name, ParentChild parent, JsonElement data)`                  | `String name`, `ParentChild parent`, `JsonElement data`                    | 调用上述构造函数，设置 `isInRow` 为 `false`。                       |
+| `JsonPath(String name, JsonElement data)`                                      | `String name`, `JsonElement data`                                          | 调用上述构造函数，`parent` 设置为 `null`。                          |
+| `JsonPath(String name)`                                                        | `String name`                                                              | 调用上述构造函数，`parent` 和 `data` 均设置为 `null`。                |
+
+##### 方法
+
+| 方法名                                     | 参数                 | 返回值            | 描述                                                                                             |
+|-----------------------------------------|--------------------|----------------|------------------------------------------------------------------------------------------------|
+| `void loadFromJson(JsonElement data)`   | `JsonElement data` | `void`         | 从传入的 `JsonElement` 数据中加载并构建子节点。如果数据是 `JsonArray`，则将每个元素作为子节点添加；如果是 `JsonObject`，则将每个值对作为子节点添加。 |
+| `Object getObjectName()`                | 无                  | `Object`       | 获取对象的真实名称（整数或字符串）。尝试将名称解析为整数，若失败则返回原始名称。                                                       |
+| `List<Object> listAbsolutePathObject()` | 无                  | `List<Object>` | 返回从根到当前节点的绝对路径列表，包含每个节点的对象名称（整数或字符串）。                                                          |
+
+#### 2. `JsonFile`
+
+`JsonFile` 用于表示一个JSON文件。
+
+它提供了加载、遍历和管理JSON数据的方法，并通过`JsonPath`来实现对JSON结构的路径导航。
+
+##### 字段
+
+| 字段名           | 含义     | 类型            | 默认值    |
+|---------------|--------|---------------|--------|
+| `data`        | JSON数据 | `JsonElement` | `null` |
+| `name`        | 文件名称   | `String`      | -      |
+| `root`        | 根路径    | `JsonPath`    | `null` |
+| `currentPath` | 当前路径   | `JsonPath`    | `null` |
+| `configs`     | 配置管理对象 | `Configs`     | 新实例    |
+
+##### 构造函数
+
+| 构造函数                                            | 参数                                | 描述                                            |
+|-------------------------------------------------|-----------------------------------|-----------------------------------------------|
+| `JsonFile(String name, JsonElement data)`       | `String name`, `JsonElement data` | 使用指定名称和JSON数据初始化 `JsonFile` 实例，设置根路径并初始化当前路径。 |
+| `JsonFile(JsonElement data)`                    | `JsonElement data`                | 调用上述构造函数，使用默认名称 `"JsonFile"`。                 |
+| `JsonFile(String path) throws Throwable`        | `String path`                     | 从指定路径加载JSON文件并初始化 `JsonFile` 实例。              |
+| `JsonFile(File file) throws Throwable`          | `File file`                       | 从指定文件加载JSON数据并初始化 `JsonFile` 实例。              |
+| `JsonFile(MultipartFile file) throws Throwable` | `MultipartFile file`              | 从上传的文件加载JSON数据并初始化 `JsonFile` 实例。             |
+
+##### 方法
+
+| 方法名                                         | 参数                     | 返回值        | 描述                                      |
+|---------------------------------------------|------------------------|------------|-----------------------------------------|
+| `void gotoChild(String name)`               | `String name`          | `void`     | 如果当前路径有名为 `name` 的子节点，则移动到该子节点。         |
+| `void gotoChild(int index)`                 | `int index`            | `void`     | 如果当前路径有索引为 `index` 的子节点，则移动到该子节点。       |
+| `void gotoParent()`                         | 无                      | `void`     | 如果当前路径有父节点，则移动到父节点。                     |
+| `void setCurrentPathAsConfig(String name)`  | `String name`          | `void`     | 将当前路径设置为配置项，并以 `name` 命名。               |
+| `void setCurrentPath(JsonPath currentPath)` | `JsonPath currentPath` | `void`     | 设置当前路径。确保必须是当前文件内部的 `JsonPath`，否则会导致错误。 |
